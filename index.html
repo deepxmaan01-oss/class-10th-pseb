@@ -1,677 +1,335 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pa">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fit With Kulbeer</title>
-
-  <!-- Firebase Compatibility Libraries -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ਕਲਾਸ 10ਵੀਂ ਰੋਜ਼ਾਨਾ ਟੈਸਟ (Class 10 Daily Quiz)</title>
   <style>
     :root {
-      --bg: #f3f9fa;
-      --card-bg: #ffffff;
-      --text: #1a2a36;
-      --primary: #4a6b82;
-      --accent: #28a745;
-      --progress-bg: #deebf4;
-      --danger: #dc3545;
-      --gold: #f39c12;
+      --primary: #2563eb;
+      --success: #16a34a;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
     }
-    body.dark {
-      --bg: #101c24;
-      --card-bg: #1b2a36;
-      --text: #ffffff;
-      --primary: #345063;
-      --accent: #2ecc71;
-      --progress-bg: #233745;
-      --danger: #e74c3c;
-      --gold: #f1c40f;
-    }
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
-    .screen { display: none; padding: 20px; animation: fadeIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
-    .active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Button Animations & Tactile Press */
-    button {
-      width: 100%;
-      padding: 13px;
-      margin: 8px 0;
-      border-radius: 14px;
-      border: none;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      background: var(--primary);
-      color: white;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    button:active {
-      transform: scale(0.96) translateY(2px);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    button:hover {
-      filter: brightness(1.06);
-    }
-
-    input {
-      width: 100%;
-      padding: 13px;
-      margin: 8px 0;
-      border-radius: 14px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-    }
-    input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(74, 107, 130, 0.2);
-    }
-
-    /* Cards & Layout */
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .drawer { display: none; position: fixed; top: 0; left: 0; width: 275px; height: 100%; background: var(--card-bg); box-shadow: 2px 0 15px rgba(0,0,0,0.3); padding: 24px; z-index: 1000; animation: slideIn 0.25s ease-out; }
-    @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
-
-    .card-workout { background: var(--primary); color: white; border-radius: 22px; padding: 18px; display: flex; align-items: center; gap: 15px; margin-bottom: 14px; box-shadow: 0 6px 16px rgba(74,107,130,0.25); }
-    .card-workout button { background: white; color: var(--primary); border-radius: 20px; padding: 8px 22px; width: auto; font-size: 14px; box-shadow: none; }
-    .card-progress { background: var(--progress-bg); border-radius: 22px; padding: 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-
-    .profile-card { background: var(--card-bg); border-radius: 20px; padding: 16px; margin-bottom: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
-    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-    .stat-pill { background: var(--bg); padding: 10px 12px; border-radius: 12px; font-size: 13px; }
-    .stat-pill b { display: block; font-size: 15px; color: var(--primary); margin-top: 2px; }
-
-    .batches-row { display: flex; gap: 10px; justify-content: space-between; margin-bottom: 15px; }
-    .batch-badge { flex: 1; padding: 16px 6px; text-align: center; border-radius: 18px; font-size: 13px; font-weight: 600; color: #111; }
-
-    /* Live Card Container with Corner Button */
-    .live-card {
-      position: relative;
-      margin-top: 15px;
-      padding: 24px;
-      background: var(--card-bg);
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-    }
-    .corner-remove-btn {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      background: var(--danger);
-      color: white;
-      border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
-      cursor: pointer;
-    }
-    .corner-remove-btn:active {
-      transform: scale(0.9);
-    }
-
-    .btn-live-pulse {
-      background: linear-gradient(135deg, #28a745, #218838);
-      color: white;
-      font-size: 16px;
-      animation: liveGlow 1.6s infinite alternate;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-    }
-    @keyframes liveGlow {
-      0% { box-shadow: 0 0 6px rgba(40, 167, 69, 0.4); transform: scale(1); }
-      100% { box-shadow: 0 0 18px rgba(40, 167, 69, 0.9); transform: scale(1.02); }
-    }
-
-    .lock-box {
-      background: #fff3cd;
-      border: 2px dashed #ffeeba;
-      color: #856404;
-      padding: 18px;
-      border-radius: 18px;
-      text-align: center;
-      margin-top: 15px;
-    }
-    body.dark .lock-box {
-      background: #332701;
-      border-color: #664d03;
-      color: #ffda6a;
-    }
-
-    /* Bottom Navigation */
-    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: var(--primary); display: flex; justify-content: space-around; align-items: center; color: white; z-index: 99; box-shadow: 0 -3px 12px rgba(0,0,0,0.15); }
-    .nav-item { text-align: center; font-size: 11px; cursor: pointer; opacity: 0.75; transition: all 0.2s; }
-    .nav-item.active-nav { opacity: 1; font-weight: bold; transform: translateY(-2px); }
-    .nav-item i { font-size: 19px; display: block; margin-bottom: 3px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 680px; }
+    .card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 20px; }
+    h1, h2, h3 { margin-bottom: 12px; }
+    input, select, button { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 15px; }
+    button { background: var(--primary); color: white; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    button:hover { opacity: 0.92; }
+    .opt-btn { background: #f1f5f9; color: var(--text); text-align: left; margin: 6px 0; border: 1px solid #e2e8f0; }
+    .opt-btn.selected { background: #dbeafe; border-color: var(--primary); }
+    .hidden { display: none; }
+    .badge { display: inline-block; background: #e0e7ff; color: #3730a3; padding: 4px 10px; border-radius: 9999px; font-size: 13px; font-weight: 600; }
+    .report-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .report-table th, .report-table td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; font-size: 14px; }
+    .report-table th { background: #f1f5f9; }
   </style>
 </head>
 <body>
 
-  <!-- Sign Up Screen -->
-  <div id="authScreen" class="screen">
-    <h2 style="margin-bottom: 6px; font-size: 26px;">Create Account</h2>
-    <p style="color: gray; margin-bottom: 14px; font-size: 14px;">Fill details once to join batches & live classes</p>
+<div class="container">
+
+  <!-- AUTH SECTION -->
+  <div id="authSection" class="card">
+    <h2>ਵਿਦਿਆਰਥੀ ਸਾਈਨ-ਅੱਪ / ਲੌਗਇਨ</h2>
+    <p style="color:#64748b; margin-bottom:12px;">Class 10 Daily Test Portal</p>
     
-    <input type="text" id="uName" placeholder="Full Name" required />
-    <input type="tel" id="uPhone" placeholder="WhatsApp / Phone Number" required />
-    <input type="email" id="uEmail" placeholder="Email Address" required />
-    <input type="password" id="uPass" placeholder="Password" required />
-    <div style="display:flex; gap:10px;">
-      <input type="number" id="uWeight" placeholder="Weight (kg)" required />
-      <input type="number" id="uHeight" placeholder="Height (cm)" required />
-    </div>
-    <input type="text" id="uAddress" placeholder="Village / District / State" required />
-    <button onclick="handleLogin()" id="btnStart" style="margin-top: 14px; padding: 15px;">
-      <i class="fas fa-play"></i> Start Training
-    </button>
+    <label>ਵਿਦਿਆਰਥੀ ਦਾ ਨਾਂ (Student Name)</label>
+    <input type="text" id="studentName" placeholder="ਉਦਾਹਰਨ: Deepinder Singh">
+
+    <label>ਰੋਲ ਨੰਬਰ (Roll Number)</label>
+    <input type="number" id="rollNumber" placeholder="ਉਦਾਹਰਨ: 5">
+
+    <label>ਈਮੇਲ (Email ID)</label>
+    <input type="email" id="email" placeholder="student@example.com">
+
+    <label>ਪਾਸਵਰਡ (Password)</label>
+    <input type="password" id="password" placeholder="ਘੱਟੋ-ਘੱਟ 6 ਅੱਖਰ">
+
+    <button id="btnSignUp">ਸਾਈਨ-ਅੱਪ ਕਰੋ (Sign Up)</button>
+    <button id="btnLogin" style="background:#64748b;">ਲੌਗਇਨ ਕਰੋ (Login)</button>
   </div>
 
-  <!-- Side Drawer Menu -->
-  <div id="sideDrawer" class="drawer">
-    <h3 style="margin-bottom:16px;">Settings</h3>
-    <button onclick="openWhatsApp()" style="background:#25D366; margin-bottom:10px;"><i class="fab fa-whatsapp"></i> WhatsApp Help</button>
-    <button onclick="toggleTheme()" style="background:#343a40; margin-bottom:10px;"><i class="fas fa-moon"></i> Toggle Dark/Light</button>
-    <div id="hostMenuSec" style="display:none;">
-      <button onclick="showClientsList()" style="background:#007bff; margin-bottom:10px;"><i class="fas fa-users-cog"></i> Manage Clients & Access</button>
-    </div>
-    <button onclick="logoutUser()" style="background:var(--danger); margin-top:15px;"><i class="fas fa-sign-out-alt"></i> Logout / Switch User</button>
-    <button onclick="closeDrawer()" style="background:#6c757d; margin-top:10px;"><i class="fas fa-times"></i> Close Menu</button>
-  </div>
-
-  <!-- Main Profile Screen -->
-  <div id="mainScreen" class="screen">
-    <div class="top-bar">
-      <i class="fas fa-bars" style="font-size:24px; cursor:pointer;" onclick="openDrawer()"></i>
-      <span id="roleBadge" style="font-size:12px; padding:4px 10px; border-radius:10px; background:#deebf4; color:#314351; font-weight:600;">Client</span>
-    </div>
-
-    <!-- Live Class Notification Banner -->
-    <div id="liveBanner" style="display: none; background: #e8f5e9; border: 2px solid #28a745; border-radius: 18px; padding: 16px; text-align: center; margin-bottom: 16px;">
-      <b style="color: #28a745; font-size: 16px;"><i class="fas fa-circle" style="color:red; font-size:12px;"></i> LIVE CLASS IS STREAMING NOW</b>
-      <p id="liveBannerText" style="font-size: 14px; margin: 4px 0 8px 0; color: #333;">Class is active!</p>
-      <button onclick="joinLiveClassNow()" class="btn-live-pulse">
-        <i class="fas fa-video"></i> Join Live Class
-      </button>
-    </div>
-
-    <h1 id="welcomeText" style="font-size: 25px; font-weight: 800;">Welcome!</h1>
-    <p style="color: gray; margin-bottom: 12px; font-size: 14px;">Let's get moving today.</p>
-
-    <!-- Health Profile Details -->
-    <div class="profile-card">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-weight:bold; font-size:14px; color:gray;">HEALTH PROFILE</span>
-        <span id="accessStatusBadge" style="font-size:11px; padding:3px 8px; border-radius:8px; background:#ffd700; color:#111; font-weight:bold;">No Active Batch</span>
-      </div>
-      <div class="details-grid">
-        <div class="stat-pill">Weight<b id="pWeight">-- kg</b></div>
-        <div class="stat-pill">Height<b id="pHeight">-- cm</b></div>
-        <div class="stat-pill">BMI Index<b id="pBMI">--</b></div>
-        <div class="stat-pill">Phone<b id="pPhone" style="font-size:13px;">--</b></div>
-      </div>
-      <div class="stat-pill" style="margin-top:8px;">Location<b id="pLocation" style="font-size:13px;">--</b></div>
-    </div>
-
-    <!-- Workout Card -->
-    <div class="card-workout">
-      <div style="background:#c7e6e0; border-radius:50%; width:58px; height:58px; min-width:58px; display:flex; align-items:center; justify-content:center;">
-        <i class="fas fa-running" style="font-size:28px; color:#335064;"></i>
-      </div>
+  <!-- DASHBOARD & TEST SECTION -->
+  <div id="quizSection" class="card hidden">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
       <div>
-        <div style="font-size:12px; opacity:0.85;">Today's Workout:</div>
-        <div style="font-size:18px; font-weight:bold;">30 Min HIIT</div>
-        <button onclick="switchTab('liveScreen')">Start</button>
+        <h2 id="welcomeText">ਜੀ ਆਇਆਂ ਨੂੰ!</h2>
+        <span class="badge" id="dailyChapter">ਅਧਿਆਇ ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...</span>
       </div>
+      <button id="btnLogout" style="width: auto; padding: 6px 14px; background: #ef4444;">Logout</button>
     </div>
 
-    <!-- Progress Card -->
-    <div class="card-progress">
-      <i class="fas fa-chart-bar" style="font-size:38px; color:var(--primary);"></i>
-      <div>
-        <div style="font-size:13px; font-weight:600;">Weekly Progress:</div>
-        <div style="font-size:16px; font-weight:bold;">5/7 Days Active</div>
-        <button onclick="alert('Great consistency! Keep working hard!')" style="padding:5px 14px; font-size:12px; width:auto; margin-top:5px; background:var(--primary); color:white;">View Details</button>
-      </div>
-      <i class="fas fa-trophy" style="font-size:32px; color:var(--gold);"></i>
+    <div id="quizLoader" style="text-align: center; padding: 30px;">
+      <p>Gemini ਅੱਜ ਦਾ ਟੈਸਟ ਤਿਆਰ ਕਰ ਰਿਹਾ ਹੈ, ਕਿਰਪਾ ਕਰਕੇ ਇੰਤਜ਼ਾਰ ਕਰੋ...</p>
     </div>
 
-    <h3 style="margin-bottom:12px; font-size: 17px;">Your Batches</h3>
-    <div class="batches-row">
-      <div class="batch-badge" style="background:#d3e7f8;"><i class="fas fa-dumbbell" style="font-size:20px; margin-bottom:4px;"></i><br>Strength</div>
-      <div class="batch-badge" style="background:#d6f0df;"><i class="fas fa-spa" style="font-size:20px; margin-bottom:4px;"></i><br>Flexibility</div>
-      <div class="batch-badge" style="background:#ffdfc7;"><i class="fas fa-hand-rock" style="font-size:20px; margin-bottom:4px;"></i><br>Cardio</div>
+    <div id="quizContent" class="hidden">
+      <div id="questionContainer"></div>
+      <button id="btnSubmitQuiz" style="background: var(--success); margin-top: 15px;">ਟੈਸਟ ਜਮ੍ਹਾ ਕਰੋ (Submit Test)</button>
     </div>
   </div>
 
-  <!-- Live Class Screen -->
-  <div id="liveScreen" class="screen">
-    <div class="top-bar">
-      <i class="fas fa-bars" style="font-size:24px; cursor:pointer;" onclick="openDrawer()"></i>
-      <h3>Live Studio</h3>
+  <!-- RESULT SECTION -->
+  <div id="resultSection" class="card hidden">
+    <h2>ਟੈਸਟ ਰਿਪੋਰਟ (Quiz Result)</h2>
+    <p id="scoreSummary" style="font-size: 18px; margin: 15px 0; font-weight: bold; color: var(--success);"></p>
+    <p style="color: #64748b;">ਇਹ ਰਿਪੋਰਟ ਅਧਿਆਪਕ/ਐਡਮਿਨ ਡੈਸ਼ਬੋਰਡ ਵਿੱਚ ਜਮ੍ਹਾ ਕਰ ਦਿੱਤੀ ਗਈ ਹੈ।</p>
+  </div>
+
+  <!-- TEACHER REAL-TIME REPORT MONITOR -->
+  <div id="adminSection" class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3>ਅਧਿਆਪਕ ਲਾਈਵ ਰਿਪੋਰਟ ਪੈਨਲ (Teacher Dashboard)</h3>
+      <button id="btnToggleAdmin" style="width: auto; padding: 4px 10px; background: #475569; font-size: 12px;">ਰਿਪੋਰਟ ਦੇਖੋ/ਲੁਕਾਓ</button>
     </div>
-    
-    <!-- Live Card with Corner Delete Button -->
-    <div class="live-card">
-      <!-- Side Corner Remove Class Button (Host Only) -->
-      <button id="btnCornerRemoveClass" class="corner-remove-btn" style="display:none;" onclick="removeClassNow()" title="Remove/Clear Current Class">
-        <i class="fas fa-trash-alt"></i>
-      </button>
-
-      <i class="fas fa-video" style="font-size:55px; color:var(--primary);"></i>
-      <p id="liveTimingDisplay" style="margin:16px 0; font-size:18px; font-weight:bold;">Checking schedule...</p>
-      
-      <!-- Unlocked Live Button -->
-      <div id="unlockedLiveBox" style="display:none;">
-        <button id="btnJoinLive" onclick="joinLiveClassNow()" class="btn-live-pulse" style="display:none; margin-bottom:12px;">
-          <i class="fas fa-play"></i> Join Live Class Now
-        </button>
-      </div>
-
-      <!-- Locked Warning -->
-      <div id="lockedLiveBox" class="lock-box">
-        <i class="fas fa-lock" style="font-size:32px; margin-bottom:8px;"></i>
-        <h4>Live Class Locked</h4>
-        <p style="font-size:13px; margin:6px 0 12px 0;">Live classes are reserved for enrolled members. Purchase a batch for ₹500 to unlock full live access.</p>
-        <button onclick="switchTab('batchScreen')" style="background:#28a745;">
-          <i class="fas fa-shopping-cart"></i> Browse Batches (₹500)
-        </button>
-      </div>
-
-      <button onclick="openWhatsApp()" style="background:#25D366; margin-top:12px;">
-        <i class="fab fa-whatsapp"></i> Chat with Trainer on WhatsApp
-      </button>
+    <div id="adminPanel" class="hidden">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>ਮਿਤੀ</th>
+            <th>ਵਿਦਿਆਰਥੀ</th>
+            <th>ਈਮੇਲ</th>
+            <th>ਅਧਿਆਇ</th>
+            <th>ਅੰਕ</th>
+          </tr>
+        </thead>
+        <tbody id="reportRows"></tbody>
+      </table>
     </div>
   </div>
 
-  <!-- Batches Screen -->
-  <div id="batchScreen" class="screen">
-    <div class="top-bar">
-      <i class="fas fa-bars" style="font-size:24px; cursor:pointer;" onclick="openDrawer()"></i>
-      <h3>All Batches</h3>
-    </div>
-    <div id="batchList" style="margin-top:10px;"></div>
-    <div id="hostAddBatch" style="display:none; margin-top:20px;">
-      <input type="text" id="newBatchInput" placeholder="Batch Name (e.g. Morning Fat Loss)" />
-      <button onclick="addBatch()"><i class="fas fa-plus"></i> Add New Batch</button>
-    </div>
-  </div>
+</div>
 
-  <!-- Host Schedule Screen -->
-  <div id="scheduleScreen" class="screen">
-    <div class="top-bar">
-      <i class="fas fa-bars" style="font-size:24px; cursor:pointer;" onclick="openDrawer()"></i>
-      <h3>Host Dashboard</h3>
-    </div>
+<!-- FIREBASE SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    <div style="background:var(--card-bg); padding:18px; border-radius:18px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <h4>1. Class Timing</h4>
-      <p style="color:gray; font-size:12px; margin-bottom:8px;">Updates schedule across all client phones:</p>
-      <input type="text" id="scheduleInput" placeholder="e.g. Daily 6:30 AM IST" />
-      <button onclick="saveSchedule()"><i class="fas fa-clock"></i> Update Schedule</button>
-    </div>
+  // Configuration with your provided API key
+  const firebaseConfig = {
+    apiKey: "AIzaSyAY9m2GzbB75aKrtsVfuH_AcdOhGw3CmX0",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
 
-    <div style="background:var(--card-bg); padding:18px; border-radius:18px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <h4>2. Broadcast Live Class</h4>
-      <p style="color:gray; font-size:12px; margin-bottom:8px;">Paste Meet/Zoom/YouTube Link:</p>
-      <input type="url" id="liveUrlInput" placeholder="https://meet.google.com/xxx-xxxx-xxx" />
-      <button onclick="startLiveClass()" style="background:#28a745; margin-bottom:8px;">
-        <i class="fas fa-broadcast-tower"></i> Start Class (Alert Enrolled Users)
-      </button>
-      <button onclick="endLiveClass()" style="background:var(--danger);">
-        <i class="fas fa-stop-circle"></i> End Live Class
-      </button>
-    </div>
-  </div>
+  // Google AI Studio Key for Gemini 2.5 Flash
+  const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY";
 
-  <!-- Bottom Navigation -->
-  <div class="nav-bar" id="bottomNav" style="display:none;">
-    <div class="nav-item active-nav" id="nvProfileBtn" onclick="switchTab('mainScreen')"><i class="fas fa-user"></i><span>Profile</span></div>
-    <div class="nav-item" id="nvLiveBtn" onclick="switchTab('liveScreen')"><i class="fas fa-video"></i><span>Live Class</span></div>
-    <div class="nav-item" id="nvBatchBtn" onclick="switchTab('batchScreen')"><i class="fas fa-users"></i><span>Batches</span></div>
-    <div class="nav-item" id="navSchedule" style="display:none;" onclick="switchTab('scheduleScreen')"><i class="fas fa-satellite-dish"></i><span>Host Panel</span></div>
-  </div>
+  // NCERT Class 10 Punjabi Chapter Pool
+  const NCERT_CHAPTERS = [
+    "ਰਸਾਇਣਿਕ ਕਿਰਿਆਵਾਂ ਅਤੇ ਸਮੀਕਰਣਾਂ (Chemical Reactions and Equations)",
+    "ਤੇਜ਼ਾਬ, ਖਾਰ ਅਤੇ ਲੂਣ (Acids, Bases and Salts)",
+    "ਧਾਤਾਂ ਅਤੇ ਅਧਾਤਾਂ (Metals and Non-metals)",
+    "ਕਾਰਬਨ ਅਤੇ ਇਸਦੇ ਯੋਗਿਕ (Carbon and its Compounds)",
+    "ਜੀਵ ਪ੍ਰਕਿਰਿਆਵਾਂ (Life Processes)",
+    "ਨਿਯੰਤਰਣ ਅਤੇ ਤਾਲਮੇਲ (Control and Coordination)",
+    "ਪ੍ਰਕਾਸ਼ - ਪਰਵਰਤਨ ਅਤੇ ਅਪਵਰਤਨ (Light - Reflection and Refraction)",
+    "ਮਨੁੱਖੀ ਅੱਖ ਅਤੇ ਰੰਗ-ਬਰੰਗਾ ਸੰਸਾਰ (Human Eye and Colourful World)",
+    "ਬਿਜਲੀ (Electricity)",
+    "ਚੁੰਬਕੀ ਪ੍ਰਭਾਵ (Magnetic Effects of Electric Current)",
+    "ਸਾਡਾ ਵਾਤਾਵਰਨ (Our Environment)",
+    "ਵਾਸਤਵਿਕ ਸੰਖਿਆਵਾਂ (Real Numbers - Math)",
+    "ਬਹੁਪਦ (Polynomials - Math)",
+    "ਤਿਕੋਣਮਿਤੀ ਦੇ ਕੁਝ ਉਪਯੋਗ (Trigonometry - Math)"
+  ];
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAY9m2GzbB75aKrtsVfuH_AcdOhGw3CmX0",
-      authDomain: "fit-with-kulbeer-de286.firebaseapp.com",
-      projectId: "fit-with-kulbeer-de286",
-      storageBucket: "fit-with-kulbeer-de286.firebasestorage.app",
-      messagingSenderId: "913534495717",
-      appId: "1:913534495717:web:b6a2ea9f7bfcc362585d0c"
-    };
+  // Rotate chapter daily
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+  const currentChapter = NCERT_CHAPTERS[dayOfYear % NCERT_CHAPTERS.length];
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentQuizData = [];
+  let userAnswers = {};
+  let currentUserData = null;
+
+  const authSection = document.getElementById("authSection");
+  const quizSection = document.getElementById("quizSection");
+  const resultSection = document.getElementById("resultSection");
+  const dailyChapterBadge = document.getElementById("dailyChapter");
+  const questionContainer = document.getElementById("questionContainer");
+  const quizLoader = document.getElementById("quizLoader");
+  const quizContent = document.getElementById("quizContent");
+  const welcomeText = document.getElementById("welcomeText");
+
+  // Track Auth State
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUserData = user;
+      authSection.classList.add("hidden");
+      quizSection.classList.remove("hidden");
+      welcomeText.innerText = `ਜੀ ਆਇਆਂ ਨੂੰ, ${user.displayName || "ਵਿਦਿਆਰਥੀ"}!`;
+      dailyChapterBadge.innerText = `ਅੱਜ ਦਾ ਅਧਿਆਇ: ${currentChapter}`;
+      generateDailyQuizWithGemini(currentChapter);
+    } else {
+      currentUserData = null;
+      authSection.classList.remove("hidden");
+      quizSection.classList.add("hidden");
+      resultSection.classList.add("hidden");
     }
-    const db = firebase.firestore();
+  });
 
-    let currentUser = null;
-    let isHost = false;
-    let hasPaidBatch = false;
-    let currentLiveUrl = "";
+  // Sign-Up Function
+  document.getElementById("btnSignUp").addEventListener("click", async () => {
+    const name = document.getElementById("studentName").value.trim();
+    const roll = document.getElementById("rollNumber").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const pass = document.getElementById("password").value.trim();
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const saved = localStorage.getItem('fit_user_session');
-      if (saved) {
-        currentUser = JSON.parse(saved);
-        setupSession(currentUser);
-      } else {
-        document.getElementById('authScreen').classList.add('active');
-      }
+    if (!name || !roll || !email || !pass) return alert("ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੇ ਵੇਰਵੇ ਭਰੋ (Please fill all fields)");
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: `${name} (Roll: ${roll})` });
+      location.reload();
+    } catch (err) {
+      alert("Sign-up Error: " + err.message);
+    }
+  });
+
+  // Login Function
+  document.getElementById("btnLogin").addEventListener("click", async () => {
+    const email = document.getElementById("email").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch (err) {
+      alert("Login Error: " + err.message);
+    }
+  });
+
+  // Logout Function
+  document.getElementById("btnLogout").addEventListener("click", () => signOut(auth));
+
+  // Gemini API Integration (Class 10 NCERT Punjabi)
+  async function generateDailyQuizWithGemini(chapter) {
+    const prompt = `You are an NCERT Class 10 Punjab School Education Board expert.
+Generate 5 multiple-choice questions (MCQs) in pure Punjabi language (Gurmukhi) for the NCERT Class 10 topic: "${chapter}".
+Return ONLY a valid raw JSON array of objects without markdown formatting or code blocks.
+Format:
+[
+  {
+    "id": 1,
+    "question": "ਪ੍ਰਸ਼ਨ ਇੱਥੇ ਲਿਖੋ",
+    "options": ["ਵਿਕਲਪ 1", "ਵਿਕਲਪ 2", "ਵਿਕਲਪ 3", "ਵਿਕਲਪ 4"],
+    "correctIndex": 0
+  }
+]`;
+
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: "application/json" }
+        })
+      });
+
+      const data = await response.json();
+      const rawText = data.candidates[0].content.parts[0].text;
+      currentQuizData = JSON.parse(rawText);
+      renderQuiz(currentQuizData);
+    } catch (err) {
+      quizLoader.innerHTML = `<p style="color:red;">ਟੈਸਟ ਲੋਡ ਕਰਨ ਵਿੱਚ ਸਮੱਸਿਆ ਆਈ। ਕਿਰਪਾ ਕਰਕੇ Gemini API Key ਚੈੱਕ ਕਰੋ।</p>`;
+    }
+  }
+
+  // Display Test Questions
+  function renderQuiz(questions) {
+    quizLoader.classList.add("hidden");
+    quizContent.classList.remove("hidden");
+    questionContainer.innerHTML = "";
+
+    questions.forEach((q, qIdx) => {
+      const div = document.createElement("div");
+      div.style.marginBottom = "24px";
+      div.innerHTML = `<p style="font-weight:600; margin-bottom: 8px;">${qIdx + 1}. ${q.question}</p>`;
+
+      q.options.forEach((opt, oIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "opt-btn";
+        btn.innerText = opt;
+        btn.onclick = () => {
+          userAnswers[qIdx] = oIdx;
+          div.querySelectorAll(".opt-btn").forEach(b => b.classList.remove("selected"));
+          btn.classList.add("selected");
+        };
+        div.appendChild(btn);
+      });
+      questionContainer.appendChild(div);
+    });
+  }
+
+  // Submit Test & Write to Database
+  document.getElementById("btnSubmitQuiz").addEventListener("click", async () => {
+    if (Object.keys(userAnswers).length < currentQuizData.length) {
+      if (!confirm("ਕੁਝ ਸਵਾਲ ਬਾਕੀ ਹਨ। ਕੀ ਤੁਸੀਂ ਜਮ੍ਹਾ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?")) return;
+    }
+
+    let score = 0;
+    currentQuizData.forEach((q, idx) => {
+      if (userAnswers[idx] === q.correctIndex) score++;
     });
 
-    function setupSession(user) {
-      if (user.email === "Deepxmaan01@gmail.com" && user.password === "Deepmaan01") {
-        isHost = true;
-        hasPaidBatch = true;
-        document.getElementById('navSchedule').style.display = 'block';
-        document.getElementById('hostMenuSec').style.display = 'block';
-        document.getElementById('hostAddBatch').style.display = 'block';
-        document.getElementById('roleBadge').innerText = "Host / Trainer";
-        document.getElementById('roleBadge').style.background = "#ffd700";
-        // Show corner remove class button for Host
-        document.getElementById('btnCornerRemoveClass').style.display = 'flex';
-      }
+    const reportData = {
+      studentName: currentUserData.displayName || "Unknown",
+      studentEmail: currentUserData.email,
+      chapter: currentChapter,
+      score: score,
+      totalQuestions: currentQuizData.length,
+      percentage: `${(score / currentQuizData.length) * 100}%`,
+      timestamp: serverTimestamp(),
+      dateString: new Date().toLocaleDateString("en-IN")
+    };
 
-      document.getElementById('welcomeText').innerText = "Welcome, " + user.name + "!";
-      document.getElementById('pWeight').innerText = user.weight ? `${user.weight} kg` : "--";
-      document.getElementById('pHeight').innerText = user.height ? `${user.height} cm` : "--";
-      document.getElementById('pPhone').innerText = user.phone || "--";
-      document.getElementById('pLocation').innerText = user.address || "--";
-
-      if (user.weight && user.height) {
-        const hMeters = parseFloat(user.height) / 100;
-        const bmi = (parseFloat(user.weight) / (hMeters * hMeters)).toFixed(1);
-        let status = "Normal";
-        if (bmi < 18.5) status = "Underweight";
-        else if (bmi >= 25 && bmi < 30) status = "Overweight";
-        else if (bmi >= 30) status = "Obese";
-        document.getElementById('pBMI').innerText = `${bmi} (${status})`;
-      }
-
-      document.getElementById('authScreen').classList.remove('active');
-      document.getElementById('mainScreen').classList.add('active');
-      document.getElementById('bottomNav').style.display = 'flex';
-
-      listenToDatabase(user.email);
+    try {
+      await addDoc(collection(db, "quiz_reports"), reportData);
+      quizSection.classList.add("hidden");
+      resultSection.classList.remove("hidden");
+      document.getElementById("scoreSummary").innerText = `ਤੁਹਾਡਾ ਸਕੋਰ: ${score} / ${currentQuizData.length} (${reportData.percentage})`;
+    } catch (err) {
+      alert("ਰਿਪੋਰਟ ਸੇਵ ਨਹੀਂ ਹੋ ਸਕੀ: " + err.message);
     }
+  });
 
-    function listenToDatabase(email) {
-      if (!isHost) {
-        db.collection("clients").doc(email).onSnapshot((doc) => {
-          if (doc.exists) {
-            const data = doc.data();
-            hasPaidBatch = data.hasAccess === true || (data.purchasedBatches && data.purchasedBatches.length > 0);
-            updateAccessUI();
-          }
-        });
-      } else {
-        updateAccessUI();
-      }
+  // Real-Time Admin Table Listener
+  const reportRows = document.getElementById("reportRows");
+  const reportsQuery = query(collection(db, "quiz_reports"), orderBy("timestamp", "desc"));
 
-      db.collection("settings").doc("schedule").onSnapshot((doc) => {
-        if (doc.exists) {
-          const data = doc.data();
-          document.getElementById('liveTimingDisplay').innerText = data.timing || "No class scheduled right now.";
-          
-          if (data.isLive && data.liveUrl) {
-            currentLiveUrl = data.liveUrl;
-            if (hasPaidBatch || isHost) {
-              document.getElementById('liveBanner').style.display = 'block';
-              document.getElementById('btnJoinLive').style.display = 'block';
-              document.getElementById('liveBannerText').innerText = `Class is ON: ${data.timing || 'Workout Session'}`;
-            }
-          } else {
-            currentLiveUrl = "";
-            document.getElementById('liveBanner').style.display = 'none';
-            document.getElementById('btnJoinLive').style.display = 'none';
-          }
-        } else {
-          document.getElementById('liveTimingDisplay').innerText = "No class scheduled right now.";
-          document.getElementById('liveBanner').style.display = 'none';
-          document.getElementById('btnJoinLive').style.display = 'none';
-        }
-      });
+  onSnapshot(reportsQuery, (snapshot) => {
+    reportRows.innerHTML = "";
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${data.dateString || "-"}</td>
+        <td>${data.studentName}</td>
+        <td>${data.studentEmail}</td>
+        <td>${data.chapter}</td>
+        <td style="font-weight:bold; color:green;">${data.score}/${data.totalQuestions}</td>
+      `;
+      reportRows.appendChild(tr);
+    });
+  });
 
-      db.collection("batches").onSnapshot((snapshot) => {
-        const container = document.getElementById('batchList');
-        container.innerHTML = "";
-        if (snapshot.empty) {
-          container.innerHTML = "<p style='color:gray; padding:10px;'>No batches created yet.</p>";
-          return;
-        }
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const id = doc.id;
-          container.innerHTML += `
-            <div style="background:var(--card-bg); padding:15px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
-              <div>
-                <b style="font-size:15px;">${data.name}</b>
-                <p style="font-size:13px; color:gray;">Fee: ₹500 / month</p>
-              </div>
-              <div>
-                ${isHost 
-                  ? `<button onclick="deleteBatch('${id}')" style="background:var(--danger); padding:6px 14px; font-size:12px; width:auto; border-radius:8px;"><i class="fas fa-trash"></i></button>` 
-                  : `<button onclick="buyBatch('${data.name}')" style="background:#28a745; padding:7px 14px; font-size:12px; width:auto; border-radius:8px;"><i class="fas fa-shopping-cart"></i> Buy ₹500</button>`}
-              </div>
-            </div>
-          `;
-        });
-      });
-    }
-
-    function updateAccessUI() {
-      const badge = document.getElementById('accessStatusBadge');
-      const unlockedBox = document.getElementById('unlockedLiveBox');
-      const lockedBox = document.getElementById('lockedLiveBox');
-
-      if (hasPaidBatch || isHost) {
-        badge.innerText = isHost ? "Admin / Host" : "Enrolled Member";
-        badge.style.background = "#28a745";
-        badge.style.color = "white";
-        unlockedBox.style.display = 'block';
-        lockedBox.style.display = 'none';
-        if (currentLiveUrl) {
-          document.getElementById('liveBanner').style.display = 'block';
-          document.getElementById('btnJoinLive').style.display = 'block';
-        }
-      } else {
-        badge.innerText = "No Active Batch";
-        badge.style.background = "#ffd700";
-        badge.style.color = "#111";
-        unlockedBox.style.display = 'none';
-        lockedBox.style.display = 'block';
-        document.getElementById('liveBanner').style.display = 'none';
-      }
-    }
-
-    // REMOVE CLASS FUNCTION (Direct Corner Action)
-    async function removeClassNow() {
-      if (!isHost) return;
-      if (confirm("Are you sure you want to remove and clear the current live class schedule for everyone?")) {
-        try {
-          await db.collection("settings").doc("schedule").set({
-            timing: "No class scheduled right now.",
-            isLive: false,
-            liveUrl: ""
-          });
-          alert("Class removed successfully from all devices!");
-        } catch (e) {
-          alert("Error removing class: " + e.message);
-        }
-      }
-    }
-
-    async function handleLogin() {
-      const name = document.getElementById('uName').value.trim();
-      const phone = document.getElementById('uPhone').value.trim();
-      const email = document.getElementById('uEmail').value.trim();
-      const password = document.getElementById('uPass').value.trim();
-      const weight = document.getElementById('uWeight').value.trim();
-      const height = document.getElementById('uHeight').value.trim();
-      const address = document.getElementById('uAddress').value.trim();
-
-      if (!name || !email || !phone) {
-        alert("Please fill in Name, Phone, and Email!");
-        return;
-      }
-
-      const userData = { name, phone, email, password, weight, height, address };
-      localStorage.setItem('fit_user_session', JSON.stringify(userData));
-
-      try {
-        await db.collection("clients").doc(email).set({
-          ...userData,
-          hasAccess: false,
-          purchasedBatches: [],
-          registeredAt: new Date().toISOString()
-        }, { merge: true });
-      } catch (e) {
-        console.error("Firestore sync note:", e);
-      }
-
-      setupSession(userData);
-    }
-
-    function logoutUser() {
-      if (confirm("Do you want to log out?")) {
-        localStorage.removeItem('fit_user_session');
-        location.reload();
-      }
-    }
-
-    async function startLiveClass() {
-      const url = document.getElementById('liveUrlInput').value.trim();
-      const timing = document.getElementById('scheduleInput').value.trim();
-
-      if (!url) {
-        alert("Please enter a meeting link (Google Meet / Zoom / YouTube)!");
-        return;
-      }
-
-      await db.collection("settings").doc("schedule").set({
-        timing: timing || "Live Workout Session",
-        liveUrl: url,
-        isLive: true,
-        startedAt: new Date().toISOString()
-      }, { merge: true });
-
-      alert("Live class started! Alert is active for all enrolled users.");
-    }
-
-    async function endLiveClass() {
-      await db.collection("settings").doc("schedule").update({
-        isLive: false,
-        liveUrl: ""
-      });
-      alert("Live class ended.");
-    }
-
-    function joinLiveClassNow() {
-      if (!hasPaidBatch && !isHost) {
-        alert("Please purchase a batch to join the live session.");
-        return;
-      }
-      if (currentLiveUrl) {
-        window.open(currentLiveUrl, "_blank");
-      }
-    }
-
-    async function saveSchedule() {
-      const val = document.getElementById('scheduleInput').value.trim();
-      if (val) {
-        await db.collection("settings").doc("schedule").set({ timing: val }, { merge: true });
-        alert("Schedule updated!");
-      }
-    }
-
-    async function addBatch() {
-      const val = document.getElementById('newBatchInput').value.trim();
-      if (val) {
-        await db.collection("batches").add({ name: val });
-        document.getElementById('newBatchInput').value = "";
-      }
-    }
-
-    async function deleteBatch(id) {
-      if (confirm("Delete this batch?")) {
-        await db.collection("batches").doc(id).delete();
-      }
-    }
-
-    async function buyBatch(batchName) {
-      alert(`To activate your ${batchName} membership, please send ₹500 to 80825-28311 on WhatsApp. Your account will unlock automatically upon confirmation!`);
-      window.open(`https://wa.me/918082528311?text=Hello%20Kulbeer%2C%20I%20want%20to%20buy%20the%20${encodeURIComponent(batchName)}%20batch%20for%20Rs.500.%20My%20Email%20is:%20${currentUser ? currentUser.email : ''}`, "_blank");
-    }
-
-    async function showClientsList() {
-      closeDrawer();
-      switchTab('liveScreen');
-      const container = document.getElementById('liveScreen');
-      container.innerHTML = "<div class='top-bar'><i class='fas fa-arrow-left' style='font-size:22px; cursor:pointer;' onclick='location.reload()'></i><h3>Manage Client Access</h3></div>";
-      const snap = await db.collection("clients").get();
-      if (snap.empty) {
-        container.innerHTML += "<p>No clients registered yet.</p>";
-        return;
-      }
-      snap.forEach(doc => {
-        const u = doc.data();
-        const active = u.hasAccess === true;
-        container.innerHTML += `
-          <div style="background:var(--card-bg); padding:14px; border-radius:16px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <b style="font-size:16px;">${u.name}</b>
-              <span style="font-size:11px; padding:3px 8px; border-radius:8px; background:${active ? '#28a745' : '#dc3545'}; color:white; font-weight:bold;">${active ? 'Active' : 'Locked'}</span>
-            </div>
-            <small style="color:gray;">${u.phone} | ${u.email}</small><br/>
-            <button onclick="toggleClientAccess('${u.email}', ${!active})" style="background:${active ? '#6c757d' : '#28a745'}; padding:6px 12px; font-size:12px; width:auto; margin-top:8px;">
-              ${active ? 'Revoke Access' : '✓ Grant Batch Access (₹500 Paid)'}
-            </button>
-          </div>
-        `;
-      });
-    }
-
-    async function toggleClientAccess(email, status) {
-      await db.collection("clients").doc(email).update({ hasAccess: status });
-      alert(`Client access updated!`);
-      showClientsList();
-    }
-
-    function switchTab(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
-      if(id === 'mainScreen') document.getElementById('nvProfileBtn').classList.add('active-nav');
-      if(id === 'liveScreen') document.getElementById('nvLiveBtn').classList.add('active-nav');
-      if(id === 'batchScreen') document.getElementById('nvBatchBtn').classList.add('active-nav');
-      if(id === 'scheduleScreen') document.getElementById('navSchedule').classList.add('active-nav');
-    }
-
-    function openDrawer() { document.getElementById('sideDrawer').style.display = 'block'; }
-    function closeDrawer() { document.getElementById('sideDrawer').style.display = 'none'; }
-    function openWhatsApp() { window.open("https://wa.me/918082528311?text=Hello%20Kulbeer%2C%20I%20have%20a%20query%20about%20fitness%20classes", "_blank"); }
-    function toggleTheme() { document.body.classList.toggle('dark'); }
-  </script>
+  document.getElementById("btnToggleAdmin").addEventListener("click", () => {
+    document.getElementById("adminPanel").classList.toggle("hidden");
+  });
+</script>
 </body>
 </html>
