@@ -3,297 +3,346 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PSEB Class 10 Learning Portal & Quiz</title>
-  
-  <!-- Tailwind CSS & Lucide Icons -->
+  <title>PSEB Class 10 Portal - Student & Admin</title>
+
+  <!-- Tailwind CSS, Icons & Animations -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
-  <!-- Firebase Scripts (Compat) -->
+  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Mukta+Mahee:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Mukta+Mahee:wght@400;600;700&display=swap');
     body {
       font-family: 'Plus Jakarta Sans', 'Mukta Mahee', sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      background: radial-gradient(circle at top, #1e1b4b 0%, #0f172a 60%, #020617 100%);
       color: #f8fafc;
       min-height: 100vh;
     }
     .glassmorphism {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
-    .active-subject {
-      border-color: #6366f1;
-      background: rgba(99, 102, 241, 0.15);
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 9999px;
+    .glow-card {
+      box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-  <!-- Navbar -->
-  <header class="glassmorphism sticky top-0 z-50 border-b border-slate-700/50">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="navigate('dashboard')">
-        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-xl shadow-lg shadow-indigo-500/30">
+  <!-- Header Bar -->
+  <header class="glassmorphism sticky top-0 z-50 border-b border-slate-700/60">
+    <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="handleLogoClick()">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center font-extrabold text-xl shadow-lg shadow-indigo-500/30">
           P
         </div>
         <div>
-          <h1 class="text-base font-bold leading-tight">PSEB Class 10</h1>
-          <p class="text-xs text-indigo-300 font-medium">Exam & Quiz Portal</p>
+          <h1 class="text-base font-bold leading-none">PSEB 10th Class</h1>
+          <p class="text-[11px] text-indigo-300 font-medium mt-0.5">Online Examination Portal</p>
         </div>
       </div>
       
       <div id="navRight" class="flex items-center space-x-3">
-        <!-- Dynamic User Status -->
+        <!-- Auth status button injected here -->
       </div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="flex-grow max-w-5xl mx-auto w-full p-4 md:p-6">
+  <!-- Content Container -->
+  <main class="flex-grow max-w-5xl mx-auto w-full p-4 md:p-6 flex flex-col justify-center">
     
-    <!-- LOGIN VIEW -->
-    <section id="loginView" class="hidden max-w-md mx-auto my-12 animate__animated animate__fadeInDown">
-      <div class="glassmorphism p-8 rounded-2xl shadow-2xl border border-slate-700">
-        <div class="text-center mb-6">
-          <div class="inline-flex p-3 rounded-2xl bg-indigo-500/10 text-indigo-400 mb-2">
-            <i data-lucide="graduation-cap" class="w-8 h-8"></i>
-          </div>
-          <h2 class="text-2xl font-bold">Student / Teacher Login</h2>
-          <p class="text-sm text-slate-400 mt-1">Class 10 PSEB Interactive Portal</p>
+    <!-- ========================================== -->
+    <!-- 1. AUTHENTICATION (LOGIN & SIGN UP SCREEN) -->
+    <!-- ========================================== -->
+    <section id="authSection" class="w-full max-w-md mx-auto my-6 animate__animated animate__zoomIn">
+      <div class="glassmorphism p-6 sm:p-8 rounded-3xl border border-slate-700 glow-card relative overflow-hidden">
+        
+        <!-- Toggle Tabs -->
+        <div class="grid grid-cols-2 p-1 bg-slate-900/80 rounded-2xl mb-6 border border-slate-700/80 text-xs font-bold">
+          <button id="tabLogin" onclick="switchAuthTab('login')" class="py-2.5 rounded-xl bg-indigo-600 text-white shadow-md transition duration-200">
+            Log In
+          </button>
+          <button id="tabSignup" onclick="switchAuthTab('signup')" class="py-2.5 rounded-xl text-slate-400 hover:text-slate-200 transition duration-200">
+            Create Account
+          </button>
         </div>
 
-        <form id="authForm" onsubmit="handleLogin(event)" class="space-y-4">
+        <!-- Auth Header Title -->
+        <div class="text-center mb-6">
+          <h2 id="authTitle" class="text-2xl font-extrabold text-white">Student & Admin Login</h2>
+          <p id="authSubtitle" class="text-xs text-slate-400 mt-1">Access your Punjab School Education Board portal</p>
+        </div>
+
+        <!-- Dynamic Form -->
+        <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+          
+          <!-- Full Name (Only for Signup) -->
+          <div id="nameFieldGroup" class="hidden">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Full Student Name</label>
+            <div class="relative">
+              <i data-lucide="user" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
+              <input type="text" id="signupName" placeholder="e.g. Deepinder Singh"
+                     class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+            </div>
+          </div>
+
+          <!-- Identifier: Username / Roll / Admin Email -->
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Full Name / Admin Email</label>
-            <input type="text" id="userInput" required placeholder="e.g. Deepinder Singh or deepxmaan.ol@gmail.com" 
-                   class="w-full px-4 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+            <label id="identifierLabel" class="block text-xs font-semibold text-slate-300 mb-1">Username or Admin Email</label>
+            <div class="relative">
+              <i data-lucide="mail" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
+              <input type="text" id="authIdentifier" required placeholder="Name or deepxmaan.ol@gmail.com"
+                     class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+            </div>
           </div>
-          <div id="rollNoGroup">
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Roll Number / Password</label>
-            <input type="password" id="passInput" placeholder="Enter Roll No or Admin Password" 
-                   class="w-full px-4 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-            <p class="text-[11px] text-slate-500 mt-1">Admin access: Use registered credentials</p>
+
+          <!-- Section and Roll (Only for Signup) -->
+          <div id="studentDetailsGroup" class="grid grid-cols-2 gap-3 hidden">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Roll Number</label>
+              <input type="text" id="signupRoll" placeholder="e.g. 05"
+                     class="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Section</label>
+              <input type="text" id="signupSection" placeholder="e.g. Section C" value="Section C"
+                     class="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500">
+            </div>
           </div>
-          <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 font-semibold rounded-xl text-sm shadow-lg shadow-indigo-600/30 transition duration-200 flex items-center justify-center space-x-2">
-            <span>Enter Portal</span>
+
+          <!-- Password Field -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Password / PIN</label>
+            <div class="relative">
+              <i data-lucide="lock" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
+              <input type="password" id="authPassword" required placeholder="••••••••"
+                     class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+            </div>
+            <p id="adminTip" class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1">
+              <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span>Teacher admin access requires registered credentials.</span>
+            </p>
+          </div>
+
+          <!-- Action Button -->
+          <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 font-bold rounded-xl text-sm shadow-lg shadow-indigo-600/30 transition transform active:scale-95 flex items-center justify-center space-x-2">
+            <span id="btnText">Sign In to Account</span>
             <i data-lucide="arrow-right" class="w-4 h-4"></i>
           </button>
         </form>
       </div>
     </section>
 
-    <!-- DASHBOARD VIEW -->
-    <section id="dashboardView" class="space-y-6 animate__animated animate__fadeIn">
-      <!-- Profile Header -->
-      <div class="glassmorphism p-6 rounded-2xl border border-slate-700/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- ========================================== -->
+    <!-- 2. STUDENT DASHBOARD VIEW                  -->
+    <!-- ========================================== -->
+    <section id="dashboardSection" class="hidden space-y-6 animate__animated animate__fadeIn">
+      <!-- Profile Card -->
+      <div class="glassmorphism p-6 rounded-3xl border border-slate-700/80 flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div class="flex items-center space-x-4">
-          <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-2xl border border-indigo-500/30 shadow-inner">
-            <span id="userAvatar">S</span>
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black text-2xl shadow-lg shadow-indigo-500/30 border border-indigo-400/30">
+            <span id="dashAvatar">S</span>
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <h2 id="profileName" class="text-xl font-bold">Welcome Student</h2>
-              <span id="roleBadge" class="text-[11px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Student</span>
+              <h2 id="dashStudentName" class="text-xl font-bold">Student Name</h2>
+              <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Active</span>
             </div>
-            <p id="profileRoll" class="text-xs text-slate-400 mt-0.5">PSEB Class 10 • Section C</p>
+            <p id="dashStudentClass" class="text-xs text-slate-400 mt-1">PSEB 10th Class • Roll No: 5</p>
           </div>
         </div>
+
         <div class="flex items-center space-x-3">
-          <div class="px-4 py-2 rounded-xl bg-slate-900/60 border border-slate-700 text-center">
-            <p class="text-[10px] text-slate-400">Total Score</p>
-            <p id="profileTotalScore" class="text-base font-bold text-indigo-300">0 / 20</p>
-          </div>
-          <div class="px-4 py-2 rounded-xl bg-slate-900/60 border border-slate-700 text-center">
-            <p class="text-[10px] text-slate-400">Status</p>
-            <p id="profileStatus" class="text-base font-bold text-amber-400">Pending</p>
+          <div class="px-5 py-3 rounded-2xl bg-slate-900/80 border border-slate-700 text-center">
+            <p class="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Exam Score</p>
+            <p id="dashScoreDisplay" class="text-lg font-black text-indigo-400">Not Attempted</p>
           </div>
         </div>
       </div>
 
-      <!-- Subject Tabs -->
+      <!-- Syllabus Section Grid -->
       <div>
-        <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">Syllabus Subjects</h3>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+          <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i>
+          <span>10th Class Syllabus Sections</span>
+        </h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          <button class="glassmorphism active-subject p-3 rounded-xl text-center border transition transform hover:-translate-y-0.5">
-            <div class="text-indigo-400 mx-auto mb-1"><i data-lucide="globe" class="w-5 h-5 mx-auto"></i></div>
-            <span class="text-xs font-semibold block">SST (ਸਮਾਜਿਕ)</span>
-            <span class="text-[10px] text-emerald-400">Quiz Active</span>
-          </button>
-          <button onclick="subjectNotice('Science')" class="glassmorphism p-3 rounded-xl text-center border border-slate-800 opacity-60 hover:opacity-100 transition">
-            <div class="text-slate-400 mx-auto mb-1"><i data-lucide="atom" class="w-5 h-5 mx-auto"></i></div>
-            <span class="text-xs font-semibold block">Science</span>
+          <div class="glassmorphism p-3.5 rounded-2xl text-center border-indigo-500/60 bg-indigo-500/10 shadow-md">
+            <i data-lucide="map-pin" class="w-5 h-5 mx-auto text-indigo-400 mb-1"></i>
+            <span class="text-xs font-bold block">SST (ਸਮਾਜਿਕ)</span>
+            <span class="text-[10px] text-emerald-400 font-medium">3 Chapters Ready</span>
+          </div>
+          <div onclick="showToast('Science book PDF upload pending.')" class="glassmorphism p-3.5 rounded-2xl text-center opacity-60 hover:opacity-100 cursor-pointer transition">
+            <i data-lucide="atom" class="w-5 h-5 mx-auto text-slate-400 mb-1"></i>
+            <span class="text-xs font-bold block">Science</span>
             <span class="text-[10px] text-slate-400">Coming Soon</span>
-          </button>
-          <button onclick="subjectNotice('Math')" class="glassmorphism p-3 rounded-xl text-center border border-slate-800 opacity-60 hover:opacity-100 transition">
-            <div class="text-slate-400 mx-auto mb-1"><i data-lucide="calculator" class="w-5 h-5 mx-auto"></i></div>
-            <span class="text-xs font-semibold block">Math</span>
+          </div>
+          <div onclick="showToast('Math book PDF upload pending.')" class="glassmorphism p-3.5 rounded-2xl text-center opacity-60 hover:opacity-100 cursor-pointer transition">
+            <i data-lucide="calculator" class="w-5 h-5 mx-auto text-slate-400 mb-1"></i>
+            <span class="text-xs font-bold block">Math</span>
             <span class="text-[10px] text-slate-400">Coming Soon</span>
-          </button>
-          <button onclick="subjectNotice('English')" class="glassmorphism p-3 rounded-xl text-center border border-slate-800 opacity-60 hover:opacity-100 transition">
-            <div class="text-slate-400 mx-auto mb-1"><i data-lucide="book" class="w-5 h-5 mx-auto"></i></div>
-            <span class="text-xs font-semibold block">English</span>
+          </div>
+          <div onclick="showToast('English book PDF upload pending.')" class="glassmorphism p-3.5 rounded-2xl text-center opacity-60 hover:opacity-100 cursor-pointer transition">
+            <i data-lucide="book-open" class="w-5 h-5 mx-auto text-slate-400 mb-1"></i>
+            <span class="text-xs font-bold block">English</span>
             <span class="text-[10px] text-slate-400">Coming Soon</span>
-          </button>
-          <button onclick="subjectNotice('Hindi')" class="glassmorphism p-3 rounded-xl text-center border border-slate-800 opacity-60 hover:opacity-100 transition">
-            <div class="text-slate-400 mx-auto mb-1"><i data-lucide="languages" class="w-5 h-5 mx-auto"></i></div>
-            <span class="text-xs font-semibold block">Hindi</span>
+          </div>
+          <div onclick="showToast('Hindi book PDF upload pending.')" class="glassmorphism p-3.5 rounded-2xl text-center opacity-60 hover:opacity-100 cursor-pointer transition">
+            <i data-lucide="languages" class="w-5 h-5 mx-auto text-slate-400 mb-1"></i>
+            <span class="text-xs font-bold block">Hindi</span>
             <span class="text-[10px] text-slate-400">Coming Soon</span>
-          </button>
-          <button onclick="subjectNotice('Punjabi')" class="glassmorphism p-3 rounded-xl text-center border border-slate-800 opacity-60 hover:opacity-100 transition">
-            <div class="text-slate-400 mx-auto mb-1"><i data-lucide="file-text" class="w-5 h-5 mx-auto"></i></div>
-            <span class="text-xs font-semibold block">Punjabi</span>
+          </div>
+          <div onclick="showToast('Punjabi book PDF upload pending.')" class="glassmorphism p-3.5 rounded-2xl text-center opacity-60 hover:opacity-100 cursor-pointer transition">
+            <i data-lucide="feather" class="w-5 h-5 mx-auto text-slate-400 mb-1"></i>
+            <span class="text-xs font-bold block">Punjabi</span>
             <span class="text-[10px] text-slate-400">Coming Soon</span>
-          </button>
+          </div>
         </div>
       </div>
 
-      <!-- Active Exam Module Box -->
-      <div class="glassmorphism p-6 rounded-2xl border border-indigo-500/40 relative overflow-hidden">
-        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl"></div>
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <!-- Active Quiz Launch Box -->
+      <div class="glassmorphism p-6 sm:p-8 rounded-3xl border border-indigo-500/40 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
-            <div class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[11px] font-semibold mb-2">
-              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
-              <span>PSEB Full Revision Series 2026</span>
-            </div>
-            <h3 class="text-lg md:text-xl font-bold">Class 10 SST (ਭੂਗੋਲ - 3 Chapters Test)</h3>
-            <p class="text-xs text-slate-300 mt-1 max-w-xl">
-              Covers: ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources), ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography), ਅਤੇ ਜਲ ਸਾਧਨ (Water Resources).
-              Standard board exam pattern questions.
+            <span class="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-[11px] font-bold">Official Book Exam Quiz</span>
+            <h3 class="text-xl font-extrabold mt-2 text-white">Class 10 SST (Chapters 1, 2 & 3 Combined)</h3>
+            <p class="text-xs text-slate-300 mt-1 max-w-xl leading-relaxed">
+              Based on the uploaded Punjab School Education Board textbook chapters: 
+              <strong>ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ</strong>, <strong>ਜੈਵਿਕ ਭੂਗੋਲ</strong>, and <strong>ਜਲ ਸਾਧਨ</strong>.
             </p>
-            <div class="flex items-center space-x-4 mt-3 text-xs text-slate-400">
-              <span class="flex items-center"><i data-lucide="help-circle" class="w-3.5 h-3.5 mr-1 text-indigo-400"></i> 20 Multiple Choice Questions</span>
-              <span class="flex items-center"><i data-lucide="award" class="w-3.5 h-3.5 mr-1 text-amber-400"></i> 20 Marks Total (1 Mark Each)</span>
+            <div class="flex flex-wrap gap-4 mt-4 text-xs font-medium text-slate-400">
+              <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-indigo-400"></i> 20 Questions</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="award" class="w-4 h-4 text-amber-400"></i> 20 Marks Total</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4 text-emerald-400"></i> Unlimited Time</span>
             </div>
           </div>
-          <button onclick="startQuiz()" class="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition transform hover:scale-105 flex items-center justify-center space-x-2">
+          <button onclick="startSSTQuiz()" class="w-full md:w-auto px-7 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-2xl shadow-xl shadow-indigo-600/30 transition transform hover:scale-105 flex items-center justify-center space-x-2">
             <i data-lucide="play" class="w-4 h-4"></i>
-            <span>Start Test Now</span>
+            <span>Begin Test</span>
           </button>
         </div>
       </div>
     </section>
 
-    <!-- QUIZ VIEW -->
-    <section id="quizView" class="hidden space-y-6 animate__animated animate__fadeIn">
-      <!-- Quiz Header Progress -->
-      <div class="glassmorphism p-4 rounded-xl border border-slate-700 flex items-center justify-between">
-        <div>
-          <span class="text-xs text-slate-400">Progress</span>
-          <p class="text-sm font-bold text-indigo-300"><span id="currentQIdx">1</span> of 20 Questions</p>
+    <!-- ========================================== -->
+    <!-- 3. INTERACTIVE QUIZ VIEW (20 MARKS)        -->
+    <!-- ========================================== -->
+    <section id="quizSection" class="hidden space-y-6 animate__animated animate__fadeIn">
+      <!-- Progress Bar -->
+      <div class="glassmorphism p-4 rounded-2xl border border-slate-700 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <span class="text-xs font-bold text-slate-400">Question</span>
+          <span id="quizCounter" class="text-sm font-extrabold text-indigo-400">1 / 20</span>
         </div>
-        <div class="w-1/2 bg-slate-800 rounded-full h-2.5 overflow-hidden">
-          <div id="progressBar" class="bg-indigo-500 h-2.5 rounded-full transition-all duration-300" style="width: 5%"></div>
+        <div class="w-1/2 bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-700">
+          <div id="quizProgressBar" class="bg-gradient-to-r from-indigo-500 to-violet-500 h-2.5 rounded-full transition-all duration-300" style="width: 5%"></div>
         </div>
-        <button onclick="exitQuiz()" class="text-xs px-3 py-1.5 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30">
-          Exit
+        <button onclick="quitQuiz()" class="text-xs px-3 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30">
+          Exit Test
         </button>
       </div>
 
       <!-- Question Card -->
-      <div class="glassmorphism p-6 md:p-8 rounded-2xl border border-slate-700/80">
+      <div class="glassmorphism p-6 sm:p-8 rounded-3xl border border-slate-700">
         <div class="flex items-center justify-between mb-4">
-          <span id="questionTag" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/20 text-indigo-300">Chapter Topic</span>
-          <span class="text-xs text-slate-400 font-medium">1 Mark</span>
+          <span id="quizChapterBadge" class="text-[11px] font-bold px-3 py-1 rounded-lg bg-indigo-500/20 text-indigo-300">
+            Chapter
+          </span>
+          <span class="text-xs font-bold text-amber-400">1 Mark</span>
         </div>
-        
-        <h3 id="questionText" class="text-lg md:text-xl font-bold mb-6 leading-snug">
-          Question goes here?
+
+        <h3 id="quizQuestionText" class="text-lg md:text-xl font-bold mb-6 leading-relaxed">
+          Question content goes here
         </h3>
 
-        <div id="optionsContainer" class="space-y-3">
-          <!-- Options loaded dynamically -->
+        <div id="quizOptionsList" class="space-y-3">
+          <!-- Dynamic options -->
         </div>
 
-        <div class="flex justify-between items-center mt-8 pt-4 border-t border-slate-700/50">
-          <button id="prevBtn" onclick="prevQuestion()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-30">
+        <div class="flex justify-between items-center mt-8 pt-4 border-t border-slate-700/60">
+          <button id="quizPrevBtn" onclick="previousQuestion()" class="px-5 py-2.5 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-30">
             Previous
           </button>
-          <button id="nextBtn" onclick="nextQuestion()" class="px-6 py-2.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30">
+          <button id="quizNextBtn" onclick="advanceQuestion()" class="px-6 py-2.5 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30">
             Next
           </button>
         </div>
       </div>
     </section>
 
-    <!-- RESULT VIEW -->
-    <section id="resultView" class="hidden max-w-lg mx-auto py-8 animate__animated animate__zoomIn">
-      <div class="glassmorphism p-8 rounded-2xl border border-slate-700 text-center relative overflow-hidden">
-        <div class="w-20 h-20 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center mx-auto mb-4 text-indigo-400">
-          <i data-lucide="trophy" class="w-10 h-10"></i>
+    <!-- ========================================== -->
+    <!-- 4. QUIZ RESULT VIEW                        -->
+    <!-- ========================================== -->
+    <section id="resultSection" class="hidden max-w-md mx-auto my-6 animate__animated animate__zoomIn">
+      <div class="glassmorphism p-8 rounded-3xl border border-slate-700 text-center">
+        <div class="w-20 h-20 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center mx-auto mb-4 text-indigo-400">
+          <i data-lucide="award" class="w-10 h-10"></i>
         </div>
-        <h2 class="text-2xl font-bold">Quiz Completed!</h2>
-        <p class="text-xs text-slate-400 mt-1">Class 10 PSEB Social Science Exam</p>
+        <h2 class="text-2xl font-extrabold text-white">Test Submitted!</h2>
+        <p class="text-xs text-slate-400 mt-1">Class 10 PSEB Social Studies</p>
 
-        <div class="my-6 p-4 rounded-xl bg-slate-900/80 border border-slate-700">
-          <span class="text-xs text-slate-400">Your Total Score</span>
-          <div class="text-4xl font-extrabold text-indigo-400 mt-1">
-            <span id="finalScore">0</span> <span class="text-lg text-slate-500">/ 20</span>
+        <div class="my-6 p-5 rounded-2xl bg-slate-900/90 border border-slate-700">
+          <span class="text-xs text-slate-400 font-semibold">Your Final Score</span>
+          <div class="text-4xl font-black text-indigo-400 mt-1">
+            <span id="finalScoreVal">0</span> <span class="text-lg text-slate-500">/ 20</span>
           </div>
-          <p id="scoreFeedback" class="text-xs font-medium text-emerald-400 mt-2">Excellent performance!</p>
+          <p id="finalFeedback" class="text-xs font-bold text-emerald-400 mt-2">Pass</p>
         </div>
 
-        <div class="flex gap-3">
-          <button onclick="navigate('dashboard')" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold">
-            Return to Dashboard
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="showSection('dashboardSection')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold transition">
+            Dashboard
           </button>
-          <button onclick="startQuiz()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold shadow-lg shadow-indigo-600/30">
-            Retake Test
+          <button onclick="startSSTQuiz()" class="py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold shadow-lg shadow-indigo-600/30 transition">
+            Retake Exam
           </button>
         </div>
       </div>
     </section>
 
-    <!-- ADMIN PANEL VIEW -->
-    <section id="adminView" class="hidden space-y-6 animate__animated animate__fadeIn">
-      <div class="glassmorphism p-6 rounded-2xl border border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <!-- ========================================== -->
+    <!-- 5. TEACHER / ADMIN PANEL VIEW              -->
+    <!-- ========================================== -->
+    <section id="adminSection" class="hidden space-y-6 animate__animated animate__fadeIn">
+      <div class="glassmorphism p-6 rounded-3xl border border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div class="flex items-center space-x-2">
-            <h2 class="text-xl font-bold">Admin Console</h2>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Privileged</span>
+            <h2 class="text-xl font-bold">Admin Management Console</h2>
+            <span class="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Teacher</span>
           </div>
-          <p class="text-xs text-slate-400">User records, submissions, and database oversight.</p>
+          <p class="text-xs text-slate-400 mt-1">Managed directly via: <code class="text-indigo-300 font-mono">deepxmaan.ol@gmail.com</code></p>
         </div>
-        <button onclick="syncFirebase()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-md">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-          <span>Sync Cloud Data</span>
+        <button onclick="syncWithFirebaseCloud()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-bold flex items-center space-x-2 shadow-md">
+          <i data-lucide="cloud" class="w-4 h-4"></i>
+          <span>Sync Firebase Firestore</span>
         </button>
       </div>
 
-      <!-- Students Table -->
-      <div class="glassmorphism rounded-2xl border border-slate-700 overflow-hidden">
-        <div class="p-4 border-b border-slate-700/80 flex items-center justify-between">
-          <h3 class="text-sm font-bold">Registered Students & Test Records</h3>
-          <span id="totalStudentsCount" class="text-xs text-slate-400">0 records</span>
+      <!-- Students List -->
+      <div class="glassmorphism rounded-3xl border border-slate-700 overflow-hidden">
+        <div class="p-5 border-b border-slate-700/80 flex items-center justify-between">
+          <h3 class="text-sm font-bold">Registered 10th Class Students</h3>
+          <span id="adminStudentCount" class="text-xs text-slate-400 font-medium">0 records</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-900/60 text-slate-400 uppercase tracking-wider text-[10px]">
+            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
               <tr>
-                <th class="p-3">Student Name</th>
-                <th class="p-3">Roll / ID</th>
-                <th class="p-3">Score (20 Marks)</th>
-                <th class="p-3">Percentage</th>
-                <th class="p-3">Last Submission</th>
+                <th class="p-3.5">Student Name</th>
+                <th class="p-3.5">Roll No & Section</th>
+                <th class="p-3.5">Score (/ 20)</th>
+                <th class="p-3.5">Percentage</th>
+                <th class="p-3.5">Submission Time</th>
               </tr>
             </thead>
-            <tbody id="studentRecordsBody" class="divide-y divide-slate-800">
+            <tbody id="adminTableRows" class="divide-y divide-slate-800">
               <!-- Rendered dynamically -->
             </tbody>
           </table>
@@ -302,140 +351,139 @@
     </section>
   </main>
 
-  <!-- Notice Toast Modal -->
-  <div id="noticeToast" class="fixed bottom-5 right-5 glassmorphism px-4 py-3 rounded-xl border border-slate-600 text-xs hidden shadow-2xl animate__animated animate__fadeInUp"></div>
+  <!-- Notification Toast -->
+  <div id="toastMessage" class="fixed bottom-6 right-6 glassmorphism px-4 py-3 rounded-2xl border border-slate-600 text-xs hidden shadow-2xl animate__animated animate__fadeInUp z-50"></div>
 
   <script>
-    // ------------------------------------------------------------------
-    // 1. PSEB CLASS 10 SST QUESTION BANK (20 Questions / 20 Marks)
-    // Directly derived from Chapter 1, 2, and 3 of the uploaded text[span_6](start_span)[span_6](end_span)
-    // ------------------------------------------------------------------
-    const SST_QUESTIONS = [
+    // -----------------------------------------------------------
+    // 1. PSEB CLASS 10 QUESTIONS DATA (SST CH 1, 2, 3)
+    // -----------------------------------------------------------
+    const QUESTIONS_DATA = [
       {
         tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਕਰਦਸ਼ੇਵ (Kardashev) ਸਕੇਲ ਅਨੁਸਾਰ ਧਰਤੀ ਦੇ ਵਾਸੀ ਕਿਸ ਪੱਧਰ ਦੀ ਸਭਿਅਤਾ ਮੰਨੇ ਜਾਂਦੇ ਹਨ?[span_7](start_span)[span_7](end_span)",
+        question: "ਕਰਦਸ਼ੇਵ (Kardashev) ਸਕੇਲ ਅਨੁਸਾਰ ਧਰਤੀ ਦੇ ਵਾਸੀ ਕਿਸ ਪੱਧਰ ਦੀ ਸਭਿਅਤਾ ਮੰਨੇ ਜਾਂਦੇ ਹਨ?[span_4](start_span)[span_4](end_span)",
         options: ["ਪੱਧਰ-I (Level 1)", "ਪੱਧਰ-II (Level 2)", "ਪੱਧਰ-III (Level 3)", "ਪੱਧਰ-IV (Level 4)"],
         answer: 0
       },
       {
         tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਭਾਰਤ ਦੇ ਕੁੱਲ ਭੂਗੋਲਿਕ ਖੇਤਰਫਲ ਦਾ ਕਿੰਨਾ ਪ੍ਰਤੀਸ਼ਤ ਰਕਬਾ ਮੈਦਾਨੀ ਹੈ ਜੋ ਖੇਤੀ ਅਤੇ ਉਦਯੋਗ ਲਈ ਸਹੂਲਤ ਦਿੰਦਾ ਹੈ?[span_8](start_span)[span_8](end_span)",
+        question: "ਭਾਰਤ ਦੇ ਕੁੱਲ ਭੂਗੋਲਿਕ ਖੇਤਰਫਲ ਦਾ ਕਿੰਨਾ ਪ੍ਰਤੀਸ਼ਤ ਰਕਬਾ ਮੈਦਾਨੀ ਹੈ ਜੋ ਖੇਤੀ ਅਤੇ ਉਦਯੋਗ ਲਈ ਸਹੂਲਤ ਦਿੰਦਾ ਹੈ?[span_5](start_span)[span_5](end_span)",
         options: ["30%", "27%", "43%", "54%"],
         answer: 2
       },
       {
         tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਰਾਸ਼ਟਰੀ ਵਣ ਨੀਤੀ 1952 ਮੁਤਾਬਕ ਵਾਤਾਵਰਨ ਦੇ ਸੰਤੁਲਨ ਲਈ ਦੇਸ਼ ਦੇ ਕਿੰਨੇ ਪ੍ਰਤੀਸ਼ਤ ਭਾਗ ਉੱਤੇ ਜੰਗਲ ਹੋਣੇ ਚਾਹੀਦੇ ਹਨ?[span_9](start_span)[span_9](end_span)",
+        question: "ਰਾਸ਼ਟਰੀ ਵਣ ਨੀਤੀ 1952 ਮੁਤਾਬਕ ਵਾਤਾਵਰਨ ਦੇ ਸੰਤੁਲਨ ਲਈ ਦੇਸ਼ ਦੇ ਕਿੰਨੇ ਪ੍ਰਤੀਸ਼ਤ ਭਾਗ ਉੱਤੇ ਜੰਗਲ ਹੋਣੇ ਚਾਹੀਦੇ ਹਨ?[span_6](start_span)[span_6](end_span)",
         options: ["21.76%", "33%", "25.17%", "40%"],
         answer: 1
       },
       {
         tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਕਿਸਨੇ ਕਿਹਾ ਸੀ ਕਿ: 'ਸਾਡੀ ਧਰਤੀ 'ਤੇ ਸਾਰਿਆਂ ਦੀਆਂ ਲੋੜਾਂ ਲਈ ਤਾਂ ਬਹੁਤ ਕੁਝ ਹੈ ਪਰ ਲਾਲਚੀਆਂ ਦੇ ਲਾਲਚ ਲਈ ਕੁਝ ਨਹੀਂ'?[span_10](start_span)[span_10](end_span)",
+        question: "ਕਿਸਨੇ ਕਿਹਾ ਸੀ ਕਿ: 'ਸਾਡੀ ਧਰਤੀ 'ਤੇ ਸਾਰਿਆਂ ਦੀਆਂ ਲੋੜਾਂ ਲਈ ਤਾਂ ਬਹੁਤ ਕੁਝ ਹੈ ਪਰ ਲਾਲਚੀਆਂ ਦੇ ਲਾਲਚ ਲਈ ਕੁਝ ਨਹੀਂ'?[span_7](start_span)[span_7](end_span)",
         options: ["ਪੰਡਿਤ ਜਵਾਹਰ ਲਾਲ ਨਹਿਰੂ", "ਮਹਾਤਮਾ ਗਾਂਧੀ", "ਡਾ. ਸਵਾਮੀਨਾਥਨ", "ਨਿਕੋਲਾਇ ਕਰਦਸ਼ੇਵ"],
         answer: 1
       },
       {
         tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਕਪਾਹ ਅਤੇ ਗੰਨੇ ਦੀ ਕਾਸ਼ਤ ਲਈ ਸਭ ਤੋਂ ਢੁਕਵੀਂ ਮਿੱਟੀ ਕਿਹੜੀ ਮੰਨੀ ਜਾਂਦੀ ਹੈ?[span_11](start_span)[span_11](end_span)",
+        question: "ਕਪਾਹ ਅਤੇ ਗੰਨੇ ਦੀ ਕਾਸ਼ਤ ਲਈ ਸਭ ਤੋਂ ਢੁਕਵੀਂ ਮਿੱਟੀ ਕਿਹੜੀ ਮੰਨੀ ਜਾਂਦੀ ਹੈ?[span_8](start_span)[span_8](end_span)",
         options: ["ਜਲੋਢੀ ਮਿੱਟੀ", "ਕਾਲੀ ਮਿੱਟੀ", "ਲੈਟਰਾਈਟ ਮਿੱਟੀ", "ਰੇਤਲੀ ਮਿੱਟੀ"],
         answer: 1
       },
       {
         tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਪੰਜਾਬ, ਹਰਿਆਣਾ ਅਤੇ ਪੱਛਮੀ ਉੱਤਰ ਪ੍ਰਦੇਸ਼ ਵਿੱਚ ਭੂਮੀ ਦਾ ਮਿਆਰ ਡਿੱਗਣ (Degradation) ਦਾ ਮੁੱਖ ਕਾਰਨ ਕੀ ਹੈ?[span_12](start_span)[span_12](end_span)",
+        question: "ਪੰਜਾਬ, ਹਰਿਆਣਾ ਅਤੇ ਪੱਛਮੀ ਉੱਤਰ ਪ੍ਰਦੇਸ਼ ਵਿੱਚ ਭੂਮੀ ਦਾ ਮਿਆਰ ਡਿੱਗਣ (Degradation) ਦਾ ਮੁੱਖ ਕਾਰਨ ਕੀ ਹੈ?[span_9](start_span)[span_9](end_span)",
         options: ["ਜੰਗਲਾਂ ਦੀ ਕਟਾਈ", "ਖਾਣਾਂ ਦੀ ਖੁਦਾਈ", "ਜ਼ਰੂਰਤ ਤੋਂ ਜ਼ਿਆਦਾ ਸਿੰਚਾਈ (Over-irrigation)", "ਪਸ਼ੂ ਚਾਰਨ"],
         answer: 2
       },
       {
         tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਸਮੁੰਦਰੀ ਤੱਟ (ਬੇਸ ਲਾਈਨ) ਤੋਂ ਕਿੰਨੇ ਨਾਟੀਕਲ ਮੀਲ ਤੱਕ ਦਾ ਸਮੁੰਦਰੀ ਖੇਤਰ ਦੇਸ਼ ਦਾ ਨਿਵੇਕਲਾ ਆਰਥਿਕ ਖੇਤਰ (EEZ) ਹੁੰਦਾ ਹੈ?[span_13](start_span)[span_13](end_span)",
+        question: "ਸਮੁੰਦਰੀ ਤੱਟ (ਬੇਸ ਲਾਈਨ) ਤੋਂ ਕਿੰਨੇ ਨਾਟੀਕਲ ਮੀਲ ਤੱਕ ਦਾ ਸਮੁੰਦਰੀ ਖੇਤਰ ਦੇਸ਼ ਦਾ ਨਿਵੇਕਲਾ ਆਰਥਿਕ ਖੇਤਰ (EEZ) ਹੁੰਦਾ ਹੈ?[span_10](start_span)[span_10](end_span)",
         options: ["12 ਨਾਟੀਕਲ ਮੀਲ", "200 ਨਾਟੀਕਲ ਮੀਲ", "350 ਨਾਟੀਕਲ ਮੀਲ", "100 ਨਾਟੀਕਲ ਮੀਲ"],
         answer: 1
       },
       {
         tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਭਾਰਤ ਨੂੰ ਕਿੰਨੇ ਜੈਵ-ਭੂਗੋਲਿਕ ਜ਼ੋਨਾਂ (Biogeographic Zones) ਵਿੱਚ ਵੰਡਿਆ ਗਿਆ ਹੈ?[span_14](start_span)[span_14](end_span)",
+        question: "ਭਾਰਤ ਨੂੰ ਕਿੰਨੇ ਜੈਵ-ਭੂਗੋਲਿਕ ਜ਼ੋਨਾਂ (Biogeographic Zones) ਵਿੱਚ ਵੰਡਿਆ ਗਿਆ ਹੈ?[span_11](start_span)[span_11](end_span)",
         options: ["8", "10", "18", "26"],
         answer: 1
       },
       {
         tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਕਿਸੇ ਦੇਸ਼ ਨੂੰ ਮੈਗਾ ਜੈਵ-ਵਿਭਿੰਨਤਾ (Mega Diverse) ਵਾਲਾ ਮੁਲਕ ਕਹਿਣ ਲਈ ਘੱਟੋ-ਘੱਟ ਕਿੰਨੀਆਂ ਪੌਦਿਆਂ ਦੀਆਂ ਸਥਾਨਕ ਪ੍ਰਜਾਤੀਆਂ ਚਾਹੀਦੀਆਂ ਹਨ?[span_15](start_span)[span_15](end_span)",
+        question: "ਕਿਸੇ ਦੇਸ਼ ਨੂੰ ਮੈਗਾ ਜੈਵ-ਵਿਭਿੰਨਤਾ (Mega Diverse) ਵਾਲਾ ਮੁਲਕ ਕਹਿਣ ਲਈ ਘੱਟੋ-ਘੱਟ ਕਿੰਨੀਆਂ ਪੌਦਿਆਂ ਦੀਆਂ ਸਥਾਨਕ ਪ੍ਰਜਾਤੀਆਂ ਚਾਹੀਦੀਆਂ ਹਨ?[span_12](start_span)[span_12](end_span)",
         options: ["3,000", "5,000", "7,500", "10,000"],
         answer: 1
       },
       {
         tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਦੋ ਅਲੱਗ-ਅਲੱਗ ਕਿਸਮ ਦੀਆਂ ਪ੍ਰਜਾਤੀਆਂ ਜਾਂ ਪਾਰਿਸਥਿਤਿਕ ਤੰਤਰਾਂ ਵਿਚਕਾਰ ਤਬਦੀਲੀ ਵਾਲੀ ਜ਼ੋਨ (Transition Zone) ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?[span_16](start_span)[span_16](end_span)",
+        question: "ਦੋ ਅਲੱਗ-ਅਲੱਗ ਕਿਸਮ ਦੀਆਂ ਪ੍ਰਜਾਤੀਆਂ ਜਾਂ ਪਾਰਿਸਥਿਤਿਕ ਤੰਤਰਾਂ ਵਿਚਕਾਰ ਤਬਦੀਲੀ ਵਾਲੀ ਜ਼ੋਨ (Transition Zone) ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?[span_13](start_span)[span_13](end_span)",
         options: ["ਬਾਇਓਮ (Biome)", "ਈਕੋਟੋਨ (Ecotone)", "ਜੈਵਿਕ ਸੂਬਾ", "ਰਿਜ਼ਰਵ"],
         answer: 1
       },
       {
         tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਪੰਜਾਬ ਦੇ ਕਿਸ ਸ਼ਹਿਰ ਦੇ ਤਾਂਬੇ ਅਤੇ ਪਿੱਤਲ ਦੇ ਭਾਂਡੇ ਬਣਾਉਣ ਵਾਲੇ ਠਠੇਰਿਆਂ ਦੀ ਕਲਾ ਨੂੰ ਯੂਨੈਸਕੋ ਦੀ ਅਦਿੱਖ ਸੂਚੀ ਵਿੱਚ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ ਹੈ?[span_17](start_span)[span_17](end_span)",
+        question: "ਪੰਜਾਬ ਦੇ ਕਿਸ ਸ਼ਹਿਰ ਦੇ ਤਾਂਬੇ ਅਤੇ ਪਿੱਤਲ ਦੇ ਭਾਂਡੇ ਬਣਾਉਣ ਵਾਲੇ ਠਠੇਰਿਆਂ ਦੀ ਕਲਾ ਨੂੰ ਯੂਨੈਸਕੋ ਦੀ ਅਦਿੱਖ ਸੂਚੀ ਵਿੱਚ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ ਹੈ?[span_14](start_span)[span_14](end_span)",
         options: ["ਸੁਲਤਾਨਪੁਰ ਲੋਧੀ", "ਜੰਡਿਆਲਾ ਗੁਰੂ (ਅੰਮ੍ਰਿਤਸਰ)", "ਆਨੰਦਪੁਰ ਸਾਹਿਬ", "ਬਠਿੰਡਾ"],
         answer: 1
       },
       {
         tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਭਾਰਤ ਵਿੱਚ ਸਿੰਧ ਡੌਲਫਿਨ (Indus Dolphin) ਖ਼ਾਸ ਤੌਰ 'ਤੇ ਕਿਸ ਦਰਿਆ ਵਿੱਚ ਮਿਲਦੀ ਹੈ?[span_18](start_span)[span_18](end_span)",
+        question: "ਭਾਰਤ ਵਿੱਚ ਸਿੰਧ ਡੌਲਫਿਨ (Indus Dolphin) ਖ਼ਾਸ ਤੌਰ 'ਤੇ ਕਿਸ ਦਰਿਆ ਵਿੱਚ ਮਿਲਦੀ ਹੈ?[span_15](start_span)[span_15](end_span)",
         options: ["ਸਤਲੁਜ ਦਰਿਆ", "ਬਿਆਸ ਦਰਿਆ", "ਰਾਵੀ ਦਰਿਆ", "ਘੱਗਰ ਦਰਿਆ"],
         answer: 1
       },
       {
         tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਕਾਇਬੁਲ ਲੈਮਜ਼ੋ ਤੈਰਦਾ ਹੋਇਆ ਰਾਸ਼ਟਰੀ ਪਾਰਕ ਕਿਸ ਝੀਲ ਵਿੱਚ ਸਥਿਤ ਹੈ?[span_19](start_span)[span_19](end_span)",
+        question: "ਕਾਇਬੁਲ ਲੈਮਜ਼ੋ ਤੈਰਦਾ ਹੋਇਆ ਰਾਸ਼ਟਰੀ ਪਾਰਕ ਕਿਸ ਝੀਲ ਵਿੱਚ ਸਥਿਤ ਹੈ?[span_16](start_span)[span_16](end_span)",
         options: ["ਲੋਕਟਾਕ ਝੀਲ (ਮਨੀਪੁਰ)", "ਲੋਨਾਰ ਝੀਲ", "ਵੂਲਰ ਝੀਲ", "ਚਿਲਕਾ ਝੀਲ"],
         answer: 0
       },
       {
         tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਮਹਾਰਾਸ਼ਟਰ ਦੀ ਕਿਹੜੀ ਝੀਲ ਉਲਕਾ (Meteorite) ਡਿੱਗਣ ਨਾਲ ਬਣੇ ਟੋਏ ਕਾਰਨ ਹੋਂਦ ਵਿੱਚ ਆਈ?[span_20](start_span)[span_20](end_span)",
+        question: "ਮਹਾਰਾਸ਼ਟਰ ਦੀ ਕਿਹੜੀ ਝੀਲ ਉਲਕਾ (Meteorite) ਡਿੱਗਣ ਨਾਲ ਬਣੇ ਟੋਏ ਕਾਰਨ ਹੋਂਦ ਵਿੱਚ ਆਈ?[span_17](start_span)[span_17](end_span)",
         options: ["ਦਲ ਝੀਲ", "ਸਾਂਭਰ ਝੀਲ", "ਲੋਨਾਰ ਝੀਲ", "ਸੁਖਨਾ ਝੀਲ"],
         answer: 2
       },
       {
         tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਧਰਤੀ 'ਤੇ ਮੌਜੂਦ ਕੁੱਲ ਪਾਣੀ ਦਾ ਕਿੰਨੇ ਪ੍ਰਤੀਸ਼ਤ ਹਿੱਸਾ ਤਾਜ਼ਾ ਪਾਣੀ (Freshwater) ਹੈ?[span_21](start_span)[span_21](end_span)",
+        question: "ਧਰਤੀ 'ਤੇ ਮੌਜੂਦ ਕੁੱਲ ਪਾਣੀ ਦਾ ਕਿੰਨੇ ਪ੍ਰਤੀਸ਼ਤ ਹਿੱਸਾ ਤਾਜ਼ਾ ਪਾਣੀ (Freshwater) ਹੈ?[span_18](start_span)[span_18](end_span)",
         options: ["2.5% ਤੋਂ 3%", "10%", "15%", "25%"],
         answer: 0
       },
       {
         tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਭਾਰਤ ਵਿੱਚ ਵੱਡੇ ਡੈਮਾਂ ਅਤੇ ਬਹੁ-ਮੰਤਵੀ ਪ੍ਰਾਜੈਕਟਾਂ ਨੂੰ 'ਆਧੁਨਿਕ ਭਾਰਤ ਦੇ ਮੰਦਰ' ਦੀ ਸੰਗਿਆ ਕਿਸਨੇ ਦਿੱਤੀ ਸੀ?[span_22](start_span)[span_22](end_span)",
+        question: "ਭਾਰਤ ਵਿੱਚ ਵੱਡੇ ਡੈਮਾਂ ਅਤੇ ਬਹੁ-ਮੰਤਵੀ ਪ੍ਰਾਜੈਕਟਾਂ ਨੂੰ 'ਆਧੁਨਿਕ ਭਾਰਤ ਦੇ ਮੰਦਰ' ਦੀ ਸੰਗਿਆ ਕਿਸਨੇ ਦਿੱਤੀ ਸੀ?[span_19](start_span)[span_19](end_span)",
         options: ["ਡਾ. ਬੀ. ਆਰ. ਅੰਬੇਡਕਰ", "ਪੰਡਿਤ ਜਵਾਹਰ ਲਾਲ ਨਹਿਰੂ", "ਲਾਲ ਬਹਾਦਰ ਸ਼ਾਸਤਰੀ", "ਇੰਦਿਰਾ ਗਾਂਧੀ"],
         answer: 1
       },
       {
         tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਦੇਸ਼ ਦਾ ਸਭ ਤੋਂ ਉੱਚਾ ਡੈਮ 'ਟਿਹਰੀ ਡੈਮ' (261 ਮੀਟਰ) ਉੱਤਰਾਖੰਡ ਵਿੱਚ ਕਿਸ ਦਰਿਆ 'ਤੇ ਸਥਿਤ ਹੈ?[span_23](start_span)[span_23](end_span)",
+        question: "ਦੇਸ਼ ਦਾ ਸਭ ਤੋਂ ਉੱਚਾ ਡੈਮ 'ਟਿਹਰੀ ਡੈਮ' (261 ਮੀਟਰ) ਉੱਤਰਾਖੰਡ ਵਿੱਚ ਕਿਸ ਦਰਿਆ 'ਤੇ ਸਥਿਤ ਹੈ?[span_20](start_span)[span_20](end_span)",
         options: ["ਨਰਮਦਾ ਦਰਿਆ", "ਮਹਾਂਨਦੀ", "ਭਾਗੀਰਥੀ ਦਰਿਆ", "ਸਤਲੁਜ ਦਰਿਆ"],
         answer: 2
       },
       {
         tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਕਿਸ ਵਾਤਾਵਰਨ ਪ੍ਰੇਮੀ ਨੂੰ 'ਭਾਰਤ ਦਾ ਜਲ ਪੁਰਸ਼' (The Waterman of India) ਕਿਹਾ ਜਾਂਦਾ ਹੈ?[span_24](start_span)[span_24](end_span)",
+        question: "ਕਿਸ ਵਾਤਾਵਰਨ ਪ੍ਰੇਮੀ ਨੂੰ 'ਭਾਰਤ ਦਾ ਜਲ ਪੁਰਸ਼' (The Waterman of India) ਕਿਹਾ ਜਾਂਦਾ ਹੈ?[span_21](start_span)[span_21](end_span)",
         options: ["ਬਾਬਾ ਬਲਬੀਰ ਸਿੰਘ ਸੀਚੇਵਾਲ", "ਡਾ. ਰਾਜੇਂਦਰ ਸਿੰਘ", "ਸੁੰਦਰਲਾਲ ਬਹੁਗੁਣਾ", "ਜਾਦਵ ਪਾਯੇਂਗ"],
         answer: 1
       },
       {
         tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਪੰਜਾਬ ਵਿੱਚ ਪਿੰਡਾਂ ਦੇ ਗੰਦੇ ਪਾਣੀ ਦੇ ਕੁਦਰਤੀ ਸ਼ੁੱਧੀਕਰਨ ਲਈ ਕਿਹੜਾ ਪ੍ਰਸਿੱਧ ਮਾਡਲ ਲਾਗੂ ਕੀਤਾ ਗਿਆ ਹੈ?[span_25](start_span)[span_25](end_span)",
+        question: "ਪੰਜਾਬ ਵਿੱਚ ਪਿੰਡਾਂ ਦੇ ਗੰਦੇ ਪਾਣੀ ਦੇ ਕੁਦਰਤੀ ਸ਼ੁੱਧੀਕਰਨ ਲਈ ਕਿਹੜਾ ਪ੍ਰਸਿੱਧ ਮਾਡਲ ਲਾਗੂ ਕੀਤਾ ਗਿਆ ਹੈ?[span_22](start_span)[span_22](end_span)",
         options: ["ਚਿਪਕੋ ਮਾਡਲ", "ਸੀਚੇਵਾਲ ਮਾਡਲ", "ਤਰੁਣ ਭਾਰਤ ਮਾਡਲ", "ਸੁਲਤਾਨਪੁਰ ਮਾਡਲ"],
         answer: 1
       },
       {
         tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਭਾਰਤ ਦਾ ਕਿਹੜਾ ਪਹਿਲਾ ਰਾਜ ਹੈ ਜਿੱਥੇ ਹਰ ਘਰ ਦੀ ਛੱਤ ਉੱਤੇ ਮੀਂਹ ਦੇ ਪਾਣੀ ਦੀ ਸੰਭਾਲ (Rainwater Harvesting) ਕਾਨੂੰਨੀ ਤੌਰ 'ਤੇ ਲਾਜ਼ਮੀ ਹੈ?[span_26](start_span)[span_26](end_span)",
+        question: "ਭਾਰਤ ਦਾ ਕਿਹੜਾ ਪਹਿਲਾ ਰਾਜ ਹੈ ਜਿੱਥੇ ਹਰ ਘਰ ਦੀ ਛੱਤ ਉੱਤੇ ਮੀਂਹ ਦੇ ਪਾਣੀ ਦੀ ਸੰਭਾਲ (Rainwater Harvesting) ਕਾਨੂੰਨੀ ਤੌਰ 'ਤੇ ਲਾਜ਼ਮੀ ਹੈ?[span_23](start_span)[span_23](end_span)",
         options: ["ਪੰਜਾਬ", "ਰਾਜਸਥਾਨ", "ਤਾਮਿਲਨਾਡੂ", "ਮਹਾਰਾਸ਼ਟਰ"],
         answer: 2
       }
     ];
 
-    // ------------------------------------------------------------------
-    // 2. FIREBASE CONFIGURATION (Using user provided credentials)
-    // ------------------------------------------------------------------
+    // -----------------------------------------------------------
+    // 2. FIREBASE & STATE VARIABLES
+    // -----------------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyDvIt6oPT_mJjpTM3X3_zVI9i3NjomV6fo",
       authDomain: "pseb-class10-portal.firebaseapp.com",
@@ -449,47 +497,66 @@
     try {
       firebase.initializeApp(firebaseConfig);
       db = firebase.firestore();
-    } catch (e) {
-      console.warn("Firebase initialized in offline/local fallback mode.", e);
+    } catch(err) {
+      console.warn("Firebase initialized with local store fallback.");
     }
 
-    // ------------------------------------------------------------------
-    // 3. STATE MANAGEMENT & SESSION
-    // ------------------------------------------------------------------
-    let currentUser = JSON.parse(localStorage.getItem('pseb_user')) || null;
-    let currentQuizIndex = 0;
-    let selectedAnswers = new Array(SST_QUESTIONS.length).fill(null);
+    const ADMIN_CREDS = {
+      email: "deepxmaan.ol@gmail.com",
+      pass: "deep@2012"
+    };
 
-    const ADMIN_EMAIL = "deepxmaan.ol@gmail.com";
-    const ADMIN_PASS = "deep@2012";
+    let activeAuthMode = 'login'; // 'login' or 'signup'
+    let currentUser = JSON.parse(localStorage.getItem('pseb_current_user')) || null;
+    let quizQuestionIndex = 0;
+    let quizSelectedAnswers = new Array(QUESTIONS_DATA.length).fill(null);
 
-    function init() {
+    // -----------------------------------------------------------
+    // 3. INITIALIZATION & ROUTING
+    // -----------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      updateNavbar();
+      refreshNavigation();
+
       if (!currentUser) {
-        navigate('login');
+        showSection('authSection');
       } else {
         if (currentUser.role === 'admin') {
-          navigate('admin');
+          showSection('adminSection');
         } else {
-          navigate('dashboard');
+          showSection('dashboardSection');
         }
       }
+    });
+
+    function showSection(sectionId) {
+      ['authSection', 'dashboardSection', 'quizSection', 'resultSection', 'adminSection'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      const target = document.getElementById(sectionId);
+      if (target) {
+        target.classList.remove('hidden');
+      }
+
+      if (sectionId === 'dashboardSection') renderStudentDashboard();
+      if (sectionId === 'adminSection') renderAdminDashboard();
+      lucide.createIcons();
     }
 
-    function updateNavbar() {
+    function refreshNavigation() {
       const container = document.getElementById('navRight');
       if (!currentUser) {
         container.innerHTML = `
-          <button onclick="navigate('login')" class="text-xs px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 font-semibold transition">
-            Login
+          <button onclick="showSection('authSection')" class="text-xs px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold transition">
+            Sign In
           </button>
         `;
       } else {
         container.innerHTML = `
           <div class="flex items-center space-x-2">
-            <span class="text-xs text-slate-300 font-medium">${currentUser.name}</span>
-            <button onclick="handleLogout()" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
+            <span class="text-xs font-semibold text-slate-300">${currentUser.name}</span>
+            <button onclick="logoutSession()" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
               Logout
             </button>
           </div>
@@ -498,247 +565,287 @@
       lucide.createIcons();
     }
 
-    function navigate(view) {
-      document.getElementById('loginView').classList.add('hidden');
-      document.getElementById('dashboardView').classList.add('hidden');
-      document.getElementById('quizView').classList.add('hidden');
-      document.getElementById('resultView').classList.add('hidden');
-      document.getElementById('adminView').classList.add('hidden');
+    function handleLogoClick() {
+      if (!currentUser) {
+        showSection('authSection');
+      } else if (currentUser.role === 'admin') {
+        showSection('adminSection');
+      } else {
+        showSection('dashboardSection');
+      }
+    }
 
-      if (view === 'login') {
-        document.getElementById('loginView').classList.remove('hidden');
-      } else if (view === 'dashboard') {
-        renderDashboard();
-        document.getElementById('dashboardView').classList.remove('hidden');
-      } else if (view === 'quiz') {
-        document.getElementById('quizView').classList.remove('hidden');
-      } else if (view === 'result') {
-        document.getElementById('resultView').classList.remove('hidden');
-      } else if (view === 'admin') {
-        renderAdmin();
-        document.getElementById('adminView').classList.remove('hidden');
+    // -----------------------------------------------------------
+    // 4. AUTHENTICATION (LOGIN & SIGN UP SWITCHING)
+    // -----------------------------------------------------------
+    function switchAuthTab(mode) {
+      activeAuthMode = mode;
+      const tabLogin = document.getElementById('tabLogin');
+      const tabSignup = document.getElementById('tabSignup');
+      const nameGroup = document.getElementById('nameFieldGroup');
+      const detailsGroup = document.getElementById('studentDetailsGroup');
+      const title = document.getElementById('authTitle');
+      const subtitle = document.getElementById('authSubtitle');
+      const btnText = document.getElementById('btnText');
+      const identifierLabel = document.getElementById('identifierLabel');
+
+      if (mode === 'signup') {
+        tabSignup.className = "py-2.5 rounded-xl bg-indigo-600 text-white shadow-md transition duration-200";
+        tabLogin.className = "py-2.5 rounded-xl text-slate-400 hover:text-slate-200 transition duration-200";
+        
+        nameGroup.classList.remove('hidden');
+        detailsGroup.classList.remove('hidden');
+        title.textContent = "Student Registration";
+        subtitle.textContent = "Create your Class 10 profile for instant access";
+        btnText.textContent = "Register & Enter Portal";
+        identifierLabel.textContent = "Username / Student ID";
+      } else {
+        tabLogin.className = "py-2.5 rounded-xl bg-indigo-600 text-white shadow-md transition duration-200";
+        tabSignup.className = "py-2.5 rounded-xl text-slate-400 hover:text-slate-200 transition duration-200";
+        
+        nameGroup.classList.add('hidden');
+        detailsGroup.classList.add('hidden');
+        title.textContent = "Student & Admin Login";
+        subtitle.textContent = "Access your Punjab School Education Board portal";
+        btnText.textContent = "Sign In to Account";
+        identifierLabel.textContent = "Username or Admin Email";
       }
       lucide.createIcons();
     }
 
-    // ------------------------------------------------------------------
-    // 4. AUTHENTICATION & ADMIN
-    // ------------------------------------------------------------------
-    function handleLogin(e) {
-      e.preventDefault();
-      const userVal = document.getElementById('userInput').value.trim();
-      const passVal = document.getElementById('passInput').value.trim();
+    function handleAuthSubmit(event) {
+      event.preventDefault();
+      const identifier = document.getElementById('authIdentifier').value.trim();
+      const password = document.getElementById('authPassword').value.trim();
 
-      if (userVal.toLowerCase() === ADMIN_EMAIL.toLowerCase() && passVal === ADMIN_PASS) {
+      // Check for Admin Credentials
+      if (identifier.toLowerCase() === ADMIN_CREDS.email.toLowerCase() && password === ADMIN_CREDS.pass) {
         currentUser = {
           name: "Deepinder Singh (Admin)",
-          email: ADMIN_EMAIL,
+          email: ADMIN_CREDS.email,
           role: "admin",
-          rollNo: "ADM-001"
+          rollNo: "TEACHER-01"
         };
-        localStorage.setItem('pseb_user', JSON.stringify(currentUser));
-        updateNavbar();
-        showToast("Welcome Admin! Redirecting to Management Panel.");
-        navigate('admin');
+        localStorage.setItem('pseb_current_user', JSON.stringify(currentUser));
+        refreshNavigation();
+        showToast("Logged in as Admin!");
+        showSection('adminSection');
         return;
       }
 
-      // Normal Student Login
-      currentUser = {
-        name: userVal,
-        rollNo: passVal || "Roll No. 05",
-        role: "student",
-        score: null,
-        submittedAt: null
-      };
-      localStorage.setItem('pseb_user', JSON.stringify(currentUser));
-      saveStudentRecord(currentUser);
-      updateNavbar();
-      showToast(`Welcome ${currentUser.name}! Profile Loaded.`);
-      navigate('dashboard');
+      if (activeAuthMode === 'signup') {
+        const studentName = document.getElementById('signupName').value.trim() || identifier;
+        const roll = document.getElementById('signupRoll').value.trim() || "Roll No. 05";
+        const section = document.getElementById('signupSection').value.trim() || "Section C";
+
+        currentUser = {
+          name: studentName,
+          rollNo: roll,
+          section: section,
+          role: "student",
+          score: null,
+          submittedAt: null
+        };
+        showToast(`Account registered for ${currentUser.name}!`);
+      } else {
+        // Find existing record or create new session
+        const allStudents = JSON.parse(localStorage.getItem('pseb_student_records')) || [];
+        const existing = allStudents.find(s => s.name.toLowerCase() === identifier.toLowerCase());
+
+        currentUser = existing || {
+          name: identifier,
+          rollNo: "Roll No. 05",
+          section: "Section C",
+          role: "student",
+          score: null,
+          submittedAt: null
+        };
+        showToast(`Welcome back, ${currentUser.name}!`);
+      }
+
+      localStorage.setItem('pseb_current_user', JSON.stringify(currentUser));
+      saveRecordToStorage(currentUser);
+      refreshNavigation();
+      showSection('dashboardSection');
     }
 
-    function handleLogout() {
-      localStorage.removeItem('pseb_user');
+    function logoutSession() {
+      localStorage.removeItem('pseb_current_user');
       currentUser = null;
-      updateNavbar();
-      navigate('login');
+      refreshNavigation();
+      showSection('authSection');
       showToast("Logged out successfully.");
     }
 
-    // ------------------------------------------------------------------
-    // 5. DASHBOARD & SYLLABUS
-    // ------------------------------------------------------------------
-    function renderDashboard() {
+    // -----------------------------------------------------------
+    // 5. DASHBOARD FUNCTIONS
+    // -----------------------------------------------------------
+    function renderStudentDashboard() {
       if (!currentUser) return;
-      document.getElementById('profileName').textContent = currentUser.name;
-      document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-      document.getElementById('profileRoll').textContent = `PSEB Class 10 • ${currentUser.rollNo || 'Sec C'}`;
-      
-      const students = JSON.parse(localStorage.getItem('pseb_all_students')) || [];
-      const record = students.find(s => s.name === currentUser.name) || currentUser;
+      document.getElementById('dashStudentName').textContent = currentUser.name;
+      document.getElementById('dashAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+      document.getElementById('dashStudentClass').textContent = `PSEB 10th Class • ${currentUser.rollNo || 'Roll No. 5'} • ${currentUser.section || 'Sec C'}`;
 
-      if (record.score !== null && record.score !== undefined) {
-        document.getElementById('profileTotalScore').textContent = `${record.score} / 20`;
-        document.getElementById('profileStatus').textContent = "Completed";
-        document.getElementById('profileStatus').className = "text-base font-bold text-emerald-400";
+      const records = JSON.parse(localStorage.getItem('pseb_student_records')) || [];
+      const studentData = records.find(s => s.name === currentUser.name) || currentUser;
+
+      const scoreEl = document.getElementById('dashScoreDisplay');
+      if (studentData.score !== null && studentData.score !== undefined) {
+        scoreEl.textContent = `${studentData.score} / 20 Marks`;
+        scoreEl.className = "text-lg font-black text-emerald-400";
       } else {
-        document.getElementById('profileTotalScore').textContent = "0 / 20";
-        document.getElementById('profileStatus').textContent = "Pending";
-        document.getElementById('profileStatus').className = "text-base font-bold text-amber-400";
+        scoreEl.textContent = "Not Attempted";
+        scoreEl.className = "text-lg font-black text-amber-400";
       }
     }
 
-    function subjectNotice(subject) {
-      showToast(`${subject} chapters are currently queued. SST Chapter 1-3 is live!`);
+    // -----------------------------------------------------------
+    // 6. QUIZ FLOW (20 QUESTIONS / 20 MARKS)
+    // -----------------------------------------------------------
+    function startSSTQuiz() {
+      quizQuestionIndex = 0;
+      quizSelectedAnswers = new Array(QUESTIONS_DATA.length).fill(null);
+      showSection('quizSection');
+      displayCurrentQuestion();
     }
 
-    // ------------------------------------------------------------------
-    // 6. QUIZ LOGIC (20 MARKS)
-    // ------------------------------------------------------------------
-    function startQuiz() {
-      currentQuizIndex = 0;
-      selectedAnswers = new Array(SST_QUESTIONS.length).fill(null);
-      navigate('quiz');
-      loadQuestion();
-    }
+    function displayCurrentQuestion() {
+      const q = QUESTIONS_DATA[quizQuestionIndex];
+      document.getElementById('quizCounter').textContent = `${quizQuestionIndex + 1} / ${QUESTIONS_DATA.length}`;
+      document.getElementById('quizChapterBadge').textContent = q.tag;
+      document.getElementById('quizQuestionText').textContent = `${quizQuestionIndex + 1}. ${q.question}`;
 
-    function loadQuestion() {
-      const q = SST_QUESTIONS[currentQuizIndex];
-      document.getElementById('currentQIdx').textContent = currentQuizIndex + 1;
-      document.getElementById('questionTag').textContent = q.tag;
-      document.getElementById('questionText').textContent = `${currentQuizIndex + 1}. ${q.question}`;
-      
-      const percent = ((currentQuizIndex + 1) / SST_QUESTIONS.length) * 100;
-      document.getElementById('progressBar').style.width = `${percent}%`;
+      const pct = ((quizQuestionIndex + 1) / QUESTIONS_DATA.length) * 100;
+      document.getElementById('quizProgressBar').style.width = `${pct}%`;
 
-      const container = document.getElementById('optionsContainer');
-      container.innerHTML = '';
+      const listContainer = document.getElementById('quizOptionsList');
+      listContainer.innerHTML = '';
 
-      q.options.forEach((opt, idx) => {
-        const isSelected = selectedAnswers[currentQuizIndex] === idx;
+      q.options.forEach((opt, index) => {
+        const isSelected = quizSelectedAnswers[quizQuestionIndex] === index;
         const btn = document.createElement('button');
-        btn.className = `w-full text-left p-3.5 rounded-xl border text-xs md:text-sm font-medium transition flex items-center justify-between ${
+        btn.className = `w-full text-left p-3.5 rounded-2xl border text-xs sm:text-sm font-semibold transition flex items-center justify-between ${
           isSelected 
             ? 'bg-indigo-600/30 border-indigo-500 text-white shadow-md' 
             : 'glassmorphism border-slate-700/80 hover:border-slate-600 text-slate-300'
         }`;
-        btn.onclick = () => selectOption(idx);
+        btn.onclick = () => selectQuizAnswer(index);
         btn.innerHTML = `
           <span>${opt}</span>
-          <span class="w-5 h-5 rounded-full border border-slate-600 flex items-center justify-center text-[10px] ${isSelected ? 'bg-indigo-500 border-indigo-400 text-white' : ''}">
-            ${String.fromCharCode(65 + idx)}
+          <span class="w-6 h-6 rounded-full border border-slate-600 flex items-center justify-center text-[10px] ${
+            isSelected ? 'bg-indigo-500 border-indigo-400 text-white' : ''
+          }">
+            ${String.fromCharCode(65 + index)}
           </span>
         `;
-        container.appendChild(btn);
+        listContainer.appendChild(btn);
       });
 
-      document.getElementById('prevBtn').disabled = currentQuizIndex === 0;
-      document.getElementById('nextBtn').textContent = currentQuizIndex === SST_QUESTIONS.length - 1 ? 'Finish Exam' : 'Next';
+      document.getElementById('quizPrevBtn').disabled = quizQuestionIndex === 0;
+      document.getElementById('quizNextBtn').textContent = quizQuestionIndex === QUESTIONS_DATA.length - 1 ? 'Finish & Submit' : 'Next';
     }
 
-    function selectOption(idx) {
-      selectedAnswers[currentQuizIndex] = idx;
-      loadQuestion();
+    function selectQuizAnswer(index) {
+      quizSelectedAnswers[quizQuestionIndex] = index;
+      displayCurrentQuestion();
     }
 
-    function prevQuestion() {
-      if (currentQuizIndex > 0) {
-        currentQuizIndex--;
-        loadQuestion();
+    function previousQuestion() {
+      if (quizQuestionIndex > 0) {
+        quizQuestionIndex--;
+        displayCurrentQuestion();
       }
     }
 
-    function nextQuestion() {
-      if (currentQuizIndex < SST_QUESTIONS.length - 1) {
-        currentQuizIndex++;
-        loadQuestion();
+    function advanceQuestion() {
+      if (quizQuestionIndex < QUESTIONS_DATA.length - 1) {
+        quizQuestionIndex++;
+        displayCurrentQuestion();
       } else {
-        submitQuiz();
+        submitTestAnswers();
       }
     }
 
-    function exitQuiz() {
-      if (confirm("Are you sure you want to exit the quiz? Unsubmitted answers will be lost.")) {
-        navigate('dashboard');
+    function quitQuiz() {
+      if (confirm("Do you want to exit the quiz? Any unsaved answers will be discarded.")) {
+        showSection('dashboardSection');
       }
     }
 
-    function submitQuiz() {
-      let score = 0;
-      selectedAnswers.forEach((ans, i) => {
-        if (ans === SST_QUESTIONS[i].answer) {
-          score += 1;
+    function submitTestAnswers() {
+      let earnedMarks = 0;
+      quizSelectedAnswers.forEach((answerIndex, qIdx) => {
+        if (answerIndex === QUESTIONS_DATA[qIdx].answer) {
+          earnedMarks += 1;
         }
       });
 
       const submissionDate = new Date().toLocaleString();
-      currentUser.score = score;
+      currentUser.score = earnedMarks;
       currentUser.submittedAt = submissionDate;
-      localStorage.setItem('pseb_user', JSON.stringify(currentUser));
-      saveStudentRecord(currentUser);
 
-      // Trigger Celebration Confetti
+      localStorage.setItem('pseb_current_user', JSON.stringify(currentUser));
+      saveRecordToStorage(currentUser);
+
       try {
         confetti({
-          particleCount: 80,
+          particleCount: 100,
           spread: 70,
           origin: { y: 0.6 }
         });
       } catch(e) {}
 
-      document.getElementById('finalScore').textContent = score;
-      const feedback = document.getElementById('scoreFeedback');
-      if (score >= 18) {
-        feedback.textContent = "Outstanding! Grade: A+ (Board Exam Ready)";
+      document.getElementById('finalScoreVal').textContent = earnedMarks;
+      const feedback = document.getElementById('finalFeedback');
+      if (earnedMarks >= 18) {
+        feedback.textContent = "Outstanding Performance! Grade: A+";
         feedback.className = "text-xs font-bold text-emerald-400 mt-2";
-      } else if (score >= 12) {
-        feedback.textContent = "Well Done! Grade: B (Revise weaker concepts)";
+      } else if (earnedMarks >= 10) {
+        feedback.textContent = "Good Attempt! Revise Chapters 1 to 3.";
         feedback.className = "text-xs font-bold text-indigo-300 mt-2";
       } else {
-        feedback.textContent = "Keep practicing! Review Chapter 1, 2, and 3 notes.";
+        feedback.textContent = "Needs Revision. Study the uploaded PDF.";
         feedback.className = "text-xs font-bold text-amber-400 mt-2";
       }
 
-      navigate('result');
+      showSection('resultSection');
     }
 
-    // ------------------------------------------------------------------
-    // 7. DATA STORAGE & SYNC (LOCAL & FIRESTORE)
-    // ------------------------------------------------------------------
-    function saveStudentRecord(userObj) {
-      let list = JSON.parse(localStorage.getItem('pseb_all_students')) || [];
-      const idx = list.findIndex(s => s.name === userObj.name);
-      if (idx >= 0) {
-        list[idx] = { ...list[idx], ...userObj };
+    // -----------------------------------------------------------
+    // 7. RECORD PERSISTENCE & ADMIN VIEW
+    // -----------------------------------------------------------
+    function saveRecordToStorage(user) {
+      let records = JSON.parse(localStorage.getItem('pseb_student_records')) || [];
+      const matchIndex = records.findIndex(r => r.name.toLowerCase() === user.name.toLowerCase());
+      if (matchIndex >= 0) {
+        records[matchIndex] = { ...records[matchIndex], ...user };
       } else {
-        list.push(userObj);
+        records.push(user);
       }
-      localStorage.setItem('pseb_all_students', JSON.stringify(list));
+      localStorage.setItem('pseb_student_records', JSON.stringify(records));
 
-      // Async write to Firebase Firestore
+      // Optional cloud sync with Firebase Firestore
       if (db) {
-        db.collection("exam_results").doc(userObj.name).set({
-          name: userObj.name,
-          rollNo: userObj.rollNo || "N/A",
-          score: userObj.score !== null ? userObj.score : 0,
+        db.collection("pseb_exam_results").doc(user.name).set({
+          name: user.name,
+          rollNo: user.rollNo || "05",
+          section: user.section || "C",
+          score: user.score !== null ? user.score : 0,
           total: 20,
-          submittedAt: userObj.submittedAt || new Date().toISOString()
-        }, { merge: true }).catch(err => {
-          console.log("Firestore cloud sync note:", err.message);
-        });
+          submittedAt: user.submittedAt || new Date().toISOString()
+        }, { merge: true }).catch(err => console.log("Firestore notice:", err.message));
       }
     }
 
-    function renderAdmin() {
-      const records = JSON.parse(localStorage.getItem('pseb_all_students')) || [];
-      document.getElementById('totalStudentsCount').textContent = `${records.length} Students registered`;
+    function renderAdminDashboard() {
+      const records = JSON.parse(localStorage.getItem('pseb_student_records')) || [];
+      document.getElementById('adminStudentCount').textContent = `${records.length} total students`;
 
-      const tbody = document.getElementById('studentRecordsBody');
+      const tbody = document.getElementById('adminTableRows');
       tbody.innerHTML = '';
 
       if (records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No student records found yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No student records registered yet.</td></tr>`;
         return;
       }
 
@@ -747,52 +854,51 @@
         tr.className = "hover:bg-slate-800/40 transition";
         const pct = student.score !== null ? ((student.score / 20) * 100).toFixed(0) + '%' : 'Pending';
         tr.innerHTML = `
-          <td class="p-3 font-semibold text-slate-200">${student.name}</td>
-          <td class="p-3 text-slate-400">${student.rollNo || 'Roll No. 05'}</td>
-          <td class="p-3 font-bold ${student.score >= 12 ? 'text-emerald-400' : 'text-amber-400'}">
+          <td class="p-3.5 font-bold text-slate-200">${student.name}</td>
+          <td class="p-3.5 text-slate-400">${student.rollNo || 'Roll No. 5'} (${student.section || 'Sec C'})</td>
+          <td class="p-3.5 font-extrabold ${student.score >= 10 ? 'text-emerald-400' : 'text-amber-400'}">
             ${student.score !== null ? student.score : 'Not Attempted'}
           </td>
-          <td class="p-3 text-slate-300">${pct}</td>
-          <td class="p-3 text-slate-500 text-[11px]">${student.submittedAt || '—'}</td>
+          <td class="p-3.5 text-slate-300 font-semibold">${pct}</td>
+          <td class="p-3.5 text-slate-500 text-[11px]">${student.submittedAt || '—'}</td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    function syncFirebase() {
-      showToast("Fetching latest data and records...");
+    function syncWithFirebaseCloud() {
+      showToast("Connecting to Firestore database...");
       if (db) {
-        db.collection("exam_results").get().then((querySnapshot) => {
-          let list = JSON.parse(localStorage.getItem('pseb_all_students')) || [];
-          querySnapshot.forEach((doc) => {
+        db.collection("pseb_exam_results").get().then((snapshot) => {
+          let records = JSON.parse(localStorage.getItem('pseb_student_records')) || [];
+          snapshot.forEach(doc => {
             const data = doc.data();
-            const existing = list.find(s => s.name === data.name);
-            if (!existing) {
-              list.push(data);
+            const idx = records.findIndex(r => r.name.toLowerCase() === data.name.toLowerCase());
+            if (idx >= 0) {
+              records[idx] = { ...records[idx], ...data };
+            } else {
+              records.push(data);
             }
           });
-          localStorage.setItem('pseb_all_students', JSON.stringify(list));
-          renderAdmin();
-          showToast("Sync completed with Firestore!");
+          localStorage.setItem('pseb_student_records', JSON.stringify(records));
+          renderAdminDashboard();
+          showToast("Sync completed successfully!");
         }).catch(err => {
           showToast("Cloud sync note: " + err.message);
         });
       } else {
-        setTimeout(() => showToast("Local records are verified and up to date."), 600);
+        setTimeout(() => showToast("Local records verified and loaded."), 500);
       }
     }
 
     function showToast(msg) {
-      const toast = document.getElementById('noticeToast');
+      const toast = document.getElementById('toastMessage');
       toast.textContent = msg;
       toast.classList.remove('hidden');
       setTimeout(() => {
         toast.classList.add('hidden');
       }, 3000);
     }
-
-    // Launch App on Load
-    window.addEventListenr('DOMContentLoaded', init);
   </script>
 </body>
 </html>
