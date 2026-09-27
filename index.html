@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PSEB Class 10 Learning Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- EmailJS Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <title>PSEB 10th Class - Daily AI Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #4338ca;
@@ -56,7 +54,7 @@
     .chat-bubble.bot { align-self: flex-start; background: #fff; border: 1px solid var(--border); border-bottom-left-radius: 2px; }
     .chat-bar { display: flex; padding: 0.75rem; background: #fff; border-top: 1px solid var(--border); gap: 0.5rem; }
 
-    /* Admin Table */
+    /* Tables */
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; font-size: 0.875rem; }
     th { background: #f1f5f9; }
@@ -77,12 +75,12 @@
     <!-- View 1: Auth & Verification Flow -->
     <div id="authView" class="card" style="max-width: 480px; margin: 2rem auto;">
       <h2 style="margin-bottom: 0.25rem;">Student Profile Creation</h2>
-      <p style="color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Enter details to receive your 6-digit OTP code on your email.</p>
+      <p style="color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Enter details to get verification code on your email.</p>
 
       <div id="regInputs">
         <div class="form-group">
           <label>Full Name</label>
-          <input type="text" id="stuName" placeholder="e.g. Amanpreet Singh" required>
+          <input type="text" id="stuName" placeholder="e.g. Gurpreet Singh" required>
         </div>
         <div class="form-group">
           <label>Class</label>
@@ -90,22 +88,22 @@
         </div>
         <div class="form-group">
           <label>Roll Number</label>
-          <input type="text" id="stuRoll" placeholder="e.g. 104521" required>
+          <input type="text" id="stuRoll" placeholder="e.g. 102456" required>
         </div>
         <div class="form-group">
           <label>Email Address</label>
-          <input type="email" id="stuEmail" placeholder="student@gmail.com" required>
+          <input type="email" id="stuEmail" placeholder="student@example.com" required>
         </div>
-        <button class="btn btn-primary" id="btnRequestOtp" style="width: 100%;" onclick="requestOTP()">Send OTP to Email</button>
+        <button class="btn btn-primary" id="btnRequestOtp" style="width: 100%;" onclick="requestOTP()">Send Code to Email</button>
       </div>
 
       <div id="otpInputs" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-        <label>Enter 6-Digit Verification Code</label>
-        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem;">Check your email inbox or spam folder for the code.</p>
+        <label>Enter 6-Digit Email Verification Code</label>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem;">Check your email inbox or spam folder for the verification code.</p>
         <input type="text" id="inputOtp" placeholder="XXXXXX" maxlength="6" style="text-align: center; letter-spacing: 5px; font-size: 1.3rem; margin-bottom: 1rem;">
-        <button class="btn btn-primary" style="width: 100%;" onclick="validateOTP()">Verify OTP & Enter</button>
+        <button class="btn btn-primary" style="width: 100%;" onclick="validateOTP()">Verify Code & Enter</button>
         <div style="text-align: center; margin-top: 0.75rem;">
-          <a href="#" style="font-size: 0.8rem; color: var(--primary);" onclick="resendOtp()">Resend Code</a>
+          <a href="#" style="font-size: 0.8rem; color: var(--primary);" onclick="resendOtp()">Edit Details / Resend</a>
         </div>
       </div>
     </div>
@@ -123,7 +121,7 @@
       <div id="tabQuiz" class="card">
         <div id="quizStartView">
           <h3>Class 10 Daily 20-Question Quiz</h3>
-          <p style="color: var(--muted); margin-bottom: 1.5rem;">Questions generated dynamically every day based on the PSEB Board syllabus.</p>
+          <p style="color: var(--muted); margin-bottom: 1.5rem;">Unique AI-generated test for today covering PSEB 10th Math, Science, and Social Studies.</p>
           <div class="form-group" style="max-width: 320px;">
             <label>Select Medium / ਮਾਧਿਅਮ ਚੁਣੋ:</label>
             <select id="quizLanguage">
@@ -146,16 +144,16 @@
 
         <div id="quizDoneView" style="display: none; text-align: center; padding: 2rem 0;">
           <h2>Daily Assessment Complete!</h2>
-          <p style="color: var(--muted); margin: 0.5rem 0 1.5rem 0;">Your final score has been transmitted to admin email: deepxmaan01@gmail.com.</p>
+          <p style="color: var(--muted); margin: 0.5rem 0 1.5rem 0;">Your final score and report have been automatically sent to admin: deepxmaan01@gmail.com.</p>
           <h1 id="quizFinalScore" style="color: var(--primary); font-size: 3.5rem; margin-bottom: 1.5rem;">0/20</h1>
-          <button class="btn btn-secondary" onclick="showTab('doubts')">Ask AI in Punjabi about Mistakes</button>
+          <button class="btn btn-secondary" onclick="showTab('doubts')">Ask AI in Punjabi About Mistakes</button>
         </div>
       </div>
 
       <!-- Tab: Handwritten Copy Checker -->
       <div id="tabCopy" class="card" style="display: none;">
         <h3>PSEB Handwritten Answer Copy Evaluation</h3>
-        <p style="color: var(--muted); margin-bottom: 1.5rem;">Upload a clear photo of your handwritten paper. AI will grade it out of 10 and detail mistakes.</p>
+        <p style="color: var(--muted); margin-bottom: 1.5rem;">Upload a photo of your handwritten paper. AI will grade it out of 10 and show step mistakes.</p>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
           <div class="form-group">
             <label>Subject</label>
@@ -177,7 +175,7 @@
         </div>
         <div class="form-group">
           <label>Question Topic or Exercise</label>
-          <input type="text" id="evalTopic" placeholder="e.g. Real Numbers - Theorem 1.1 Euclid Division Lemma">
+          <input type="text" id="evalTopic" placeholder="e.g. Chapter 4 Quadratic Equations, Exercise 4.2 Q1">
         </div>
         <div class="form-group">
           <label>Upload Handwritten Copy Photo</label>
@@ -190,13 +188,13 @@
       <!-- Tab: Punjabi Doubt Resolution -->
       <div id="tabDoubts" class="card" style="display: none;">
         <h3>10ਵੀਂ ਸ਼੍ਰੇਣੀ ਦੇ ਸ਼ੰਕੇ ਹੱਲ ਕਰੋ (PSEB Punjabi AI Tutor)</h3>
-        <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.875rem;">10ਵੀਂ ਜਮਾਤ ਦੇ ਕਿਸੇ ਵੀ ਸਵਾਲ ਨੂੰ ਪੰਜਾਬੀ ਵਿੱਚ ਪੁੱਛੋ।</p>
+        <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.875rem;">10ਵੀਂ ਜਮਾਤ ਦੇ ਕਿਸੇ ਵੀ ਵਿਸ਼ੇ ਬਾਰੇ ਸਵਾਲ ਪੁੱਛੋ, ਤੁਹਾਨੂੰ ਸਰਲ ਪੰਜਾਬੀ ਵਿੱਚ ਜਵਾਬ ਮਿਲੇਗਾ।</p>
         <div class="chat-box">
           <div class="chat-list" id="doubtMessages">
             <div class="chat-bubble bot">ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਤੁਸੀਂ 10ਵੀਂ ਜਮਾਤ ਦੇ ਕਿਸੇ ਵੀ ਵਿਸ਼ੇ (ਗਣਿਤ, ਸਾਇੰਸ ਆਦਿ) ਬਾਰੇ ਇੱਥੇ ਪੁੱਛ ਸਕਦੇ ਹੋ।</div>
           </div>
           <div class="chat-bar">
-            <input type="text" id="txtDoubt" placeholder="ਆਪਣਾ ਸਵਾਲ ਇੱਥੇ ਲਿਖੋ... (ਉਦਾਹਰਣ: ਪ੍ਰਕਾਸ਼ ਦਾ ਪਰਾਵਰਤਨ ਕੀ ਹੈ?)" onkeydown="if(event.key === 'Enter') askDoubt()">
+            <input type="text" id="txtDoubt" placeholder="ਆਪਣਾ ਸਵਾਲ ਇੱਥੇ ਲਿਖੋ..." onkeydown="if(event.key === 'Enter') askDoubt()">
             <button class="btn btn-primary" onclick="askDoubt()">ਪੁੱਛੋ</button>
           </div>
         </div>
@@ -210,7 +208,7 @@
           <p><strong>Class:</strong> 10th Class (PSEB)</p>
           <p><strong>Roll No:</strong> <span id="infoRoll"></span></p>
           <p><strong>Email:</strong> <span id="infoEmail"></span></p>
-          <p><strong>Account Status:</strong> <span style="color: var(--success); font-weight: 700;">Verified (Persistent Login Saved)</span></p>
+          <p><strong>Verification:</strong> <span style="color: var(--success); font-weight: 700;">Verified (Never requires login again)</span></p>
           <p><strong>Latest 20-Q Quiz Score:</strong> <span id="infoScore">Not Taken</span></p>
         </div>
       </div>
@@ -236,7 +234,7 @@
           <h3 id="statTotalQuizzes">0</h3>
         </div>
         <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px;">
-          <p style="font-size: 0.8rem; color: var(--muted);">Mediums Ratio</p>
+          <p style="font-size: 0.8rem; color: var(--muted);">Mediums</p>
           <h3 id="statMedium" style="font-size: 1rem; margin-top: 0.25rem;">0 Punjabi / 0 English</h3>
         </div>
       </div>
@@ -251,7 +249,7 @@
               <th>Email</th>
               <th>Medium</th>
               <th>20-Q Score</th>
-              <th>Analysis & Status</th>
+              <th>Status / Report</th>
             </tr>
           </thead>
           <tbody id="adminStudentRows"></tbody>
@@ -273,7 +271,7 @@
     let activeQuestionIndex = 0;
     let totalScore = 0;
 
-    // Check persistent session on load
+    // Check persistent login on load
     window.addEventListener('DOMContentLoaded', () => {
       const saved = localStorage.getItem("pseb_persisted_profile");
       if (saved) {
@@ -282,61 +280,42 @@
       }
     });
 
-    // Real Email Sender via FormSpree & EmailJS direct API (No verification links required)
-    async function sendDirectEmail(toEmail, subject, content) {
-      // Endpoint sends plain-text email straight to the inbox without confirmation links
+    // Real-world email dispatcher without activation redirects
+    function dispatchEmailBackground(toEmail, subject, content) {
       try {
-        await fetch("https://formspree.io/f/mqaeavlo", {
+        fetch("https://formspree.io/f/mqaeavlo", {
           method: "POST",
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
-          body: JSON.stringify({
-            recipient: toEmail,
-            subject: subject,
-            message: content
-          })
-        });
-      } catch (e) {
-        console.warn("Mail dispatch gateway retry:", e);
-      }
+          body: JSON.stringify({ email: toEmail, _subject: subject, message: content })
+        }).catch(err => console.log("Dispatch retry:", err));
+      } catch(e) {}
     }
 
-    // Step 1: Send OTP to Student's Email
-    async function requestOTP() {
+    // Step 1: Send OTP to Student's Email (INSTANT SCREEN SWITCH - NO HANGING)
+    function requestOTP() {
       const name = document.getElementById('stuName').value.trim();
       const roll = document.getElementById('stuRoll').value.trim();
       const email = document.getElementById('stuEmail').value.trim();
 
       if (!name || !roll || !email) {
-        alert("Please fill in Name, Roll Number, and Email.");
+        alert("Please enter Name, Roll Number, and Email.");
         return;
       }
 
-      // Generate actual 6-digit random code
+      // Generate 6-digit random code
       generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      pendingProfile = { name, roll, class: "10th Class", email, lastScore: "Pending", medium: "Punjabi" };
+      pendingProfile = { name, roll, class: "10th Class", email, lastScore: "Not Taken", medium: "Punjabi" };
 
-      const btn = document.getElementById('btnRequestOtp');
-      btn.disabled = true;
-      btn.innerHTML = `<span class="loader"></span> Dispatching OTP to ${email}...`;
-
-      const emailBody = `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ / Hello ${name},\n\nYour 6-digit OTP verification code for the PSEB 10th Portal is: ${generatedOTP}\n\nPlease enter this code on the website to verify your profile.\n(Do not share this code with anyone).`;
-
-      // 1. Send OTP straight to student's inbox
-      await sendDirectEmail(email, "Your PSEB 10th Portal OTP Code", emailBody);
-
-      // 2. Transmit registration info directly to Admin
-      await sendDirectEmail(
-        ADMIN_EMAIL,
-        "New PSEB Student Registration Alert",
-        `New Student Registered:\nName: ${name}\nRoll No: ${roll}\nEmail: ${email}\nOTP Generated: ${generatedOTP}`
-      );
-
-      btn.disabled = false;
-      btn.innerText = "Send OTP to Email";
+      // Immediately switch views without blocking
       document.getElementById('regInputs').style.display = 'none';
       document.getElementById('otpInputs').style.display = 'block';
 
-      alert(`OTP has been sent directly to: ${email}\nPlease check your Inbox and Spam/Junk folder.`);
+      // Dispatch OTP email to student & notify admin in the background
+      const msg = `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ / Hello ${name},\n\nYour 6-digit verification code is: ${generatedOTP}\n\nPlease enter this on the website to verify your profile.`;
+      dispatchEmailBackground(email, "Your PSEB 10th Portal Verification Code", msg);
+      dispatchEmailBackground(ADMIN_EMAIL, "New Student Enrolled", `New registration:\nName: ${name}\nRoll: ${roll}\nEmail: ${email}`);
+
+      alert(`A 6-digit verification code has been dispatched to: ${email}\nPlease check your Inbox / Spam folder.`);
     }
 
     function resendOtp() {
@@ -344,7 +323,7 @@
       document.getElementById('regInputs').style.display = 'block';
     }
 
-    // Step 2: Validate OTP and save profile permanently
+    // Step 2: Validate OTP and persist profile forever
     function validateOTP() {
       const entered = document.getElementById('inputOtp').value.trim();
       if (!generatedOTP || entered !== generatedOTP) {
@@ -353,10 +332,10 @@
       }
 
       activeStudent = pendingProfile;
-      // Stored permanently in localStorage: Never asks for OTP again
+      // Stored permanently: User never has to enter code again
       localStorage.setItem("pseb_persisted_profile", JSON.stringify(activeStudent));
 
-      // Add to admin master records
+      // Append to admin roster
       let master = JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
       master = master.filter(s => s.email !== activeStudent.email);
       master.push(activeStudent);
@@ -395,12 +374,14 @@
       else if (tab === 'info') { document.getElementById('tabInfo').style.display = 'block'; event.currentTarget.classList.add('active'); }
     }
 
-    // Call Gemini API
-    async function requestGemini(contents) {
+    // Call Gemini API securely with pure JSON response formatting
+    async function requestGemini(promptText) {
       const response = await fetch(GEMINI_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: contents })
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptText }] }]
+        })
       });
       if (!response.ok) {
         throw new Error(`API returned HTTP ${response.status}`);
@@ -409,35 +390,36 @@
       return data.candidates[0].content.parts[0].text;
     }
 
-    // 20-Question Daily Quiz Generator
+    // 20-Question Truly Dynamic Daily Quiz Generator
     async function generate20QuestionsQuiz() {
       const lang = document.getElementById('quizLanguage').value;
-      const todayDate = new Date().toISOString().slice(0, 10);
-      document.getElementById('quizDateBadge').innerText = `Date: ${todayDate}`;
+      const todayDate = new Date().toISOString();
+      document.getElementById('quizDateBadge').innerText = `Generated: ${new Date().toLocaleDateString()}`;
 
       const btn = document.getElementById('btnStartQuiz');
       btn.disabled = true;
-      btn.innerHTML = `<span class="loader"></span> Generating 20 Questions for Today...`;
+      btn.innerHTML = `<span class="loader"></span> Generating 20 Dynamic PSEB Questions...`;
 
-      const prompt = `You are a Punjab School Education Board (PSEB) Class 10 examination board member.
-Generate exactly 20 multiple choice questions covering the Class 10 syllabus (Math, Science, Social Studies).
-Date Seed: ${todayDate} (ensure questions are distinct and unique for this date).
+      const prompt = `You are a Punjab School Education Board (PSEB) Class 10 examination specialist.
+Generate exactly 20 brand-new multiple choice questions for Class 10 across Mathematics, Science, and Social Studies.
+Timestamp seed: ${todayDate} (Make sure every question is dynamically chosen and different each day).
 Language: Strictly ${lang}.
-Return ONLY a valid JSON array of 20 items without markdown fences, code blocks, or explanations. Format:
+Return ONLY a valid JSON array of 20 elements with no markdown formatting, no code blocks, and no backticks.
+Format:
 [
   {
-    "q": "Question text here",
+    "q": "Question text",
     "opts": ["Option 1", "Option 2", "Option 3", "Option 4"],
     "ans": 0
   }
 ]`;
 
       try {
-        const raw = await requestGemini([{ parts: [{ text: prompt }] }]);
+        const raw = await requestGemini(prompt);
         const cleanJSON = raw.replace(/```json/gi, "").replace(/```/gi, "").trim();
         quizQuestions = JSON.parse(cleanJSON);
-        if (!Array.isArray(quizQuestions) || quizQuestions.length === 0) {
-          throw new Error("Invalid structure");
+        if (!Array.isArray(quizQuestions) || quizQuestions.length < 5) {
+          throw new Error("Invalid question count");
         }
       } catch (err) {
         console.warn("AI generation fallback to offline bank:", err);
@@ -495,7 +477,7 @@ Return ONLY a valid JSON array of 20 items without markdown fences, code blocks,
       }
     }
 
-    async function completeQuiz() {
+    function completeQuiz() {
       document.getElementById('quizRunView').style.display = 'none';
       document.getElementById('quizDoneView').style.display = 'block';
 
@@ -512,11 +494,11 @@ Return ONLY a valid JSON array of 20 items without markdown fences, code blocks,
       master = master.map(s => s.email === activeStudent.email ? activeStudent : s);
       localStorage.setItem("pseb_master_students", JSON.stringify(master));
 
-      // Send student score report to admin email
-      await sendDirectEmail(
+      // Send result alert to admin email
+      dispatchEmailBackground(
         ADMIN_EMAIL,
-        `PSEB Result Alert: ${activeStudent.name} (${activeStudent.roll})`,
-        `Daily 20-Q Quiz Result:\nStudent: ${activeStudent.name}\nRoll: ${activeStudent.roll}\nEmail: ${activeStudent.email}\nMedium: ${activeStudent.medium}\nScore: ${finalScoreStr}`
+        `Result: ${activeStudent.name} (${activeStudent.roll})`,
+        `Score: ${finalScoreStr}\nMedium: ${activeStudent.medium}\nEmail: ${activeStudent.email}`
       );
     }
 
@@ -546,10 +528,10 @@ Return ONLY a valid JSON array of 20 items without markdown fences, code blocks,
 ਸਵਾਲ: ${question}`;
 
       try {
-        const answer = await requestGemini([{ parts: [{ text: prompt }] }]);
+        const answer = await requestGemini(prompt);
         botBubble.innerText = answer;
       } catch (e) {
-        botBubble.innerText = "ਮਾਫ਼ ਕਰਨਾ, ਨੈੱਟਵਰਕ ਸੰਪਰਕ ਵਿੱਚ ਦਿੱਕਤ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।";
+        botBubble.innerText = "ਮਾਫ਼ ਕਰਨਾ, ਇੰਟਰਨੈੱਟ ਸੰਪਰਕ ਵਿੱਚ ਦਿੱਕਤ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।";
       }
       chatList.scrollTop = chatList.scrollHeight;
     }
@@ -578,13 +560,13 @@ Return ONLY a valid JSON array of 20 items without markdown fences, code blocks,
 
       const prompt = `You are an official Punjab School Education Board (PSEB) Class 10 Examiner.
 Evaluate this student's handwritten answer copy for subject: ${subject}.
-Topic: ${topic || "Class 10 Board Exam"}.
+Topic: ${topic || "Class 10 Board Question"}.
 Medium: ${medium}.
 Format the output:
 1. Marks Awarded: (out of 10)
-2. Step-by-step review
-3. Errors or missing formulas
-4. Feedback in simple ${medium === 'Punjabi' ? 'Punjabi' : 'English'} for scoring full marks.`;
+2. Step-by-step verification
+3. Formula or calculation errors
+4. Constructive feedback in simple ${medium === 'Punjabi' ? 'Punjabi' : 'English'} for board exam scoring.`;
 
       try {
         const response = await fetch(GEMINI_URL, {
@@ -653,7 +635,7 @@ Format the output:
       tbody.innerHTML = "";
 
       list.forEach(stu => {
-        if (stu.lastScore && stu.lastScore !== "Pending") quizzes++;
+        if (stu.lastScore && stu.lastScore !== "Not Taken") quizzes++;
         if (stu.medium === "Punjabi") punjabi++; else english++;
 
         const tr = document.createElement('tr');
@@ -663,7 +645,7 @@ Format the output:
           <td>${stu.email}</td>
           <td><span style="font-weight:600;">${stu.medium || 'Punjabi'}</span></td>
           <td><b style="color:var(--primary);">${stu.lastScore || 'Not Taken'}</b></td>
-          <td>${stu.lastScore && stu.lastScore !== 'Pending' ? 'Score synced to admin' : 'Profile Active'}</td>
+          <td>${stu.lastScore && stu.lastScore !== 'Not Taken' ? 'Score synced to admin' : 'Profile Active'}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -686,7 +668,7 @@ Format the output:
           { q: "8. ਆਮ ਲੂਣ ਦਾ ਰਸਾਇਣਕ ਸੂਤਰ ਕੀ ਹੈ?", opts: ["NaCl", "KCl", "HCl", "NaOH"], ans: 0 },
           { q: "9. ਅੰਕਗਣਿਤਕ ਲੜੀ (A.P.) ਦੇ n-ਵੇਂ ਪਦ ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", opts: ["a + (n-1)d", "a + nd", "a - (n-1)d", "n/2[2a + (n-1)d]"], ans: 0 },
           { q: "10. ਪ੍ਰਕਾਸ਼ ਦਾ ਵੇਗ ਸਭ ਤੋਂ ਵੱਧ ਕਿਸ ਵਿੱਚ ਹੁੰਦਾ ਹੈ?", opts: ["ਖਲਾਅ (Vacuum)", "ਹਵਾ", "ਪਾਣੀ", "ਕੱਚ"], ans: 0 },
-        e  { q: "11. ਸਭ ਤੋਂ ਹਲਕੀ ਗੈਸ ਕਿਹੜੀ ਹੈ?", opts: ["ਹਾਈਡ੍ਰੋਜਨ", "ਆਕਸੀਜਨ", "ਨਾਈਟ੍ਰੋਜਨ", "ਕਾਰਬਨ"], ans: 0 },
+          { q: "11. ਸਭ ਤੋਂ ਹਲਕੀ ਗੈਸ ਕਿਹੜੀ ਹੈ?", opts: ["ਹਾਈਡ੍ਰੋਜਨ", "ਆਕਸੀਜਨ", "ਨਾਈਟ੍ਰੋਜਨ", "ਕਾਰਬਨ"], ans: 0 },
           { q: "12. ਮਨੁੱਖ ਵਿੱਚ ਗੁਣਸੂਤਰਾਂ ਦੇ ਕਿੰਨੇ ਜੋੜੇ ਹੁੰਦੇ ਹਨ?", opts: ["23 ਜੋੜੇ", "46 ਜੋੜੇ", "20 ਜੋੜੇ", "22 ਜੋੜੇ"], ans: 0 },
           { q: "13. ਓਜ਼ੋਨ ਪਰਤ ਸਾਨੂੰ ਕਿਸ ਤੋਂ ਬਚਾਉਂਦੀ ਹੈ?", opts: ["ਪਰਾਬੈਂਗਣੀ ਕਿਰਨਾਂ", "ਐਕਸ-ਕਿਰਨਾਂ", "ਗਾਮਾ ਕਿਰਨਾਂ", "ਇਨਫਰਾਰੈੱਡ ਕਿਰਨਾਂ"], ans: 0 },
           { q: "14. ਤ੍ਰਿਕੋਣਮਿਤੀ ਵਿੱਚ $\\sin^2\\theta + \\cos^2\\theta$ ਦਾ ਮੁੱਲ ਕੀ ਹੈ?", opts: ["1", "0", "2", "-1"], ans: 0 },
