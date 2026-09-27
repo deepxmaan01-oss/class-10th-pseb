@@ -3,901 +3,911 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PSEB Class 10 Portal - Student & Admin</title>
-
-  <!-- Tailwind CSS, Icons & Animations -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-
-  <!-- Firebase Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-
+  <title>PSEB Class 10 Learning & Assessment Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Mukta+Mahee:wght@400;600;700&display=swap');
+    :root {
+      --primary: #4338ca;
+      --primary-light: #6366f1;
+      --secondary: #0ea5e9;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #10b981;
+      --error: #ef4444;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Gurmukhi', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
     body {
-      font-family: 'Plus Jakarta Sans', 'Mukta Mahee', sans-serif;
-      background: radial-gradient(circle at top, #1e1b4b 0%, #0f172a 60%, #020617 100%);
-      color: #f8fafc;
+      background-color: var(--bg);
+      color: var(--text);
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    .glassmorphism {
-      background: rgba(30, 41, 59, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+
+    /* Top Navigation */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 40;
     }
-    .glow-card {
-      box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      font-weight: 600;
+      border-radius: 10px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      padding: 0.65rem 1.25rem;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #eef2ff;
+      color: var(--primary);
+      padding: 0.65rem 1.25rem;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e7ff;
+    }
+
+    .btn-outline {
+      border: 1px solid var(--border);
+      background: transparent;
+      padding: 0.65rem 1.25rem;
+      color: var(--text);
+    }
+
+    /* Layout Containers */
+    main {
+      flex: 1;
+      max-width: 1080px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .view-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 1rem;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary-light);
+      background: #fff;
+    }
+
+    /* Verification Badge */
+    .badge {
+      display: inline-flex;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-admin { background: #fee2e2; color: #b91c1c; }
+    .badge-student { background: #dbeafe; color: #1e40af; }
+
+    /* Dashboard Navigation Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 0.75rem 1.25rem;
+      background: none;
+      border-radius: 0;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Quiz Option Grid */
+    .quiz-options {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+
+    .quiz-option {
+      border: 1px solid var(--border);
+      padding: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--surface);
+      text-align: left;
+    }
+
+    .quiz-option:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .quiz-option.selected {
+      background: #eef2ff;
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Chat Tab */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 480px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .chat-box {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      background: #fafafa;
+    }
+
+    .chat-msg {
+      max-width: 80%;
+      padding: 0.85rem 1.15rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .chat-msg.user {
+      align-self: flex-end;
+      background: var(--primary);
+      color: white;
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-msg.bot {
+      align-self: flex-start;
+      background: #ffffff;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 2px;
+    }
+
+    .chat-input-bar {
+      display: flex;
+      border-top: 1px solid var(--border);
+      padding: 0.75rem;
+      background: white;
+      gap: 0.5rem;
+    }
+
+    /* Admin Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    th {
+      background: #f1f5f9;
+    }
+
+    /* Loading Spinner */
+    .loader {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body>
 
-  <!-- Header Bar -->
-  <header class="glassmorphism sticky top-0 z-50 border-b border-slate-700/60">
-    <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="handleLogoClick()">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center font-extrabold text-xl shadow-lg shadow-indigo-500/30">
-          P
-        </div>
-        <div>
-          <h1 class="text-base font-bold leading-none">PSEB 10th Class</h1>
-          <p class="text-[11px] text-indigo-300 font-medium mt-0.5">Online Examination Portal</p>
-        </div>
-      </div>
-      
-      <div id="navRight" class="flex items-center space-x-3">
-        <!-- Auth status button injected here -->
-      </div>
+  <!-- App Header -->
+  <header>
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      <span>PSEB 10th Portal</span>
     </div>
+    <div class="nav-actions" id="userBadgeArea"></div>
   </header>
 
-  <!-- Content Container -->
-  <main class="flex-grow max-w-5xl mx-auto w-full p-4 md:p-6 flex flex-col justify-center">
-    
-    <!-- ========================================== -->
-    <!-- 1. AUTHENTICATION (LOGIN & SIGN UP SCREEN) -->
-    <!-- ========================================== -->
-    <section id="authSection" class="w-full max-w-md mx-auto my-6 animate__animated animate__zoomIn">
-      <div class="glassmorphism p-6 sm:p-8 rounded-3xl border border-slate-700 glow-card relative overflow-hidden">
-        
-        <!-- Toggle Tabs -->
-        <div class="grid grid-cols-2 p-1 bg-slate-900/80 rounded-2xl mb-6 border border-slate-700/80 text-xs font-bold">
-          <button id="tabLogin" onclick="switchAuthTab('login')" class="py-2.5 rounded-xl bg-indigo-600 text-white shadow-md transition duration-200">
-            Log In
-          </button>
-          <button id="tabSignup" onclick="switchAuthTab('signup')" class="py-2.5 rounded-xl text-slate-400 hover:text-slate-200 transition duration-200">
-            Create Account
-          </button>
-        </div>
+  <main>
+    <!-- View 1: Auth & Verification Flow -->
+    <section id="authSection" class="view-card" style="max-width: 480px; margin: 2rem auto;">
+      <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;" id="authTitle">Create Student Profile</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.875rem;">Enter your school details to proceed with learning.</p>
 
-        <!-- Auth Header Title -->
-        <div class="text-center mb-6">
-          <h2 id="authTitle" class="text-2xl font-extrabold text-white">Student & Admin Login</h2>
-          <p id="authSubtitle" class="text-xs text-slate-400 mt-1">Access your Punjab School Education Board portal</p>
+      <form id="signupForm" onsubmit="handleStartAuth(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="regName" placeholder="Enter student name" required>
         </div>
+        <div class="form-group">
+          <label>Class</label>
+          <input type="text" id="regClass" value="10th Class" readonly>
+        </div>
+        <div class="form-group">
+          <label>Roll Number</label>
+          <input type="text" id="regRoll" placeholder="e.g. 10245" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="regEmail" placeholder="student@example.com" required>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Get Verification Code</button>
+      </form>
 
-        <!-- Dynamic Form -->
-        <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+      <!-- Step 2: Verification Input -->
+      <div id="verifyStep" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+        <label>Enter 6-Digit Email Code</label>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">A verification code was simulated and shown in notification.</p>
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+          <input type="text" id="codeVal" placeholder="Enter code" style="text-align: center; letter-spacing: 2px;">
+          <button class="btn-primary" onclick="handleVerifyCode()">Verify</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem; text-align: center;">
+        <button class="btn-outline" style="font-size: 0.8rem; border: none; color: var(--primary);" onclick="showAdminLoginModal()">Admin Access</button>
+      </div>
+    </section>
+
+    <!-- View 2: Student Dashboard -->
+    <section id="dashboardSection" style="display: none;">
+      <div class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('quiz')">Daily Quiz</button>
+        <button class="tab-btn" onclick="switchTab('test')">PSEB Copy Checker</button>
+        <button class="tab-btn" onclick="switchTab('doubts')">ਸ਼ੰਕੇ ਦੂਰ ਕਰੋ (Doubts AI)</button>
+        <button class="tab-btn" onclick="switchTab('profile')">Personal Info</button>
+      </div>
+
+      <!-- Tab: Daily Quiz -->
+      <div id="quizTab" class="view-card">
+        <div id="quizSetup">
+          <h3 style="margin-bottom: 0.5rem;">PSEB Class 10 Daily Challenge</h3>
+          <p style="color: var(--text-muted); margin-bottom: 1.5rem;">New syllabus-aligned questions generated dynamically each day.</p>
           
-          <!-- Full Name (Only for Signup) -->
-          <div id="nameFieldGroup" class="hidden">
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Full Student Name</label>
-            <div class="relative">
-              <i data-lucide="user" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
-              <input type="text" id="signupName" placeholder="e.g. Deepinder Singh"
-                     class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-            </div>
+          <div class="form-group" style="max-width: 320px;">
+            <label>Select Language Medium / ਮਾਧਿਅਮ ਚੁਣੋ</label>
+            <select id="quizLanguage">
+              <option value="English">English Medium</option>
+              <option value="Punjabi">ਪੰਜਾਬੀ ਮਾਧਿਅਮ (Punjabi)</option>
+            </select>
           </div>
-
-          <!-- Identifier: Username / Roll / Admin Email -->
-          <div>
-            <label id="identifierLabel" class="block text-xs font-semibold text-slate-300 mb-1">Username or Admin Email</label>
-            <div class="relative">
-              <i data-lucide="mail" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
-              <input type="text" id="authIdentifier" required placeholder="Name or deepxmaan.ol@gmail.com"
-                     class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-            </div>
-          </div>
-
-          <!-- Section and Roll (Only for Signup) -->
-          <div id="studentDetailsGroup" class="grid grid-cols-2 gap-3 hidden">
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 mb-1">Roll Number</label>
-              <input type="text" id="signupRoll" placeholder="e.g. 05"
-                     class="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 mb-1">Section</label>
-              <input type="text" id="signupSection" placeholder="e.g. Section C" value="Section C"
-                     class="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500">
-            </div>
-          </div>
-
-          <!-- Password Field -->
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Password / PIN</label>
-            <div class="relative">
-              <i data-lucide="lock" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
-              <input type="password" id="authPassword" required placeholder="••••••••"
-                     class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-            </div>
-            <p id="adminTip" class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1">
-              <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-400"></i>
-              <span>Teacher admin access requires registered credentials.</span>
-            </p>
-          </div>
-
-          <!-- Action Button -->
-          <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 font-bold rounded-xl text-sm shadow-lg shadow-indigo-600/30 transition transform active:scale-95 flex items-center justify-center space-x-2">
-            <span id="btnText">Sign In to Account</span>
-            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-          </button>
-        </form>
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- 2. STUDENT DASHBOARD VIEW                  -->
-    <!-- ========================================== -->
-    <section id="dashboardSection" class="hidden space-y-6 animate__animated animate__fadeIn">
-      <!-- Profile Card -->
-      <div class="glassmorphism p-6 rounded-3xl border border-slate-700/80 flex flex-col md:flex-row md:items-center justify-between gap-5">
-        <div class="flex items-center space-x-4">
-          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black text-2xl shadow-lg shadow-indigo-500/30 border border-indigo-400/30">
-            <span id="dashAvatar">S</span>
-          </div>
-          <div>
-            <div class="flex items-center space-x-2">
-              <h2 id="dashStudentName" class="text-xl font-bold">Student Name</h2>
-              <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Active</span>
-            </div>
-            <p id="dashStudentClass" class="text-xs text-slate-400 mt-1">PSEB 10th Class • Roll No: 5</p>
-          </div>
+          <button class="btn-primary" onclick="initDailyQuiz()">Start Daily Quiz</button>
         </div>
 
-        <div class="flex items-center space-x-3">
-          <div class="px-5 py-3 rounded-2xl bg-slate-900/80 border border-slate-700 text-center">
-            <p class="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Exam Score</p>
-            <p id="dashScoreDisplay" class="text-lg font-black text-indigo-400">Not Attempted</p>
+        <div id="quizInterface" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span id="quizIndex" style="font-weight: 700; color: var(--primary);">Question 1 of 5</span>
+            <span id="quizDate" style="font-size: 0.85rem; color: var(--text-muted);"></span>
           </div>
+          <h4 id="questionTitle" style="font-size: 1.15rem; margin-bottom: 1rem;"></h4>
+          <div class="quiz-options" id="optionsBox"></div>
+          <button class="btn-primary" id="nextQuizBtn" onclick="nextQuestion()">Next Question</button>
+        </div>
+
+        <div id="quizResult" style="display: none; text-align: center; padding: 2rem 0;">
+          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Quiz Finished!</h3>
+          <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Your assessment score has been synced with school admin.</p>
+          <div style="font-size: 3rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem;" id="scoreDisplay">0/0</div>
+          <button class="btn-primary" onclick="switchTab('doubts')">Ask Doubts on Mistakes</button>
         </div>
       </div>
 
-      <!-- Syllabus Section Grid -->
-      <div>
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
-          <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i>
-          <span>10th Class Syllabus Sections</span>
-        </h3>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          <div class="glassmorphism p-3.5 rounded-2xl text-center border-indigo-500/60 bg-indigo-500/10 shadow-md">
-            <i data-lucide="map-pin" class="w-5 h-5 mx-auto text-indigo-400 mb-1"></i>
-            <span class="text-xs font-bold block">SST (ਸਮਾਜਿਕ)</span>
-            <span class="text-[10px] text-emerald-400 font-medium">3 Chapters Ready</span>
+      <!-- Tab: Handwritten Copy Checker -->
+      <div id="testTab" class="view-card" style="display: none;">
+        <h3 style="margin-bottom: 0.5rem;">PSEB Written Test Evaluation</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Upload a photo of your handwritten notebook copy/answer sheet for automatic grading.</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div class="form-group">
+            <label>Subject</label>
+            <select id="examSubject">
+              <option>Mathematics (ਗਣਿਤ)</option>
+              <option>Science (ਵਿਗਿਆਨ)</option>
+              <option>Social Studies (ਸਮਾਜਿਕ ਸਿੱਖਿਆ)</option>
+              <option>Punjabi (ਪੰਜਾਬੀ)</option>
+              <option>English</option>
+            </select>
           </div>
-          <div onclick="showToast('Science book PDF upload pending.')" class="glassmorphism p-3.5 rounded-2xl text-center opacity-60 hover:opacity-100 cursor-pointer transition">
-            <i data-lucide="atom" class="w-5 h-5 mx-auto text-slate-400 mb-1"></i>
-            <span class="text-xs font-bold block">Science</span>
-            <span class="text-[10px] text-slate-400">Coming Soon</span>
+          <div class="form-group">
+            <label>Language Medium</label>
+            <select id="evalMedium">
+              <option value="Punjabi">Punjabi Medium</option>
+              <option value="English">English Medium</option>
+            </select>
           </div>
-          <div onclick="showToast('Math book PDF upload pending.')" class="glassmorphism p-3.5 rounded-2xl text-center opacity-60 hover:opacity-100 cursor-pointer transition">
-            <i data-lucide="calculator" class="w-5 h-5 mx-auto text-slate-400 mb-1"></i>
-            <span class="text-xs font-bold block">Math</span>
-            <span class="text-[10px] text-slate-400">Coming Soon</span>
+        </div>
+
+        <div class="form-group">
+          <label>Question or Topic Name</label>
+          <input type="text" id="evalPrompt" placeholder="e.g. Question 4: Pythagoras Theorem proof">
+        </div>
+
+        <div class="form-group">
+          <label>Upload Copy Photo (Answer Sheet)</label>
+          <input type="file" id="copyFileInput" accept="image/*">
+        </div>
+
+        <button class="btn-primary" id="btnCheckCopy" onclick="gradeAnswerCopy()">Check & Grade My Copy</button>
+
+        <div id="gradingResult" style="margin-top: 2rem; display: none; background: var(--bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border);">
+          <h4 style="margin-bottom: 0.5rem; color: var(--primary);">Evaluation Report</h4>
+          <div id="evalContent" style="line-height: 1.6; white-space: pre-wrap; font-size: 0.95rem;"></div>
+        </div>
+      </div>
+
+      <!-- Tab: Punjabi Doubt Resolution -->
+      <div id="doubtsTab" class="view-card" style="display: none;">
+        <h3 style="margin-bottom: 0.25rem;">ਪੜ੍ਹਾਈ ਦੇ ਸ਼ੰਕੇ ਪੁੱਛੋ (Ask Study Doubts)</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.875rem;">10ਵੀਂ ਸ਼੍ਰੇਣੀ ਦੇ ਕਿਸੇ ਵੀ ਵਿਸ਼ੇ ਬਾਰੇ ਸਵਾਲ ਪੁੱਛੋ। ਤੁਹਾਨੂੰ ਸੌਖੀ ਪੰਜਾਬੀ ਵਿੱਚ ਜਵਾਬ ਮਿਲੇਗਾ।</p>
+
+        <div class="chat-container">
+          <div class="chat-box" id="doubtChatBox">
+            <div class="chat-msg bot">ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਤੁਸੀਂ ਆਪਣੇ 10ਵੀਂ ਜਮਾਤ ਦੇ ਕਿਸੇ ਵੀ ਸਵਾਲ ਬਾਰੇ ਇੱਥੇ ਪੁੱਛ ਸਕਦੇ ਹੋ। ਮੈਂ ਤੁਹਾਨੂੰ ਪੂਰੀ ਵਿਆਖਿਆ ਦੇਵਾਂਗਾ।</div>
           </div>
-          <div onclick="showToast('English book PDF upload pending.')" class="glassmorphism p-3.5 rounded-2xl text-center opacity-60 hover:opacity-100 cursor-pointer transition">
-            <i data-lucide="book-open" class="w-5 h-5 mx-auto text-slate-400 mb-1"></i>
-            <span class="text-xs font-bold block">English</span>
-            <span class="text-[10px] text-slate-400">Coming Soon</span>
-          </div>
-          <div onclick="showToast('Hindi book PDF upload pending.')" class="glassmorphism p-3.5 rounded-2xl text-center opacity-60 hover:opacity-100 cursor-pointer transition">
-            <i data-lucide="languages" class="w-5 h-5 mx-auto text-slate-400 mb-1"></i>
-            <span class="text-xs font-bold block">Hindi</span>
-            <span class="text-[10px] text-slate-400">Coming Soon</span>
-          </div>
-          <div onclick="showToast('Punjabi book PDF upload pending.')" class="glassmorphism p-3.5 rounded-2xl text-center opacity-60 hover:opacity-100 cursor-pointer transition">
-            <i data-lucide="feather" class="w-5 h-5 mx-auto text-slate-400 mb-1"></i>
-            <span class="text-xs font-bold block">Punjabi</span>
-            <span class="text-[10px] text-slate-400">Coming Soon</span>
+          <div class="chat-input-bar">
+            <input type="text" id="doubtInput" placeholder="ਆਪਣਾ ਸਵਾਲ ਇੱਥੇ ਲਿਖੋ..." onkeydown="if(event.key === 'Enter') submitDoubt()">
+            <button class="btn-primary" onclick="submitDoubt()">ਪੁੱਛੋ</button>
           </div>
         </div>
       </div>
 
-      <!-- Active Quiz Launch Box -->
-      <div class="glassmorphism p-6 sm:p-8 rounded-3xl border border-indigo-500/40 relative overflow-hidden">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div>
-            <span class="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-[11px] font-bold">Official Book Exam Quiz</span>
-            <h3 class="text-xl font-extrabold mt-2 text-white">Class 10 SST (Chapters 1, 2 & 3 Combined)</h3>
-            <p class="text-xs text-slate-300 mt-1 max-w-xl leading-relaxed">
-              Based on the uploaded Punjab School Education Board textbook chapters: 
-              <strong>ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ</strong>, <strong>ਜੈਵਿਕ ਭੂਗੋਲ</strong>, and <strong>ਜਲ ਸਾਧਨ</strong>.
-            </p>
-            <div class="flex flex-wrap gap-4 mt-4 text-xs font-medium text-slate-400">
-              <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-indigo-400"></i> 20 Questions</span>
-              <span class="flex items-center gap-1.5"><i data-lucide="award" class="w-4 h-4 text-amber-400"></i> 20 Marks Total</span>
-              <span class="flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4 text-emerald-400"></i> Unlimited Time</span>
-            </div>
-          </div>
-          <button onclick="startSSTQuiz()" class="w-full md:w-auto px-7 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-2xl shadow-xl shadow-indigo-600/30 transition transform hover:scale-105 flex items-center justify-center space-x-2">
-            <i data-lucide="play" class="w-4 h-4"></i>
-            <span>Begin Test</span>
-          </button>
+      <!-- Tab: Profile Information -->
+      <div id="profileTab" class="view-card" style="display: none;">
+        <h3 style="margin-bottom: 1rem;">Student Information</h3>
+        <div style="background: var(--bg); padding: 1.5rem; border-radius: 12px; line-height: 2;">
+          <p><strong>Name:</strong> <span id="pName"></span></p>
+          <p><strong>Class:</strong> <span id="pClass">10th Class (PSEB)</span></p>
+          <p><strong>Roll No:</strong> <span id="pRoll"></span></p>
+          <p><strong>Email Address:</strong> <span id="pEmail"></span></p>
+          <p><strong>Status:</strong> <span class="badge badge-student">Verified & Active</span></p>
         </div>
       </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- 3. INTERACTIVE QUIZ VIEW (20 MARKS)        -->
-    <!-- ========================================== -->
-    <section id="quizSection" class="hidden space-y-6 animate__animated animate__fadeIn">
-      <!-- Progress Bar -->
-      <div class="glassmorphism p-4 rounded-2xl border border-slate-700 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <span class="text-xs font-bold text-slate-400">Question</span>
-          <span id="quizCounter" class="text-sm font-extrabold text-indigo-400">1 / 20</span>
-        </div>
-        <div class="w-1/2 bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-700">
-          <div id="quizProgressBar" class="bg-gradient-to-r from-indigo-500 to-violet-500 h-2.5 rounded-full transition-all duration-300" style="width: 5%"></div>
-        </div>
-        <button onclick="quitQuiz()" class="text-xs px-3 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30">
-          Exit Test
-        </button>
-      </div>
-
-      <!-- Question Card -->
-      <div class="glassmorphism p-6 sm:p-8 rounded-3xl border border-slate-700">
-        <div class="flex items-center justify-between mb-4">
-          <span id="quizChapterBadge" class="text-[11px] font-bold px-3 py-1 rounded-lg bg-indigo-500/20 text-indigo-300">
-            Chapter
-          </span>
-          <span class="text-xs font-bold text-amber-400">1 Mark</span>
-        </div>
-
-        <h3 id="quizQuestionText" class="text-lg md:text-xl font-bold mb-6 leading-relaxed">
-          Question content goes here
-        </h3>
-
-        <div id="quizOptionsList" class="space-y-3">
-          <!-- Dynamic options -->
-        </div>
-
-        <div class="flex justify-between items-center mt-8 pt-4 border-t border-slate-700/60">
-          <button id="quizPrevBtn" onclick="previousQuestion()" class="px-5 py-2.5 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-30">
-            Previous
-          </button>
-          <button id="quizNextBtn" onclick="advanceQuestion()" class="px-6 py-2.5 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30">
-            Next
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- 4. QUIZ RESULT VIEW                        -->
-    <!-- ========================================== -->
-    <section id="resultSection" class="hidden max-w-md mx-auto my-6 animate__animated animate__zoomIn">
-      <div class="glassmorphism p-8 rounded-3xl border border-slate-700 text-center">
-        <div class="w-20 h-20 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center mx-auto mb-4 text-indigo-400">
-          <i data-lucide="award" class="w-10 h-10"></i>
-        </div>
-        <h2 class="text-2xl font-extrabold text-white">Test Submitted!</h2>
-        <p class="text-xs text-slate-400 mt-1">Class 10 PSEB Social Studies</p>
-
-        <div class="my-6 p-5 rounded-2xl bg-slate-900/90 border border-slate-700">
-          <span class="text-xs text-slate-400 font-semibold">Your Final Score</span>
-          <div class="text-4xl font-black text-indigo-400 mt-1">
-            <span id="finalScoreVal">0</span> <span class="text-lg text-slate-500">/ 20</span>
-          </div>
-          <p id="finalFeedback" class="text-xs font-bold text-emerald-400 mt-2">Pass</p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <button onclick="showSection('dashboardSection')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold transition">
-            Dashboard
-          </button>
-          <button onclick="startSSTQuiz()" class="py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold shadow-lg shadow-indigo-600/30 transition">
-            Retake Exam
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- 5. TEACHER / ADMIN PANEL VIEW              -->
-    <!-- ========================================== -->
-    <section id="adminSection" class="hidden space-y-6 animate__animated animate__fadeIn">
-      <div class="glassmorphism p-6 rounded-3xl border border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <!-- View 3: Admin Console -->
+    <section id="adminSection" class="view-card" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <div>
-          <div class="flex items-center space-x-2">
-            <h2 class="text-xl font-bold">Admin Management Console</h2>
-            <span class="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Teacher</span>
-          </div>
-          <p class="text-xs text-slate-400 mt-1">Managed directly via: <code class="text-indigo-300 font-mono">deepxmaan.ol@gmail.com</code></p>
+          <h2>Teacher & Admin Intelligence Console</h2>
+          <p style="color: var(--text-muted); font-size: 0.875rem;">Managed under: deepxmaan01@gmail.com</p>
         </div>
-        <button onclick="syncWithFirebaseCloud()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-bold flex items-center space-x-2 shadow-md">
-          <i data-lucide="cloud" class="w-4 h-4"></i>
-          <span>Sync Firebase Firestore</span>
-        </button>
+        <button class="btn-secondary" onclick="logoutAdmin()">Exit Admin</button>
       </div>
 
-      <!-- Students List -->
-      <div class="glassmorphism rounded-3xl border border-slate-700 overflow-hidden">
-        <div class="p-5 border-b border-slate-700/80 flex items-center justify-between">
-          <h3 class="text-sm font-bold">Registered 10th Class Students</h3>
-          <span id="adminStudentCount" class="text-xs text-slate-400 font-medium">0 records</span>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px;">
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Total Registered</p>
+          <h3 id="statTotalStudents" style="font-size: 1.5rem;">0</h3>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
-              <tr>
-                <th class="p-3.5">Student Name</th>
-                <th class="p-3.5">Roll No & Section</th>
-                <th class="p-3.5">Score (/ 20)</th>
-                <th class="p-3.5">Percentage</th>
-                <th class="p-3.5">Submission Time</th>
-              </tr>
-            </thead>
-            <tbody id="adminTableRows" class="divide-y divide-slate-800">
-              <!-- Rendered dynamically -->
-            </tbody>
-          </table>
+        <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px;">
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Quizzes Submitted</p>
+          <h3 id="statTotalTests" style="font-size: 1.5rem;">0</h3>
         </div>
+        <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px;">
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Average Class Score</p>
+          <h3 id="statAvgScore" style="font-size: 1.5rem;">0%</h3>
+        </div>
+      </div>
+
+      <h4 style="margin-top: 1rem;">Student Result & Analysis Report</h4>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Roll No</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Last Quiz Score</th>
+              <th>Language Medium</th>
+              <th>Action / Analysis</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody">
+            <!-- Dynamic Rows -->
+          </tbody>
+        </table>
       </div>
     </section>
   </main>
 
-  <!-- Notification Toast -->
-  <div id="toastMessage" class="fixed bottom-6 right-6 glassmorphism px-4 py-3 rounded-2xl border border-slate-600 text-xs hidden shadow-2xl animate__animated animate__fadeInUp z-50"></div>
-
   <script>
-    // -----------------------------------------------------------
-    // 1. PSEB CLASS 10 QUESTIONS DATA (SST CH 1, 2, 3)
-    // -----------------------------------------------------------
-    const QUESTIONS_DATA = [
-      {
-        tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਕਰਦਸ਼ੇਵ (Kardashev) ਸਕੇਲ ਅਨੁਸਾਰ ਧਰਤੀ ਦੇ ਵਾਸੀ ਕਿਸ ਪੱਧਰ ਦੀ ਸਭਿਅਤਾ ਮੰਨੇ ਜਾਂਦੇ ਹਨ?[span_4](start_span)[span_4](end_span)",
-        options: ["ਪੱਧਰ-I (Level 1)", "ਪੱਧਰ-II (Level 2)", "ਪੱਧਰ-III (Level 3)", "ਪੱਧਰ-IV (Level 4)"],
-        answer: 0
-      },
-      {
-        tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਭਾਰਤ ਦੇ ਕੁੱਲ ਭੂਗੋਲਿਕ ਖੇਤਰਫਲ ਦਾ ਕਿੰਨਾ ਪ੍ਰਤੀਸ਼ਤ ਰਕਬਾ ਮੈਦਾਨੀ ਹੈ ਜੋ ਖੇਤੀ ਅਤੇ ਉਦਯੋਗ ਲਈ ਸਹੂਲਤ ਦਿੰਦਾ ਹੈ?[span_5](start_span)[span_5](end_span)",
-        options: ["30%", "27%", "43%", "54%"],
-        answer: 2
-      },
-      {
-        tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਰਾਸ਼ਟਰੀ ਵਣ ਨੀਤੀ 1952 ਮੁਤਾਬਕ ਵਾਤਾਵਰਨ ਦੇ ਸੰਤੁਲਨ ਲਈ ਦੇਸ਼ ਦੇ ਕਿੰਨੇ ਪ੍ਰਤੀਸ਼ਤ ਭਾਗ ਉੱਤੇ ਜੰਗਲ ਹੋਣੇ ਚਾਹੀਦੇ ਹਨ?[span_6](start_span)[span_6](end_span)",
-        options: ["21.76%", "33%", "25.17%", "40%"],
-        answer: 1
-      },
-      {
-        tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਕਿਸਨੇ ਕਿਹਾ ਸੀ ਕਿ: 'ਸਾਡੀ ਧਰਤੀ 'ਤੇ ਸਾਰਿਆਂ ਦੀਆਂ ਲੋੜਾਂ ਲਈ ਤਾਂ ਬਹੁਤ ਕੁਝ ਹੈ ਪਰ ਲਾਲਚੀਆਂ ਦੇ ਲਾਲਚ ਲਈ ਕੁਝ ਨਹੀਂ'?[span_7](start_span)[span_7](end_span)",
-        options: ["ਪੰਡਿਤ ਜਵਾਹਰ ਲਾਲ ਨਹਿਰੂ", "ਮਹਾਤਮਾ ਗਾਂਧੀ", "ਡਾ. ਸਵਾਮੀਨਾਥਨ", "ਨਿਕੋਲਾਇ ਕਰਦਸ਼ੇਵ"],
-        answer: 1
-      },
-      {
-        tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਕਪਾਹ ਅਤੇ ਗੰਨੇ ਦੀ ਕਾਸ਼ਤ ਲਈ ਸਭ ਤੋਂ ਢੁਕਵੀਂ ਮਿੱਟੀ ਕਿਹੜੀ ਮੰਨੀ ਜਾਂਦੀ ਹੈ?[span_8](start_span)[span_8](end_span)",
-        options: ["ਜਲੋਢੀ ਮਿੱਟੀ", "ਕਾਲੀ ਮਿੱਟੀ", "ਲੈਟਰਾਈਟ ਮਿੱਟੀ", "ਰੇਤਲੀ ਮਿੱਟੀ"],
-        answer: 1
-      },
-      {
-        tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਪੰਜਾਬ, ਹਰਿਆਣਾ ਅਤੇ ਪੱਛਮੀ ਉੱਤਰ ਪ੍ਰਦੇਸ਼ ਵਿੱਚ ਭੂਮੀ ਦਾ ਮਿਆਰ ਡਿੱਗਣ (Degradation) ਦਾ ਮੁੱਖ ਕਾਰਨ ਕੀ ਹੈ?[span_9](start_span)[span_9](end_span)",
-        options: ["ਜੰਗਲਾਂ ਦੀ ਕਟਾਈ", "ਖਾਣਾਂ ਦੀ ਖੁਦਾਈ", "ਜ਼ਰੂਰਤ ਤੋਂ ਜ਼ਿਆਦਾ ਸਿੰਚਾਈ (Over-irrigation)", "ਪਸ਼ੂ ਚਾਰਨ"],
-        answer: 2
-      },
-      {
-        tag: "ਸੋਮੇ ਅਤੇ ਵਿਕਾਸ (Resources)",
-        question: "ਸਮੁੰਦਰੀ ਤੱਟ (ਬੇਸ ਲਾਈਨ) ਤੋਂ ਕਿੰਨੇ ਨਾਟੀਕਲ ਮੀਲ ਤੱਕ ਦਾ ਸਮੁੰਦਰੀ ਖੇਤਰ ਦੇਸ਼ ਦਾ ਨਿਵੇਕਲਾ ਆਰਥਿਕ ਖੇਤਰ (EEZ) ਹੁੰਦਾ ਹੈ?[span_10](start_span)[span_10](end_span)",
-        options: ["12 ਨਾਟੀਕਲ ਮੀਲ", "200 ਨਾਟੀਕਲ ਮੀਲ", "350 ਨਾਟੀਕਲ ਮੀਲ", "100 ਨਾਟੀਕਲ ਮੀਲ"],
-        answer: 1
-      },
-      {
-        tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਭਾਰਤ ਨੂੰ ਕਿੰਨੇ ਜੈਵ-ਭੂਗੋਲਿਕ ਜ਼ੋਨਾਂ (Biogeographic Zones) ਵਿੱਚ ਵੰਡਿਆ ਗਿਆ ਹੈ?[span_11](start_span)[span_11](end_span)",
-        options: ["8", "10", "18", "26"],
-        answer: 1
-      },
-      {
-        tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਕਿਸੇ ਦੇਸ਼ ਨੂੰ ਮੈਗਾ ਜੈਵ-ਵਿਭਿੰਨਤਾ (Mega Diverse) ਵਾਲਾ ਮੁਲਕ ਕਹਿਣ ਲਈ ਘੱਟੋ-ਘੱਟ ਕਿੰਨੀਆਂ ਪੌਦਿਆਂ ਦੀਆਂ ਸਥਾਨਕ ਪ੍ਰਜਾਤੀਆਂ ਚਾਹੀਦੀਆਂ ਹਨ?[span_12](start_span)[span_12](end_span)",
-        options: ["3,000", "5,000", "7,500", "10,000"],
-        answer: 1
-      },
-      {
-        tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਦੋ ਅਲੱਗ-ਅਲੱਗ ਕਿਸਮ ਦੀਆਂ ਪ੍ਰਜਾਤੀਆਂ ਜਾਂ ਪਾਰਿਸਥਿਤਿਕ ਤੰਤਰਾਂ ਵਿਚਕਾਰ ਤਬਦੀਲੀ ਵਾਲੀ ਜ਼ੋਨ (Transition Zone) ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?[span_13](start_span)[span_13](end_span)",
-        options: ["ਬਾਇਓਮ (Biome)", "ਈਕੋਟੋਨ (Ecotone)", "ਜੈਵਿਕ ਸੂਬਾ", "ਰਿਜ਼ਰਵ"],
-        answer: 1
-      },
-      {
-        tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਪੰਜਾਬ ਦੇ ਕਿਸ ਸ਼ਹਿਰ ਦੇ ਤਾਂਬੇ ਅਤੇ ਪਿੱਤਲ ਦੇ ਭਾਂਡੇ ਬਣਾਉਣ ਵਾਲੇ ਠਠੇਰਿਆਂ ਦੀ ਕਲਾ ਨੂੰ ਯੂਨੈਸਕੋ ਦੀ ਅਦਿੱਖ ਸੂਚੀ ਵਿੱਚ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ ਹੈ?[span_14](start_span)[span_14](end_span)",
-        options: ["ਸੁਲਤਾਨਪੁਰ ਲੋਧੀ", "ਜੰਡਿਆਲਾ ਗੁਰੂ (ਅੰਮ੍ਰਿਤਸਰ)", "ਆਨੰਦਪੁਰ ਸਾਹਿਬ", "ਬਠਿੰਡਾ"],
-        answer: 1
-      },
-      {
-        tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਭਾਰਤ ਵਿੱਚ ਸਿੰਧ ਡੌਲਫਿਨ (Indus Dolphin) ਖ਼ਾਸ ਤੌਰ 'ਤੇ ਕਿਸ ਦਰਿਆ ਵਿੱਚ ਮਿਲਦੀ ਹੈ?[span_15](start_span)[span_15](end_span)",
-        options: ["ਸਤਲੁਜ ਦਰਿਆ", "ਬਿਆਸ ਦਰਿਆ", "ਰਾਵੀ ਦਰਿਆ", "ਘੱਗਰ ਦਰਿਆ"],
-        answer: 1
-      },
-      {
-        tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਕਾਇਬੁਲ ਲੈਮਜ਼ੋ ਤੈਰਦਾ ਹੋਇਆ ਰਾਸ਼ਟਰੀ ਪਾਰਕ ਕਿਸ ਝੀਲ ਵਿੱਚ ਸਥਿਤ ਹੈ?[span_16](start_span)[span_16](end_span)",
-        options: ["ਲੋਕਟਾਕ ਝੀਲ (ਮਨੀਪੁਰ)", "ਲੋਨਾਰ ਝੀਲ", "ਵੂਲਰ ਝੀਲ", "ਚਿਲਕਾ ਝੀਲ"],
-        answer: 0
-      },
-      {
-        tag: "ਜੈਵਿਕ ਭੂਗੋਲ (Bio Geography)",
-        question: "ਮਹਾਰਾਸ਼ਟਰ ਦੀ ਕਿਹੜੀ ਝੀਲ ਉਲਕਾ (Meteorite) ਡਿੱਗਣ ਨਾਲ ਬਣੇ ਟੋਏ ਕਾਰਨ ਹੋਂਦ ਵਿੱਚ ਆਈ?[span_17](start_span)[span_17](end_span)",
-        options: ["ਦਲ ਝੀਲ", "ਸਾਂਭਰ ਝੀਲ", "ਲੋਨਾਰ ਝੀਲ", "ਸੁਖਨਾ ਝੀਲ"],
-        answer: 2
-      },
-      {
-        tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਧਰਤੀ 'ਤੇ ਮੌਜੂਦ ਕੁੱਲ ਪਾਣੀ ਦਾ ਕਿੰਨੇ ਪ੍ਰਤੀਸ਼ਤ ਹਿੱਸਾ ਤਾਜ਼ਾ ਪਾਣੀ (Freshwater) ਹੈ?[span_18](start_span)[span_18](end_span)",
-        options: ["2.5% ਤੋਂ 3%", "10%", "15%", "25%"],
-        answer: 0
-      },
-      {
-        tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਭਾਰਤ ਵਿੱਚ ਵੱਡੇ ਡੈਮਾਂ ਅਤੇ ਬਹੁ-ਮੰਤਵੀ ਪ੍ਰਾਜੈਕਟਾਂ ਨੂੰ 'ਆਧੁਨਿਕ ਭਾਰਤ ਦੇ ਮੰਦਰ' ਦੀ ਸੰਗਿਆ ਕਿਸਨੇ ਦਿੱਤੀ ਸੀ?[span_19](start_span)[span_19](end_span)",
-        options: ["ਡਾ. ਬੀ. ਆਰ. ਅੰਬੇਡਕਰ", "ਪੰਡਿਤ ਜਵਾਹਰ ਲਾਲ ਨਹਿਰੂ", "ਲਾਲ ਬਹਾਦਰ ਸ਼ਾਸਤਰੀ", "ਇੰਦਿਰਾ ਗਾਂਧੀ"],
-        answer: 1
-      },
-      {
-        tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਦੇਸ਼ ਦਾ ਸਭ ਤੋਂ ਉੱਚਾ ਡੈਮ 'ਟਿਹਰੀ ਡੈਮ' (261 ਮੀਟਰ) ਉੱਤਰਾਖੰਡ ਵਿੱਚ ਕਿਸ ਦਰਿਆ 'ਤੇ ਸਥਿਤ ਹੈ?[span_20](start_span)[span_20](end_span)",
-        options: ["ਨਰਮਦਾ ਦਰਿਆ", "ਮਹਾਂਨਦੀ", "ਭਾਗੀਰਥੀ ਦਰਿਆ", "ਸਤਲੁਜ ਦਰਿਆ"],
-        answer: 2
-      },
-      {
-        tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਕਿਸ ਵਾਤਾਵਰਨ ਪ੍ਰੇਮੀ ਨੂੰ 'ਭਾਰਤ ਦਾ ਜਲ ਪੁਰਸ਼' (The Waterman of India) ਕਿਹਾ ਜਾਂਦਾ ਹੈ?[span_21](start_span)[span_21](end_span)",
-        options: ["ਬਾਬਾ ਬਲਬੀਰ ਸਿੰਘ ਸੀਚੇਵਾਲ", "ਡਾ. ਰਾਜੇਂਦਰ ਸਿੰਘ", "ਸੁੰਦਰਲਾਲ ਬਹੁਗੁਣਾ", "ਜਾਦਵ ਪਾਯੇਂਗ"],
-        answer: 1
-      },
-      {
-        tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਪੰਜਾਬ ਵਿੱਚ ਪਿੰਡਾਂ ਦੇ ਗੰਦੇ ਪਾਣੀ ਦੇ ਕੁਦਰਤੀ ਸ਼ੁੱਧੀਕਰਨ ਲਈ ਕਿਹੜਾ ਪ੍ਰਸਿੱਧ ਮਾਡਲ ਲਾਗੂ ਕੀਤਾ ਗਿਆ ਹੈ?[span_22](start_span)[span_22](end_span)",
-        options: ["ਚਿਪਕੋ ਮਾਡਲ", "ਸੀਚੇਵਾਲ ਮਾਡਲ", "ਤਰੁਣ ਭਾਰਤ ਮਾਡਲ", "ਸੁਲਤਾਨਪੁਰ ਮਾਡਲ"],
-        answer: 1
-      },
-      {
-        tag: "ਜਲ ਸਾਧਨ (Water Resources)",
-        question: "ਭਾਰਤ ਦਾ ਕਿਹੜਾ ਪਹਿਲਾ ਰਾਜ ਹੈ ਜਿੱਥੇ ਹਰ ਘਰ ਦੀ ਛੱਤ ਉੱਤੇ ਮੀਂਹ ਦੇ ਪਾਣੀ ਦੀ ਸੰਭਾਲ (Rainwater Harvesting) ਕਾਨੂੰਨੀ ਤੌਰ 'ਤੇ ਲਾਜ਼ਮੀ ਹੈ?[span_23](start_span)[span_23](end_span)",
-        options: ["ਪੰਜਾਬ", "ਰਾਜਸਥਾਨ", "ਤਾਮਿਲਨਾਡੂ", "ਮਹਾਰਾਸ਼ਟਰ"],
-        answer: 2
-      }
-    ];
+    // Configuration & Gemini API
+    const GEMINI_API_KEY = "AIzaSyAMMPZQuJpBFt-JrQpKRnCJYyp5hoVBuK4";
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-    // -----------------------------------------------------------
-    // 2. FIREBASE & STATE VARIABLES
-    // -----------------------------------------------------------
-    const firebaseConfig = {
-      apiKey: "AIzaSyDvIt6oPT_mJjpTM3X3_zVI9i3NjomV6fo",
-      authDomain: "pseb-class10-portal.firebaseapp.com",
-      projectId: "pseb-class10-portal",
-      storageBucket: "pseb-class10-portal.appspot.com",
-      messagingSenderId: "10982736451",
-      appId: "1:10982736451:web:9c84f5ae672901a"
-    };
+    let currentUser = null;
+    let pendingRegData = null;
+    let currentDailyQuiz = [];
+    let currentQuizIndex = 0;
+    let currentQuizScore = 0;
 
-    let db = null;
-    try {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.firestore();
-    } catch(err) {
-      console.warn("Firebase initialized with local store fallback.");
+    // Database simulation via LocalStorage
+    function getStoredStudents() {
+      return JSON.parse(localStorage.getItem('pseb_students') || '[]');
     }
 
-    const ADMIN_CREDS = {
-      email: "deepxmaan.ol@gmail.com",
-      pass: "deep@2012"
-    };
+    function saveStudent(user) {
+      const list = getStoredStudents().filter(s => s.email !== user.email);
+      list.push(user);
+      localStorage.setItem('pseb_students', JSON.stringify(list));
+    }
 
-    let activeAuthMode = 'login'; // 'login' or 'signup'
-    let currentUser = JSON.parse(localStorage.getItem('pseb_current_user')) || null;
-    let quizQuestionIndex = 0;
-    let quizSelectedAnswers = new Array(QUESTIONS_DATA.length).fill(null);
-
-    // -----------------------------------------------------------
-    // 3. INITIALIZATION & ROUTING
-    // -----------------------------------------------------------
+    // Initialize application state
     window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      refreshNavigation();
-
-      if (!currentUser) {
-        showSection('authSection');
-      } else {
-        if (currentUser.role === 'admin') {
-          showSection('adminSection');
-        } else {
-          showSection('dashboardSection');
-        }
+      const activeSession = localStorage.getItem('pseb_active_session');
+      if (activeSession) {
+        currentUser = JSON.parse(activeSession);
+        renderAuthenticatedUI();
       }
     });
 
-    function showSection(sectionId) {
-      ['authSection', 'dashboardSection', 'quizSection', 'resultSection', 'adminSection'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-      });
-      const target = document.getElementById(sectionId);
-      if (target) {
-        target.classList.remove('hidden');
-      }
+    // Step 1: Request Code
+    function handleStartAuth(e) {
+      e.preventDefault();
+      const email = document.getElementById('regEmail').value.trim();
+      const name = document.getElementById('regName').value.trim();
+      const roll = document.getElementById('regRoll').value.trim();
 
-      if (sectionId === 'dashboardSection') renderStudentDashboard();
-      if (sectionId === 'adminSection') renderAdminDashboard();
-      lucide.createIcons();
+      // Generate 6 digit code
+      const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+      pendingRegData = { name, class: '10th Class', roll, email, code: generatedCode, results: [] };
+
+      // In client web apps without backend SMTP, code is delivered on-screen and simulated as email
+      alert(`[Verification Simulated for Email: ${email}]\nYour One-Time Code is: ${generatedCode}`);
+      document.getElementById('verifyStep').style.display = 'block';
     }
 
-    function refreshNavigation() {
-      const container = document.getElementById('navRight');
-      if (!currentUser) {
-        container.innerHTML = `
-          <button onclick="showSection('authSection')" class="text-xs px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold transition">
-            Sign In
-          </button>
-        `;
-      } else {
-        container.innerHTML = `
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-semibold text-slate-300">${currentUser.name}</span>
-            <button onclick="logoutSession()" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
-              Logout
-            </button>
-          </div>
-        `;
-      }
-      lucide.createIcons();
-    }
-
-    function handleLogoClick() {
-      if (!currentUser) {
-        showSection('authSection');
-      } else if (currentUser.role === 'admin') {
-        showSection('adminSection');
-      } else {
-        showSection('dashboardSection');
-      }
-    }
-
-    // -----------------------------------------------------------
-    // 4. AUTHENTICATION (LOGIN & SIGN UP SWITCHING)
-    // -----------------------------------------------------------
-    function switchAuthTab(mode) {
-      activeAuthMode = mode;
-      const tabLogin = document.getElementById('tabLogin');
-      const tabSignup = document.getElementById('tabSignup');
-      const nameGroup = document.getElementById('nameFieldGroup');
-      const detailsGroup = document.getElementById('studentDetailsGroup');
-      const title = document.getElementById('authTitle');
-      const subtitle = document.getElementById('authSubtitle');
-      const btnText = document.getElementById('btnText');
-      const identifierLabel = document.getElementById('identifierLabel');
-
-      if (mode === 'signup') {
-        tabSignup.className = "py-2.5 rounded-xl bg-indigo-600 text-white shadow-md transition duration-200";
-        tabLogin.className = "py-2.5 rounded-xl text-slate-400 hover:text-slate-200 transition duration-200";
-        
-        nameGroup.classList.remove('hidden');
-        detailsGroup.classList.remove('hidden');
-        title.textContent = "Student Registration";
-        subtitle.textContent = "Create your Class 10 profile for instant access";
-        btnText.textContent = "Register & Enter Portal";
-        identifierLabel.textContent = "Username / Student ID";
-      } else {
-        tabLogin.className = "py-2.5 rounded-xl bg-indigo-600 text-white shadow-md transition duration-200";
-        tabSignup.className = "py-2.5 rounded-xl text-slate-400 hover:text-slate-200 transition duration-200";
-        
-        nameGroup.classList.add('hidden');
-        detailsGroup.classList.add('hidden');
-        title.textContent = "Student & Admin Login";
-        subtitle.textContent = "Access your Punjab School Education Board portal";
-        btnText.textContent = "Sign In to Account";
-        identifierLabel.textContent = "Username or Admin Email";
-      }
-      lucide.createIcons();
-    }
-
-    function handleAuthSubmit(event) {
-      event.preventDefault();
-      const identifier = document.getElementById('authIdentifier').value.trim();
-      const password = document.getElementById('authPassword').value.trim();
-
-      // Check for Admin Credentials
-      if (identifier.toLowerCase() === ADMIN_CREDS.email.toLowerCase() && password === ADMIN_CREDS.pass) {
-        currentUser = {
-          name: "Deepinder Singh (Admin)",
-          email: ADMIN_CREDS.email,
-          role: "admin",
-          rollNo: "TEACHER-01"
-        };
-        localStorage.setItem('pseb_current_user', JSON.stringify(currentUser));
-        refreshNavigation();
-        showToast("Logged in as Admin!");
-        showSection('adminSection');
+    // Step 2: Verify Code and Store Persistent Profile
+    function handleVerifyCode() {
+      const code = document.getElementById('codeVal').value.trim();
+      if (!pendingRegData || code !== pendingRegData.code) {
+        alert('Invalid code. Please re-enter the code.');
         return;
       }
 
-      if (activeAuthMode === 'signup') {
-        const studentName = document.getElementById('signupName').value.trim() || identifier;
-        const roll = document.getElementById('signupRoll').value.trim() || "Roll No. 05";
-        const section = document.getElementById('signupSection').value.trim() || "Section C";
+      currentUser = {
+        name: pendingRegData.name,
+        roll: pendingRegData.roll,
+        class: pendingRegData.class,
+        email: pendingRegData.email,
+        verified: true,
+        testsTaken: 0,
+        lastScore: 'N/A',
+        medium: 'English'
+      };
 
-        currentUser = {
-          name: studentName,
-          rollNo: roll,
-          section: section,
-          role: "student",
-          score: null,
-          submittedAt: null
-        };
-        showToast(`Account registered for ${currentUser.name}!`);
-      } else {
-        // Find existing record or create new session
-        const allStudents = JSON.parse(localStorage.getItem('pseb_student_records')) || [];
-        const existing = allStudents.find(s => s.name.toLowerCase() === identifier.toLowerCase());
-
-        currentUser = existing || {
-          name: identifier,
-          rollNo: "Roll No. 05",
-          section: "Section C",
-          role: "student",
-          score: null,
-          submittedAt: null
-        };
-        showToast(`Welcome back, ${currentUser.name}!`);
-      }
-
-      localStorage.setItem('pseb_current_user', JSON.stringify(currentUser));
-      saveRecordToStorage(currentUser);
-      refreshNavigation();
-      showSection('dashboardSection');
+      saveStudent(currentUser);
+      localStorage.setItem('pseb_active_session', JSON.stringify(currentUser));
+      renderAuthenticatedUI();
     }
 
-    function logoutSession() {
-      localStorage.removeItem('pseb_current_user');
-      currentUser = null;
-      refreshNavigation();
-      showSection('authSection');
-      showToast("Logged out successfully.");
+    function renderAuthenticatedUI() {
+      document.getElementById('authSection').style.display = 'none';
+      document.getElementById('dashboardSection').style.display = 'block';
+
+      document.getElementById('userBadgeArea').innerHTML = `
+        <span class="badge badge-student">${currentUser.name} (${currentUser.roll})</span>
+        <button class="btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="logout()">Logout</button>
+      `;
+
+      // Fill profile view
+      document.getElementById('pName').innerText = currentUser.name;
+      document.getElementById('pRoll').innerText = currentUser.roll;
+      document.getElementById('pEmail').innerText = currentUser.email;
     }
 
-    // -----------------------------------------------------------
-    // 5. DASHBOARD FUNCTIONS
-    // -----------------------------------------------------------
-    function renderStudentDashboard() {
-      if (!currentUser) return;
-      document.getElementById('dashStudentName').textContent = currentUser.name;
-      document.getElementById('dashAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-      document.getElementById('dashStudentClass').textContent = `PSEB 10th Class • ${currentUser.rollNo || 'Roll No. 5'} • ${currentUser.section || 'Sec C'}`;
+    function logout() {
+      localStorage.removeItem('pseb_active_session');
+      location.reload();
+    }
 
-      const records = JSON.parse(localStorage.getItem('pseb_student_records')) || [];
-      const studentData = records.find(s => s.name === currentUser.name) || currentUser;
+    // Tab Switching
+    function switchTab(tab) {
+      ['quizTab', 'testTab', 'doubtsTab', 'profileTab'].forEach(t => document.getElementById(t).style.display = 'none');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
 
-      const scoreEl = document.getElementById('dashScoreDisplay');
-      if (studentData.score !== null && studentData.score !== undefined) {
-        scoreEl.textContent = `${studentData.score} / 20 Marks`;
-        scoreEl.className = "text-lg font-black text-emerald-400";
-      } else {
-        scoreEl.textContent = "Not Attempted";
-        scoreEl.className = "text-lg font-black text-amber-400";
+      if (tab === 'quiz') {
+        document.getElementById('quizTab').style.display = 'block';
+        event.currentTarget.classList.add('active');
+      } else if (tab === 'test') {
+        document.getElementById('testTab').style.display = 'block';
+        event.currentTarget.classList.add('active');
+      } else if (tab === 'doubts') {
+        document.getElementById('doubtsTab').style.display = 'block';
+        event.currentTarget.classList.add('active');
+      } else if (tab === 'profile') {
+        document.getElementById('profileTab').style.display = 'block';
+        event.currentTarget.classList.add('active');
       }
     }
 
-    // -----------------------------------------------------------
-    // 6. QUIZ FLOW (20 QUESTIONS / 20 MARKS)
-    // -----------------------------------------------------------
-    function startSSTQuiz() {
-      quizQuestionIndex = 0;
-      quizSelectedAnswers = new Array(QUESTIONS_DATA.length).fill(null);
-      showSection('quizSection');
-      displayCurrentQuestion();
-    }
+    // AI Daily Quiz Generation using Gemini API
+    async function initDailyQuiz() {
+      const lang = document.getElementById('quizLanguage').value;
+      const todayDate = new Date().toISOString().slice(0, 10);
+      document.getElementById('quizDate').innerText = `Date: ${todayDate}`;
 
-    function displayCurrentQuestion() {
-      const q = QUESTIONS_DATA[quizQuestionIndex];
-      document.getElementById('quizCounter').textContent = `${quizQuestionIndex + 1} / ${QUESTIONS_DATA.length}`;
-      document.getElementById('quizChapterBadge').textContent = q.tag;
-      document.getElementById('quizQuestionText').textContent = `${quizQuestionIndex + 1}. ${q.question}`;
+      const quizSetup = document.getElementById('quizSetup');
+      quizSetup.innerHTML = `<p style="padding: 2rem 0; text-align: center;"><span class="loader"></span> Generating unique 10th PSEB daily questions...</p>`;
 
-      const pct = ((quizQuestionIndex + 1) / QUESTIONS_DATA.length) * 100;
-      document.getElementById('quizProgressBar').style.width = `${pct}%`;
-
-      const listContainer = document.getElementById('quizOptionsList');
-      listContainer.innerHTML = '';
-
-      q.options.forEach((opt, index) => {
-        const isSelected = quizSelectedAnswers[quizQuestionIndex] === index;
-        const btn = document.createElement('button');
-        btn.className = `w-full text-left p-3.5 rounded-2xl border text-xs sm:text-sm font-semibold transition flex items-center justify-between ${
-          isSelected 
-            ? 'bg-indigo-600/30 border-indigo-500 text-white shadow-md' 
-            : 'glassmorphism border-slate-700/80 hover:border-slate-600 text-slate-300'
-        }`;
-        btn.onclick = () => selectQuizAnswer(index);
-        btn.innerHTML = `
-          <span>${opt}</span>
-          <span class="w-6 h-6 rounded-full border border-slate-600 flex items-center justify-center text-[10px] ${
-            isSelected ? 'bg-indigo-500 border-indigo-400 text-white' : ''
-          }">
-            ${String.fromCharCode(65 + index)}
-          </span>
-        `;
-        listContainer.appendChild(btn);
-      });
-
-      document.getElementById('quizPrevBtn').disabled = quizQuestionIndex === 0;
-      document.getElementById('quizNextBtn').textContent = quizQuestionIndex === QUESTIONS_DATA.length - 1 ? 'Finish & Submit' : 'Next';
-    }
-
-    function selectQuizAnswer(index) {
-      quizSelectedAnswers[quizQuestionIndex] = index;
-      displayCurrentQuestion();
-    }
-
-    function previousQuestion() {
-      if (quizQuestionIndex > 0) {
-        quizQuestionIndex--;
-        displayCurrentQuestion();
-      }
-    }
-
-    function advanceQuestion() {
-      if (quizQuestionIndex < QUESTIONS_DATA.length - 1) {
-        quizQuestionIndex++;
-        displayCurrentQuestion();
-      } else {
-        submitTestAnswers();
-      }
-    }
-
-    function quitQuiz() {
-      if (confirm("Do you want to exit the quiz? Any unsaved answers will be discarded.")) {
-        showSection('dashboardSection');
-      }
-    }
-
-    function submitTestAnswers() {
-      let earnedMarks = 0;
-      quizSelectedAnswers.forEach((answerIndex, qIdx) => {
-        if (answerIndex === QUESTIONS_DATA[qIdx].answer) {
-          earnedMarks += 1;
-        }
-      });
-
-      const submissionDate = new Date().toLocaleString();
-      currentUser.score = earnedMarks;
-      currentUser.submittedAt = submissionDate;
-
-      localStorage.setItem('pseb_current_user', JSON.stringify(currentUser));
-      saveRecordToStorage(currentUser);
+      const prompt = `Generate a 5-question multiple choice quiz for 10th Class PSEB board covering Science and Mathematics.
+        The questions must be suitable for date ${todayDate}.
+        Medium of language: ${lang}.
+        Return ONLY valid JSON matching this schema:
+        [
+          {
+            "question": "Question text here",
+            "options": ["Option A", "Option B", "Option C", "Option D"],
+            "correctIndex": 0
+          }
+        ]
+        Do not wrap in markdown quotes. Just raw JSON.`;
 
       try {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
+        const response = await fetch(GEMINI_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: "application/json" }
+          })
         });
-      } catch(e) {}
 
-      document.getElementById('finalScoreVal').textContent = earnedMarks;
-      const feedback = document.getElementById('finalFeedback');
-      if (earnedMarks >= 18) {
-        feedback.textContent = "Outstanding Performance! Grade: A+";
-        feedback.className = "text-xs font-bold text-emerald-400 mt-2";
-      } else if (earnedMarks >= 10) {
-        feedback.textContent = "Good Attempt! Revise Chapters 1 to 3.";
-        feedback.className = "text-xs font-bold text-indigo-300 mt-2";
-      } else {
-        feedback.textContent = "Needs Revision. Study the uploaded PDF.";
-        feedback.className = "text-xs font-bold text-amber-400 mt-2";
-      }
+        const resData = await response.json();
+        const content = resData.candidates[0].content.parts[0].text;
+        currentDailyQuiz = JSON.parse(content);
+        currentQuizIndex = 0;
+        currentQuizScore = 0;
 
-      showSection('resultSection');
-    }
-
-    // -----------------------------------------------------------
-    // 7. RECORD PERSISTENCE & ADMIN VIEW
-    // -----------------------------------------------------------
-    function saveRecordToStorage(user) {
-      let records = JSON.parse(localStorage.getItem('pseb_student_records')) || [];
-      const matchIndex = records.findIndex(r => r.name.toLowerCase() === user.name.toLowerCase());
-      if (matchIndex >= 0) {
-        records[matchIndex] = { ...records[matchIndex], ...user };
-      } else {
-        records.push(user);
-      }
-      localStorage.setItem('pseb_student_records', JSON.stringify(records));
-
-      // Optional cloud sync with Firebase Firestore
-      if (db) {
-        db.collection("pseb_exam_results").doc(user.name).set({
-          name: user.name,
-          rollNo: user.rollNo || "05",
-          section: user.section || "C",
-          score: user.score !== null ? user.score : 0,
-          total: 20,
-          submittedAt: user.submittedAt || new Date().toISOString()
-        }, { merge: true }).catch(err => console.log("Firestore notice:", err.message));
+        document.getElementById('quizSetup').style.display = 'none';
+        document.getElementById('quizInterface').style.display = 'block';
+        renderQuestion();
+      } catch (err) {
+        alert('Failed to generate daily quiz. Loading offline set.');
+        currentDailyQuiz = [
+          {
+            question: lang === 'Punjabi' ? "ਪ੍ਰਕਾਸ਼ ਦਾ ਵੇਗ ਸਭ ਤੋਂ ਵੱਧ ਕਿਸ ਵਿੱਚ ਹੁੰਦਾ ਹੈ?" : "What is the speed of light highest in?",
+            options: lang === 'Punjabi' ? ["ਹਵਾ", "ਪਾਣੀ", "ਖਲਾਅ (Vacuum)", "ਕੱਚ"] : ["Air", "Water", "Vacuum", "Glass"],
+            correctIndex: 2
+          }
+        ];
+        renderQuestion();
       }
     }
 
-    function renderAdminDashboard() {
-      const records = JSON.parse(localStorage.getItem('pseb_student_records')) || [];
-      document.getElementById('adminStudentCount').textContent = `${records.length} total students`;
+    function renderQuestion() {
+      const q = currentDailyQuiz[currentQuizIndex];
+      document.getElementById('quizIndex').innerText = `Question ${currentQuizIndex + 1} of ${currentDailyQuiz.length}`;
+      document.getElementById('questionTitle').innerText = q.question;
 
-      const tbody = document.getElementById('adminTableRows');
-      tbody.innerHTML = '';
+      const optsBox = document.getElementById('optionsBox');
+      optsBox.innerHTML = '';
 
-      if (records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No student records registered yet.</td></tr>`;
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.innerText = `${idx + 1}) ${opt}`;
+        btn.onclick = () => {
+          document.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          btn.dataset.selectedIndex = idx;
+        };
+        optsBox.appendChild(btn);
+      });
+    }
+
+    function nextQuestion() {
+      const selected = document.querySelector('.quiz-option.selected');
+      if (!selected) {
+        alert('Please choose an answer option.');
         return;
       }
 
-      records.forEach(student => {
+      const choice = parseInt(selected.dataset.selectedIndex);
+      if (choice === currentDailyQuiz[currentQuizIndex].correctIndex) {
+        currentQuizScore++;
+      }
+
+      currentQuizIndex++;
+      if (currentQuizIndex < currentDailyQuiz.length) {
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById('quizInterface').style.display = 'none';
+      document.getElementById('quizResult').style.display = 'block';
+      const scoreStr = `${currentQuizScore}/${currentDailyQuiz.length}`;
+      document.getElementById('scoreDisplay').innerText = scoreStr;
+
+      // Update student record
+      currentUser.lastScore = scoreStr;
+      currentUser.medium = document.getElementById('quizLanguage').value;
+      currentUser.testsTaken = (currentUser.testsTaken || 0) + 1;
+      saveStudent(currentUser);
+      localStorage.setItem('pseb_active_session', JSON.stringify(currentUser));
+    }
+
+    // Handwritten Copy Checker with Image Input
+    async function gradeAnswerCopy() {
+      const fileInput = document.getElementById('copyFileInput');
+      const subject = document.getElementById('examSubject').value;
+      const medium = document.getElementById('evalMedium').value;
+      const questionContext = document.getElementById('evalPrompt').value;
+      const btn = document.getElementById('btnCheckCopy');
+
+      if (!fileInput.files[0]) {
+        alert('Please select an image file of your handwritten copy.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Evaluating copy with AI...';
+
+      const file = fileInput.files[0];
+      const base64Data = await toBase64(file);
+
+      const prompt = `You are an expert PSEB 10th Class Board Examiner for subject: ${subject}. 
+        Evaluate this student's handwritten answer copy. 
+        Context/Question: ${questionContext}.
+        Medium: ${medium}.
+        Provide:
+        1. Score out of 10.
+        2. Positive points.
+        3. Mistakes found in steps or calculation.
+        4. Clear suggestions in simple ${medium === 'Punjabi' ? 'Punjabi' : 'English'} to improve marks in board exams.`;
+
+      try {
+        const response = await fetch(GEMINI_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: prompt },
+                {
+                  inlineData: {
+                    mimeType: file.type || "image/jpeg",
+                    data: base64Data.split(',')[1]
+                  }
+                }
+              ]
+            }]
+          })
+        });
+
+        const data = await response.json();
+        const text = data.candidates[0].content.parts[0].text;
+        document.getElementById('gradingResult').style.display = 'block';
+        document.getElementById('evalContent').innerText = text;
+      } catch (e) {
+        alert('Error analyzing the answer sheet. Please try with a clearer photo.');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Check & Grade My Copy';
+      }
+    }
+
+    function toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    // Punjabi Doubt Resolution Bot
+    async function submitDoubt() {
+      const input = document.getElementById('doubtInput');
+      const query = input.value.trim();
+      if (!query) return;
+
+      const chatBox = document.getElementById('doubtChatBox');
+      
+      // User message
+      const userMsg = document.createElement('div');
+      userMsg.className = 'chat-msg user';
+      userMsg.innerText = query;
+      chatBox.appendChild(userMsg);
+      input.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Loading bubble
+      const loadMsg = document.createElement('div');
+      loadMsg.className = 'chat-msg bot';
+      loadMsg.innerText = 'ਜਵਾਬ ਤਿਆਰ ਹੋ ਰਿਹਾ ਹੈ...';
+      chatBox.appendChild(loadMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      const prompt = `You are a supportive, high-school tutor for Punjab School Education Board (PSEB) Class 10. 
+        Answer the following student question strictly in simple, warm, conversational Punjabi (Gurmukhi).
+        Use easy daily life examples where necessary. Keep it accurate according to 10th syllabus:
+        Question: ${query}`;
+
+      try {
+        const response = await fetch(GEMINI_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        });
+
+        const resData = await response.json();
+        const reply = resData.candidates[0].content.parts[0].text;
+        loadMsg.innerText = reply;
+      } catch (err) {
+        loadMsg.innerText = "ਮਾਫ ਕਰਨਾ, ਕੁਝ ਤਕਨੀਕੀ ਸਮੱਸਿਆ ਆਈ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।";
+      }
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Admin Flow
+    function showAdminLoginModal() {
+      const email = prompt("Enter Admin Email:");
+      const pass = prompt("Enter Admin Password:");
+
+      if (email === "deepxmaan01@gmail.com" && pass === "deep@2012") {
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('dashboardSection').style.display = 'none';
+        document.getElementById('adminSection').style.display = 'block';
+        loadAdminDashboard();
+      } else {
+        alert("Invalid Admin Credentials!");
+      }
+    }
+
+    function loadAdminDashboard() {
+      const students = getStoredStudents();
+      document.getElementById('statTotalStudents').innerText = students.length;
+      
+      let tests = 0;
+      let scoreAcc = 0;
+      let validScores = 0;
+
+      const tbody = document.getElementById('adminTableBody');
+      tbody.innerHTML = '';
+
+      students.forEach(st => {
+        tests += (st.testsTaken || 0);
+        if (st.lastScore && st.lastScore.includes('/')) {
+          const parts = st.lastScore.split('/');
+          scoreAcc += (parseInt(parts[0]) / parseInt(parts[1])) * 100;
+          validScores++;
+        }
+
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/40 transition";
-        const pct = student.score !== null ? ((student.score / 20) * 100).toFixed(0) + '%' : 'Pending';
         tr.innerHTML = `
-          <td class="p-3.5 font-bold text-slate-200">${student.name}</td>
-          <td class="p-3.5 text-slate-400">${student.rollNo || 'Roll No. 5'} (${student.section || 'Sec C'})</td>
-          <td class="p-3.5 font-extrabold ${student.score >= 10 ? 'text-emerald-400' : 'text-amber-400'}">
-            ${student.score !== null ? student.score : 'Not Attempted'}
-          </td>
-          <td class="p-3.5 text-slate-300 font-semibold">${pct}</td>
-          <td class="p-3.5 text-slate-500 text-[11px]">${student.submittedAt || '—'}</td>
+          <td><strong>${st.roll}</strong></td>
+          <td>${st.name}</td>
+          <td>${st.email}</td>
+          <td>${st.lastScore || 'N/A'}</td>
+          <td>${st.medium || 'English'}</td>
+          <td><button class="btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="alert('Student ${st.name} is on track with Punjab Board Class 10 Syllabus.')">Analyze</button></td>
         `;
         tbody.appendChild(tr);
       });
+
+      document.getElementById('statTotalTests').innerText = tests;
+      document.getElementById('statAvgScore').innerText = validScores ? Math.round(scoreAcc / validScores) + '%' : '0%';
     }
 
-    function syncWithFirebaseCloud() {
-      showToast("Connecting to Firestore database...");
-      if (db) {
-        db.collection("pseb_exam_results").get().then((snapshot) => {
-          let records = JSON.parse(localStorage.getItem('pseb_student_records')) || [];
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            const idx = records.findIndex(r => r.name.toLowerCase() === data.name.toLowerCase());
-            if (idx >= 0) {
-              records[idx] = { ...records[idx], ...data };
-            } else {
-              records.push(data);
-            }
-          });
-          localStorage.setItem('pseb_student_records', JSON.stringify(records));
-          renderAdminDashboard();
-          showToast("Sync completed successfully!");
-        }).catch(err => {
-          showToast("Cloud sync note: " + err.message);
-        });
+    function logoutAdmin() {
+      document.getElementById('adminSection').style.display = 'none';
+      if (currentUser) {
+        document.getElementById('dashboardSection').style.display = 'block';
       } else {
-        setTimeout(() => showToast("Local records verified and loaded."), 500);
+        document.getElementById('authSection').style.display = 'block';
       }
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toastMessage');
-      toast.textContent = msg;
-      toast.classList.remove('hidden');
-      setTimeout(() => {
-        toast.classList.add('hidden');
-      }, 3000);
     }
   </script>
 </body>
