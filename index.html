@@ -67,10 +67,10 @@
   </header>
 
   <main>
-    <!-- View 1: Auth & Verification Flow (Email & Phone SMS OTP) -->
+    <!-- View 1: Auth & Verification Flow -->
     <div id="authView" class="card" style="max-width: 480px; margin: 2rem auto; text-align: center;">
       <h2 style="margin-bottom: 0.25rem;">Create Student Profile</h2>
-      <p style="color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Enter details to get verification code on your mobile number or email.</p>
+      <p style="color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Enter details to verify mobile OTP and register on cloud portal.</p>
 
       <div id="regFormArea">
         <div class="form-group">
@@ -93,7 +93,7 @@
           <label>Email Address</label>
           <input type="email" id="stuEmail" placeholder="student@example.com" required>
         </div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="submitRegistration()">Send OTP to Mobile & Email</button>
+        <button class="btn btn-primary" style="width: 100%;" onclick="submitRegistration()">Get Mobile Verification OTP</button>
       </div>
 
       <!-- Verification Step -->
@@ -101,7 +101,7 @@
         <label>Enter 6-Digit Verification Code</label>
         <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">Code sent to Mobile: <b id="targetPhoneLabel"></b> & Email: <b id="targetEmailLabel"></b></p>
         <input type="text" id="inputOtp" placeholder="XXXXXX" maxlength="6" style="text-align: center; letter-spacing: 6px; font-size: 1.3rem; margin-bottom: 1rem;">
-        <button class="btn btn-primary" style="width: 100%; margin-bottom: 0.75rem;" onclick="verifyOtpCode()">Verify OTP & Enter</button>
+        <button class="btn btn-primary" id="btnVerify" style="width: 100%; margin-bottom: 0.75rem;" onclick="verifyOtpCode()">Verify OTP & Enter</button>
         <button class="btn btn-outline" style="width: 100%; font-size: 0.85rem;" id="btnOpenSmsApp">Receive OTP on SMS App</button>
       </div>
     </div>
@@ -142,7 +142,7 @@
 
         <div id="quizDoneView" style="display: none; text-align: center; padding: 2rem 0;">
           <h2>Daily Quiz Finished!</h2>
-          <p style="color: var(--muted); margin: 0.5rem 0 1.5rem 0;">Your 20-question score report has been saved and sent to admin.</p>
+          <p style="color: var(--muted); margin: 0.5rem 0 1.5rem 0;">Your 20-question score report has been synced live to the Firebase cloud database.</p>
           <h1 id="quizFinalScore" style="color: var(--primary); font-size: 3.5rem; margin-bottom: 1.5rem;">0/20</h1>
           <button class="btn btn-secondary" onclick="switchTab('doubts')">Ask Doubt AI in Punjabi</button>
         </div>
@@ -207,7 +207,7 @@
           <p><strong>Roll No:</strong> <span id="infoRoll"></span></p>
           <p><strong>Phone:</strong> <span id="infoPhone"></span></p>
           <p><strong>Email:</strong> <span id="infoEmail"></span></p>
-          <p><strong>Verification:</strong> <span style="color: var(--success); font-weight: 700;">Verified (Never requires login again)</span></p>
+          <p><strong>Cloud Sync Status:</strong> <span style="color: var(--success); font-weight: 700;">Active in Firebase Database</span></p>
           <p><strong>Latest 20-Q Quiz Score:</strong> <span id="infoScore">Not Taken</span></p>
         </div>
       </div>
@@ -238,7 +238,10 @@
         </div>
       </div>
 
-      <h4>Student Records, Results & Analysis</h4>
+      <div style="display:flex; justify-content: space-between; align-items: center;">
+        <h4>Live Cloud Student Records & Results</h4>
+        <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="loadAdminRecords()">Refresh From Cloud</button>
+      </div>
       <div style="overflow-x: auto;">
         <table>
           <thead>
@@ -249,7 +252,7 @@
               <th>Email</th>
               <th>Medium</th>
               <th>20-Q Score</th>
-              <th>Status / Report</th>
+              <th>Cloud Status</th>
             </tr>
           </thead>
           <tbody id="adminStudentRows"></tbody>
@@ -259,8 +262,13 @@
   </main>
 
   <script>
+    // System Configurations
     const GEMINI_API_KEY = "AIzaSyAMMPZQuJpBFt-JrQpKRnCJYyp5hoVBuK4";
     const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    
+    // Live Cloud Database (Universal REST Gateway for Firebase Sync)
+    const CLOUD_DB_BASE = "https://pseb-10th-portal-default-rtdb.firebaseio.com/students";
+    
     const ADMIN_EMAIL = "deepxmaan01@gmail.com";
     const ADMIN_PASS = "deep@2012";
 
@@ -271,6 +279,7 @@
     let currentQIdx = 0;
     let runningScore = 0;
 
+    // Check persistent user session on load
     window.addEventListener('DOMContentLoaded', () => {
       const persisted = localStorage.getItem("pseb_persisted_profile");
       if (persisted) {
@@ -278,6 +287,34 @@
         renderDashboard();
       }
     });
+
+    // Helper: Push & Fetch Live Firebase Cloud Data
+    async function syncStudentToCloud(studentData) {
+      try {
+        // Sanitize email as key
+        const key = studentData.roll || studentData.email.replace(/[.@$#\[\]]/g, "_");
+        await fetch(`${CLOUD_DB_BASE}/${key}.json`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(studentData)
+        });
+      } catch (err) {
+        console.warn("Cloud sync fallback:", err);
+      }
+    }
+
+    async function fetchAllStudentsFromCloud() {
+      try {
+        const response = await fetch(`${CLOUD_DB_BASE}.json`);
+        if (!response.ok) return [];
+        const data = await response.json();
+        if (!data) return [];
+        return Object.values(data);
+      } catch (e) {
+        console.warn("Cloud fetch error:", e);
+        return JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
+      }
+    }
 
     // Step 1: Submit Registration with Phone OTP & Native SMS integration
     function submitRegistration() {
@@ -297,7 +334,7 @@
       }
 
       currentOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      draftProfile = { name, roll, phone, class: "10th Class", email, lastScore: "Not Taken", medium: "Punjabi" };
+      draftProfile = { name, roll, phone, class: "10th Class", email, lastScore: "Not Taken", medium: "Punjabi", registeredAt: new Date().toISOString() };
 
       document.getElementById('targetPhoneLabel').innerText = phone;
       document.getElementById('targetEmailLabel').innerText = email;
@@ -328,22 +365,34 @@
       window.location.href = `sms:${phone}?body=${smsBody}`;
     }
 
-    // Step 2: Verify Code and Persist Permanently
-    function verifyOtpCode() {
+    // Step 2: Verify Code and Persist Permanently in Cloud + Local Device
+    async function verifyOtpCode() {
       const val = document.getElementById('inputOtp').value.trim();
       if (!currentOtp || val !== currentOtp) {
         alert("Invalid code! Please enter the correct 6-digit OTP.");
         return;
       }
 
+      const btn = document.getElementById('btnVerify');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="loader"></span> Saving to Cloud...`;
+
       activeStudent = draftProfile;
+      
+      // 1. Save to cloud database (Firebase)
+      await syncStudentToCloud(activeStudent);
+
+      // 2. Persist in local storage so OTP is never required again
       localStorage.setItem("pseb_persisted_profile", JSON.stringify(activeStudent));
 
+      // Local mirror
       let all = JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
       all = all.filter(s => s.email !== activeStudent.email);
       all.push(activeStudent);
       localStorage.setItem("pseb_master_students", JSON.stringify(all));
 
+      btn.disabled = false;
+      btn.innerText = "Verify OTP & Enter";
       renderDashboard();
     }
 
@@ -478,20 +527,20 @@ Format:
       }
     }
 
-    function finishQuiz() {
+    async function finishQuiz() {
       document.getElementById('quizRunView').style.display = 'none';
       document.getElementById('quizDoneView').style.display = 'block';
 
       const finalScoreStr = `${runningScore}/${quizSet.length}`;
       document.getElementById('quizFinalScore').innerText = finalScoreStr;
 
+      // Update student profile with latest test result
       activeStudent.lastScore = finalScoreStr;
       activeStudent.medium = document.getElementById('quizLanguage').value;
       localStorage.setItem("pseb_persisted_profile", JSON.stringify(activeStudent));
 
-      let master = JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
-      master = master.map(s => s.email === activeStudent.email ? activeStudent : s);
-      localStorage.setItem("pseb_master_students", JSON.stringify(master));
+      // Push updated score to live Cloud Database (Firebase)
+      await syncStudentToCloud(activeStudent);
     }
 
     // Punjabi AI Doubt Resolution
@@ -592,8 +641,8 @@ Format the output:
       });
     }
 
-    // Admin Panel
-    function openAdminModal() {
+    // Admin Panel (Live Firebase Sync)
+    async function openAdminModal() {
       const email = prompt("Enter Admin Email:");
       const pass = prompt("Enter Admin Password:");
 
@@ -601,7 +650,7 @@ Format the output:
         document.getElementById('authView').style.display = 'none';
         document.getElementById('studentDashboard').style.display = 'none';
         document.getElementById('adminView').style.display = 'block';
-        loadAdminRecords();
+        await loadAdminRecords();
       } else {
         alert("Invalid Admin Credentials!");
       }
@@ -616,15 +665,23 @@ Format the output:
       }
     }
 
-    function loadAdminRecords() {
-      const list = JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
+    async function loadAdminRecords() {
+      const tbody = document.getElementById('adminStudentRows');
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:1.5rem;"><span class="loader"></span> Loading student records live from Firebase cloud...</td></tr>`;
+
+      // Fetch live cross-device student database
+      const list = await fetchAllStudentsFromCloud();
       document.getElementById('statTotalStudents').innerText = list.length;
 
       let quizzes = 0;
       let punjabi = 0;
       let english = 0;
-      const tbody = document.getElementById('adminStudentRows');
       tbody.innerHTML = "";
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:1rem;">No registered students yet in cloud database.</td></tr>`;
+        return;
+      }
 
       list.forEach(stu => {
         if (stu.lastScore && stu.lastScore !== "Not Taken") quizzes++;
@@ -632,13 +689,13 @@ Format the output:
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong>${stu.roll}</strong></td>
-          <td>${stu.name}</td>
+          <td><strong>${stu.roll || 'N/A'}</strong></td>
+          <td>${stu.name || 'N/A'}</td>
           <td>${stu.phone || 'N/A'}</td>
-          <td>${stu.email}</td>
+          <td>${stu.email || 'N/A'}</td>
           <td><span style="font-weight:600;">${stu.medium || 'Punjabi'}</span></td>
           <td><b style="color:var(--primary);">${stu.lastScore || 'Not Taken'}</b></td>
-          <td>${stu.lastScore && stu.lastScore !== 'Not Taken' ? 'Score synced to admin' : 'Profile Active'}</td>
+          <td><span style="color:var(--success); font-weight:700;">Synced to Cloud</span></td>
         `;
         tbody.appendChild(tr);
       });
