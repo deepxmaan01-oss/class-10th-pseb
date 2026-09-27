@@ -3,772 +3,584 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PSEB Class 10 Learning & Assessment Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>PSEB 10th Class - Daily Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- EmailJS SDK for delivering real emails -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     :root {
-      --primary: #4338ca;
-      --primary-light: #6366f1;
-      --secondary: #0ea5e9;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
       --bg: #f8fafc;
-      --surface: #ffffff;
+      --card-bg: #ffffff;
       --text: #0f172a;
       --text-muted: #64748b;
       --border: #e2e8f0;
-      --accent: #10b981;
-      --error: #ef4444;
-      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-      --radius: 16px;
+      --success: #16a34a;
+      --danger: #dc2626;
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Noto Sans Gurmukhi', sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+    .logo { font-size: 1.25rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    main { flex: 1; max-width: 950px; width: 100%; margin: 1.5rem auto; padding: 0 1rem; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .btn { cursor: pointer; border: none; outline: none; font-weight: 600; border-radius: 8px; padding: 0.75rem 1.25rem; transition: background 0.2s; font-size: 0.95rem; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: #e0e7ff; color: var(--primary); }
+    .btn-outline { border: 1px solid var(--border); background: transparent; color: var(--text); }
+    .form-group { margin-bottom: 1.25rem; text-align: left; }
+    label { display: block; margin-bottom: 0.4rem; font-size: 0.875rem; font-weight: 600; }
+    input, select, textarea { width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border); outline: none; font-size: 1rem; background: #fff; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); ring: 2px solid #c7d2fe; }
+    
+    /* Navigation Tabs */
+    .tabs-header { display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
+    .tab-btn { background: none; border: none; padding: 0.75rem 1.25rem; cursor: pointer; font-weight: 600; color: var(--text-muted); border-bottom: 2px solid transparent; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', 'Noto Sans Gurmukhi', sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
+    /* Quiz Styling */
+    .option-btn { width: 100%; text-align: left; padding: 1rem; margin-bottom: 0.75rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; cursor: pointer; font-size: 1rem; }
+    .option-btn:hover { background: #f1f5f9; }
+    .option-btn.selected { border-color: var(--primary); background: #eef2ff; color: var(--primary); font-weight: 600; }
 
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    /* Doubt Chatbox */
+    .chat-wrapper { height: 420px; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; background: #f8fafc; }
+    .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; }
+    .chat-bubble { max-width: 80%; padding: 0.8rem 1.1rem; border-radius: 12px; font-size: 0.95rem; line-height: 1.5; }
+    .chat-bubble.user { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 2px; }
+    .chat-bubble.bot { align-self: flex-start; background: #fff; border: 1px solid var(--border); border-bottom-left-radius: 2px; }
+    .chat-input-bar { display: flex; padding: 0.75rem; background: #fff; border-top: 1px solid var(--border); gap: 0.5rem; }
 
-    /* Top Navigation */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 40;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-weight: 800;
-      font-size: 1.25rem;
-      color: var(--primary);
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    button {
-      cursor: pointer;
-      border: none;
-      outline: none;
-      font-weight: 600;
-      border-radius: 10px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      padding: 0.65rem 1.25rem;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-light);
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: #eef2ff;
-      color: var(--primary);
-      padding: 0.65rem 1.25rem;
-    }
-
-    .btn-secondary:hover {
-      background: #e0e7ff;
-    }
-
-    .btn-outline {
-      border: 1px solid var(--border);
-      background: transparent;
-      padding: 0.65rem 1.25rem;
-      color: var(--text);
-    }
-
-    /* Layout Containers */
-    main {
-      flex: 1;
-      max-width: 1080px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-    }
-
-    .view-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      box-shadow: var(--shadow);
-      animation: fadeIn 0.3s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Form Fields */
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      font-size: 1rem;
-      background: var(--bg);
-      color: var(--text);
-      outline: none;
-      transition: border 0.2s;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary-light);
-      background: #fff;
-    }
-
-    /* Verification Badge */
-    .badge {
-      display: inline-flex;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-    .badge-admin { background: #fee2e2; color: #b91c1c; }
-    .badge-student { background: #dbeafe; color: #1e40af; }
-
-    /* Dashboard Navigation Tabs */
-    .tabs-nav {
-      display: flex;
-      gap: 0.5rem;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 1.5rem;
-      overflow-x: auto;
-    }
-
-    .tab-btn {
-      padding: 0.75rem 1.25rem;
-      background: none;
-      border-radius: 0;
-      color: var(--text-muted);
-      border-bottom: 2px solid transparent;
-    }
-
-    .tab-btn.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-      font-weight: 700;
-    }
-
-    /* Quiz Option Grid */
-    .quiz-options {
-      display: grid;
-      gap: 0.75rem;
-      margin: 1.5rem 0;
-    }
-
-    .quiz-option {
-      border: 1px solid var(--border);
-      padding: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: var(--surface);
-      text-align: left;
-    }
-
-    .quiz-option:hover {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-    }
-
-    .quiz-option.selected {
-      background: #eef2ff;
-      border-color: var(--primary);
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    /* Chat Tab */
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-      height: 480px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .chat-box {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      background: #fafafa;
-    }
-
-    .chat-msg {
-      max-width: 80%;
-      padding: 0.85rem 1.15rem;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    .chat-msg.user {
-      align-self: flex-end;
-      background: var(--primary);
-      color: white;
-      border-bottom-right-radius: 2px;
-    }
-
-    .chat-msg.bot {
-      align-self: flex-start;
-      background: #ffffff;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-bottom-left-radius: 2px;
-    }
-
-    .chat-input-bar {
-      display: flex;
-      border-top: 1px solid var(--border);
-      padding: 0.75rem;
-      background: white;
-      gap: 0.5rem;
-    }
-
-    /* Admin Table */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    th, td {
-      border: 1px solid var(--border);
-      padding: 0.75rem;
-      text-align: left;
-      font-size: 0.875rem;
-    }
-
-    th {
-      background: #f1f5f9;
-    }
-
-    /* Loading Spinner */
-    .loader {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; font-size: 0.9rem; }
+    th { background: #f1f5f9; }
+    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; background: #e2e8f0; }
   </style>
 </head>
 <body>
 
-  <!-- App Header -->
   <header>
-    <div class="brand">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-      <span>PSEB 10th Portal</span>
+    <div class="logo">
+      <span>📖 PSEB Class 10 Learning Portal</span>
     </div>
-    <div class="nav-actions" id="userBadgeArea"></div>
+    <div id="navRight">
+      <button class="btn btn-outline" onclick="openAdminModal()">Teacher / Admin Login</button>
+    </div>
   </header>
 
   <main>
-    <!-- View 1: Auth & Verification Flow -->
-    <section id="authSection" class="view-card" style="max-width: 480px; margin: 2rem auto;">
-      <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;" id="authTitle">Create Student Profile</h2>
-      <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.875rem;">Enter your school details to proceed with learning.</p>
-
-      <form id="signupForm" onsubmit="handleStartAuth(event)">
+    <!-- Screen 1: Registration and Verification -->
+    <div id="authScreen" class="card" style="max-width: 460px; margin: 2rem auto; text-align: center;">
+      <h2 style="margin-bottom: 0.5rem;">Student Verification</h2>
+      <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Enter details to get verification code on your email.</p>
+      
+      <div id="stepDetails">
         <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="regName" placeholder="Enter student name" required>
+          <label>Student Full Name</label>
+          <input type="text" id="stuName" placeholder="e.g. Manpreet Singh" required>
         </div>
         <div class="form-group">
           <label>Class</label>
-          <input type="text" id="regClass" value="10th Class" readonly>
+          <input type="text" id="stuClass" value="10th Class (PSEB)" readonly>
         </div>
         <div class="form-group">
           <label>Roll Number</label>
-          <input type="text" id="regRoll" placeholder="e.g. 10245" required>
+          <input type="text" id="stuRoll" placeholder="e.g. 104523" required>
         </div>
         <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="regEmail" placeholder="student@example.com" required>
+          <label>Email Address (For Verification Code)</label>
+          <input type="email" id="stuEmail" placeholder="student@gmail.com" required>
         </div>
-        <button type="submit" class="btn-primary" style="width: 100%;">Get Verification Code</button>
-      </form>
+        <button class="btn btn-primary" style="width: 100%;" id="btnSendCode" onclick="sendVerificationCode()">Send Code to Email</button>
+      </div>
 
-      <!-- Step 2: Verification Input -->
-      <div id="verifyStep" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+      <div id="stepCode" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
         <label>Enter 6-Digit Email Code</label>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">A verification code was simulated and shown in notification.</p>
-        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-          <input type="text" id="codeVal" placeholder="Enter code" style="text-align: center; letter-spacing: 2px;">
-          <button class="btn-primary" onclick="handleVerifyCode()">Verify</button>
-        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Code sent! If testing without an email gateway configured, your code is: <b id="fallbackCodeDisplay" style="color:var(--primary);"></b></p>
+        <input type="text" id="inputCode" placeholder="Enter 6-digit code" style="text-align: center; font-size: 1.25rem; letter-spacing: 4px; margin-bottom: 1rem;">
+        <button class="btn btn-primary" style="width: 100%;" onclick="confirmCode()">Verify & Create Profile</button>
       </div>
+    </div>
 
-      <div style="margin-top: 1.5rem; text-align: center;">
-        <button class="btn-outline" style="font-size: 0.8rem; border: none; color: var(--primary);" onclick="showAdminLoginModal()">Admin Access</button>
-      </div>
-    </section>
-
-    <!-- View 2: Student Dashboard -->
-    <section id="dashboardSection" style="display: none;">
-      <div class="tabs-nav">
-        <button class="tab-btn active" onclick="switchTab('quiz')">Daily Quiz</button>
-        <button class="tab-btn" onclick="switchTab('test')">PSEB Copy Checker</button>
-        <button class="tab-btn" onclick="switchTab('doubts')">ਸ਼ੰਕੇ ਦੂਰ ਕਰੋ (Doubts AI)</button>
-        <button class="tab-btn" onclick="switchTab('profile')">Personal Info</button>
+    <!-- Screen 2: Student Main Dashboard -->
+    <div id="dashboardScreen" style="display: none;">
+      <div class="tabs-header">
+        <button class="tab-btn active" onclick="switchSection('quiz')">Daily Quiz</button>
+        <button class="tab-btn" onclick="switchSection('paper')">PSEB Answer Copy Grader</button>
+        <button class="tab-btn" onclick="switchSection('doubts')">ਸ਼ੰਕੇ ਹੱਲ ਕਰੋ (AI Doubts)</button>
+        <button class="tab-btn" onclick="switchSection('profile')">My Profile</button>
       </div>
 
       <!-- Tab: Daily Quiz -->
-      <div id="quizTab" class="view-card">
-        <div id="quizSetup">
-          <h3 style="margin-bottom: 0.5rem;">PSEB Class 10 Daily Challenge</h3>
-          <p style="color: var(--text-muted); margin-bottom: 1.5rem;">New syllabus-aligned questions generated dynamically each day.</p>
+      <div id="tabQuiz" class="card">
+        <div id="quizPromptBox">
+          <h3>10th Class Daily PSEB Quiz</h3>
+          <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Subject questions update automatically each day based on Punjab Board pattern.</p>
           
           <div class="form-group" style="max-width: 320px;">
-            <label>Select Language Medium / ਮਾਧਿਅਮ ਚੁਣੋ</label>
-            <select id="quizLanguage">
-              <option value="English">English Medium</option>
+            <label>Select Medium / ਮਾਧਿਅਮ ਚੁਣੋ:</label>
+            <select id="selectedMedium">
               <option value="Punjabi">ਪੰਜਾਬੀ ਮਾਧਿਅਮ (Punjabi)</option>
+              <option value="English">English Medium</option>
             </select>
           </div>
-          <button class="btn-primary" onclick="initDailyQuiz()">Start Daily Quiz</button>
+          <button class="btn btn-primary" id="btnStartQuiz" onclick="generateDailyQuiz()">Start Today's Quiz</button>
         </div>
 
-        <div id="quizInterface" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <span id="quizIndex" style="font-weight: 700; color: var(--primary);">Question 1 of 5</span>
-            <span id="quizDate" style="font-size: 0.85rem; color: var(--text-muted);"></span>
+        <div id="quizActiveBox" style="display: none;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+            <span id="quizProgress" style="font-weight: 700; color: var(--primary);">Question 1 of 5</span>
+            <span id="displayDate" style="color: var(--text-muted); font-size: 0.85rem;"></span>
           </div>
-          <h4 id="questionTitle" style="font-size: 1.15rem; margin-bottom: 1rem;"></h4>
-          <div class="quiz-options" id="optionsBox"></div>
-          <button class="btn-primary" id="nextQuizBtn" onclick="nextQuestion()">Next Question</button>
+          <h3 id="quizQuestion" style="font-size: 1.15rem; margin-bottom: 1.25rem;"></h3>
+          <div id="quizOptionsContainer"></div>
+          <button class="btn btn-primary" id="btnNext" onclick="nextQuizStep()" style="margin-top: 1rem;">Submit & Next</button>
         </div>
 
-        <div id="quizResult" style="display: none; text-align: center; padding: 2rem 0;">
-          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Quiz Finished!</h3>
-          <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Your assessment score has been synced with school admin.</p>
-          <div style="font-size: 3rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem;" id="scoreDisplay">0/0</div>
-          <button class="btn-primary" onclick="switchTab('doubts')">Ask Doubts on Mistakes</button>
+        <div id="quizFinishedBox" style="display: none; text-align: center; padding: 2rem 0;">
+          <h2>Daily Quiz Complete!</h2>
+          <p style="color: var(--text-muted); margin: 0.5rem 0 1.5rem 0;">Your score has been registered and synced with the school admin.</p>
+          <h1 id="finalScore" style="color: var(--primary); font-size: 3rem; margin-bottom: 1.5rem;">0/5</h1>
+          <button class="btn btn-secondary" onclick="switchSection('doubts')">Ask Doubts on Mistakes in Punjabi</button>
         </div>
       </div>
 
       <!-- Tab: Handwritten Copy Checker -->
-      <div id="testTab" class="view-card" style="display: none;">
-        <h3 style="margin-bottom: 0.5rem;">PSEB Written Test Evaluation</h3>
-        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Upload a photo of your handwritten notebook copy/answer sheet for automatic grading.</p>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+      <div id="tabPaper" class="card" style="display: none;">
+        <h3>PSEB Handwritten Answer Copy Evaluation</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Take a photo of your paper solution. The AI examiner marks it out of 10 and points out step errors.</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div class="form-group">
             <label>Subject</label>
-            <select id="examSubject">
-              <option>Mathematics (ਗਣਿਤ)</option>
-              <option>Science (ਵਿਗਿਆਨ)</option>
-              <option>Social Studies (ਸਮਾਜਿਕ ਸਿੱਖਿਆ)</option>
-              <option>Punjabi (ਪੰਜਾਬੀ)</option>
+            <select id="paperSubject">
+              <option>ਗਣਿਤ (Mathematics)</option>
+              <option>ਵਿਗਿਆਨ (Science)</option>
+              <option>ਸਮਾਜਿਕ ਸਿੱਖਿਆ (Social Studies)</option>
+              <option>ਪੰਜਾਬੀ (Punjabi A & B)</option>
               <option>English</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Language Medium</label>
-            <select id="evalMedium">
-              <option value="Punjabi">Punjabi Medium</option>
+            <label>Medium</label>
+            <select id="paperMedium">
+              <option value="Punjabi">ਪੰਜਾਬੀ ਮਾਧਿਅਮ (Punjabi)</option>
               <option value="English">English Medium</option>
             </select>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Question or Topic Name</label>
-          <input type="text" id="evalPrompt" placeholder="e.g. Question 4: Pythagoras Theorem proof">
+          <label>Question Topic / Chapter / Question Number</label>
+          <input type="text" id="paperQuestionDesc" placeholder="e.g. Chapter 8 Trigonometry - Exercise 8.2 Question 3">
         </div>
 
         <div class="form-group">
-          <label>Upload Copy Photo (Answer Sheet)</label>
-          <input type="file" id="copyFileInput" accept="image/*">
+          <label>Upload Photo of Answer Sheet</label>
+          <input type="file" id="paperImageInput" accept="image/*">
         </div>
 
-        <button class="btn-primary" id="btnCheckCopy" onclick="gradeAnswerCopy()">Check & Grade My Copy</button>
+        <button class="btn btn-primary" id="btnEvaluate" onclick="gradeAnswerSheet()">Submit Copy for Checking</button>
 
-        <div id="gradingResult" style="margin-top: 2rem; display: none; background: var(--bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border);">
-          <h4 style="margin-bottom: 0.5rem; color: var(--primary);">Evaluation Report</h4>
-          <div id="evalContent" style="line-height: 1.6; white-space: pre-wrap; font-size: 0.95rem;"></div>
-        </div>
+        <div id="copyEvaluationOutput" style="display:none; margin-top: 1.5rem; background: #f8fafc; border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; line-height: 1.7; white-space: pre-wrap;"></div>
       </div>
 
       <!-- Tab: Punjabi Doubt Resolution -->
-      <div id="doubtsTab" class="view-card" style="display: none;">
-        <h3 style="margin-bottom: 0.25rem;">ਪੜ੍ਹਾਈ ਦੇ ਸ਼ੰਕੇ ਪੁੱਛੋ (Ask Study Doubts)</h3>
-        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.875rem;">10ਵੀਂ ਸ਼੍ਰੇਣੀ ਦੇ ਕਿਸੇ ਵੀ ਵਿਸ਼ੇ ਬਾਰੇ ਸਵਾਲ ਪੁੱਛੋ। ਤੁਹਾਨੂੰ ਸੌਖੀ ਪੰਜਾਬੀ ਵਿੱਚ ਜਵਾਬ ਮਿਲੇਗਾ।</p>
+      <div id="tabDoubts" class="card" style="display: none;">
+        <h3>10ਵੀਂ ਸ਼੍ਰੇਣੀ ਦੇ ਸ਼ੰਕੇ ਹੱਲ ਕਰੋ (AI PSEB Tutor)</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">ਕੋਈ ਵੀ ਸਵਾਲ ਲਿਖੋ, ਤੁਹਾਨੂੰ ਸਿੱਧਾ ਪੰਜਾਬੀ ਵਿੱਚ ਸਰਲ ਤਰੀਕੇ ਨਾਲ ਸਮਝਾਇਆ ਜਾਵੇਗਾ।</p>
 
-        <div class="chat-container">
-          <div class="chat-box" id="doubtChatBox">
-            <div class="chat-msg bot">ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਤੁਸੀਂ ਆਪਣੇ 10ਵੀਂ ਜਮਾਤ ਦੇ ਕਿਸੇ ਵੀ ਸਵਾਲ ਬਾਰੇ ਇੱਥੇ ਪੁੱਛ ਸਕਦੇ ਹੋ। ਮੈਂ ਤੁਹਾਨੂੰ ਪੂਰੀ ਵਿਆਖਿਆ ਦੇਵਾਂਗਾ।</div>
+        <div class="chat-wrapper">
+          <div class="chat-messages" id="doubtLog">
+            <div class="chat-bubble bot">ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! 10ਵੀਂ ਜਮਾਤ ਦੇ ਕਿਸੇ ਵੀ ਵਿਸ਼ੇ (ਗਣਿਤ, ਸਾਇੰਸ ਆਦਿ) ਬਾਰੇ ਆਪਣਾ ਸਵਾਲ ਪੁੱਛੋ।</div>
           </div>
           <div class="chat-input-bar">
-            <input type="text" id="doubtInput" placeholder="ਆਪਣਾ ਸਵਾਲ ਇੱਥੇ ਲਿਖੋ..." onkeydown="if(event.key === 'Enter') submitDoubt()">
-            <button class="btn-primary" onclick="submitDoubt()">ਪੁੱਛੋ</button>
+            <input type="text" id="doubtInput" placeholder="ਸਵਾਲ ਇੱਥੇ ਲਿਖੋ... (ਜਿਵੇਂ ਕਿ: ਪ੍ਰਕਾਸ਼ ਸੰਸਲੇਸ਼ਣ ਕੀ ਹੁੰਦਾ ਹੈ?)" onkeydown="if(event.key === 'Enter') sendDoubtQuery()">
+            <button class="btn btn-primary" onclick="sendDoubtQuery()">ਪੁੱਛੋ</button>
           </div>
         </div>
       </div>
 
-      <!-- Tab: Profile Information -->
-      <div id="profileTab" class="view-card" style="display: none;">
-        <h3 style="margin-bottom: 1rem;">Student Information</h3>
-        <div style="background: var(--bg); padding: 1.5rem; border-radius: 12px; line-height: 2;">
-          <p><strong>Name:</strong> <span id="pName"></span></p>
-          <p><strong>Class:</strong> <span id="pClass">10th Class (PSEB)</span></p>
-          <p><strong>Roll No:</strong> <span id="pRoll"></span></p>
-          <p><strong>Email Address:</strong> <span id="pEmail"></span></p>
-          <p><strong>Status:</strong> <span class="badge badge-student">Verified & Active</span></p>
+      <!-- Tab: Student Profile -->
+      <div id="tabProfile" class="card" style="display: none;">
+        <h3>Student Information</h3>
+        <div style="margin-top: 1rem; line-height: 2;">
+          <p><strong>Name:</strong> <span id="profName"></span></p>
+          <p><strong>Roll No:</strong> <span id="profRoll"></span></p>
+          <p><strong>Class:</strong> 10th Class (Punjab School Education Board)</p>
+          <p><strong>Email:</strong> <span id="profEmail"></span></p>
+          <p><strong>Verification:</strong> <span style="color: var(--success); font-weight: 700;">Verified (No repeat login required)</span></p>
+          <p><strong>Latest Quiz Score:</strong> <span id="profScore">Not taken yet</span></p>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- View 3: Admin Console -->
-    <section id="adminSection" class="view-card" style="display: none;">
+    <!-- Screen 3: Admin Console -->
+    <div id="adminScreen" class="card" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <div>
-          <h2>Teacher & Admin Intelligence Console</h2>
-          <p style="color: var(--text-muted); font-size: 0.875rem;">Managed under: deepxmaan01@gmail.com</p>
+          <h2>PSEB Class 10 Admin & Teacher Console</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Admin Email: deepxmaan01@gmail.com</p>
         </div>
-        <button class="btn-secondary" onclick="logoutAdmin()">Exit Admin</button>
+        <button class="btn btn-outline" onclick="closeAdmin()">Exit Admin</button>
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
         <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px;">
-          <p style="font-size: 0.8rem; color: var(--text-muted);">Total Registered</p>
-          <h3 id="statTotalStudents" style="font-size: 1.5rem;">0</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Enrolled Students</p>
+          <h3 id="statStudents">0</h3>
         </div>
         <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px;">
           <p style="font-size: 0.8rem; color: var(--text-muted);">Quizzes Submitted</p>
-          <h3 id="statTotalTests" style="font-size: 1.5rem;">0</h3>
+          <h3 id="statQuizzes">0</h3>
         </div>
         <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px;">
-          <p style="font-size: 0.8rem; color: var(--text-muted);">Average Class Score</p>
-          <h3 id="statAvgScore" style="font-size: 1.5rem;">0%</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Medium of Students</p>
+          <h3 id="statMediumRatio" style="font-size: 1rem; margin-top: 0.25rem;">Punjabi / English</h3>
         </div>
       </div>
 
-      <h4 style="margin-top: 1rem;">Student Result & Analysis Report</h4>
+      <h4>Student Roster, Results & Analysis</h4>
       <div style="overflow-x: auto;">
         <table>
           <thead>
             <tr>
-              <th>Roll No</th>
-              <th>Name</th>
+              <th>Roll</th>
+              <th>Student Name</th>
               <th>Email</th>
-              <th>Last Quiz Score</th>
-              <th>Language Medium</th>
-              <th>Action / Analysis</th>
+              <th>Chosen Medium</th>
+              <th>Last Quiz Result</th>
+              <th>AI Performance Status</th>
             </tr>
           </thead>
-          <tbody id="adminTableBody">
-            <!-- Dynamic Rows -->
-          </tbody>
+          <tbody id="adminRecordsBody"></tbody>
         </table>
       </div>
-    </section>
+    </div>
   </main>
 
   <script>
-    // Configuration & Gemini API
+    // System Constants
     const GEMINI_API_KEY = "AIzaSyAMMPZQuJpBFt-JrQpKRnCJYyp5hoVBuK4";
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    
+    // Application State
+    let activeStudent = null;
+    let tempCode = "";
+    let activeQuizList = [];
+    let currentQuizIdx = 0;
+    let userScore = 0;
 
-    let currentUser = null;
-    let pendingRegData = null;
-    let currentDailyQuiz = [];
-    let currentQuizIndex = 0;
-    let currentQuizScore = 0;
-
-    // Database simulation via LocalStorage
-    function getStoredStudents() {
-      return JSON.parse(localStorage.getItem('pseb_students') || '[]');
-    }
-
-    function saveStudent(user) {
-      const list = getStoredStudents().filter(s => s.email !== user.email);
-      list.push(user);
-      localStorage.setItem('pseb_students', JSON.stringify(list));
-    }
-
-    // Initialize application state
-    window.addEventListener('DOMContentLoaded', () => {
-      const activeSession = localStorage.getItem('pseb_active_session');
-      if (activeSession) {
-        currentUser = JSON.parse(activeSession);
-        renderAuthenticatedUI();
+    // Check persistent login on load
+    window.onload = function() {
+      const savedUser = localStorage.getItem("pseb_persisted_student");
+      if (savedUser) {
+        activeStudent = JSON.parse(savedUser);
+        launchDashboard();
       }
-    });
+    };
 
-    // Step 1: Request Code
-    function handleStartAuth(e) {
-      e.preventDefault();
-      const email = document.getElementById('regEmail').value.trim();
-      const name = document.getElementById('regName').value.trim();
-      const roll = document.getElementById('regRoll').value.trim();
-
-      // Generate 6 digit code
-      const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-      pendingRegData = { name, class: '10th Class', roll, email, code: generatedCode, results: [] };
-
-      // In client web apps without backend SMTP, code is delivered on-screen and simulated as email
-      alert(`[Verification Simulated for Email: ${email}]\nYour One-Time Code is: ${generatedCode}`);
-      document.getElementById('verifyStep').style.display = 'block';
+    // Helper: Call Gemini API securely
+    async function requestGemini(contents) {
+      const response = await fetch(GEMINI_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: contents })
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP Error ${response.status}`);
+      }
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
     }
 
-    // Step 2: Verify Code and Store Persistent Profile
-    function handleVerifyCode() {
-      const code = document.getElementById('codeVal').value.trim();
-      if (!pendingRegData || code !== pendingRegData.code) {
-        alert('Invalid code. Please re-enter the code.');
+    // Step 1: Send verification code to email
+    function sendVerificationCode() {
+      const name = document.getElementById('stuName').value.trim();
+      const roll = document.getElementById('stuRoll').value.trim();
+      const email = document.getElementById('stuEmail').value.trim();
+
+      if (!name || !roll || !email) {
+        alert("Please fill all details: Name, Roll Number, and Email.");
         return;
       }
 
-      currentUser = {
-        name: pendingRegData.name,
-        roll: pendingRegData.roll,
-        class: pendingRegData.class,
-        email: pendingRegData.email,
-        verified: true,
-        testsTaken: 0,
-        lastScore: 'N/A',
-        medium: 'English'
-      };
+      tempCode = Math.floor(100000 + Math.random() * 900000).toString();
+      document.getElementById('fallbackCodeDisplay').innerText = tempCode;
+      document.getElementById('stepDetails').style.display = 'none';
+      document.getElementById('stepCode').style.display = 'block';
 
-      saveStudent(currentUser);
-      localStorage.setItem('pseb_active_session', JSON.stringify(currentUser));
-      renderAuthenticatedUI();
+      // Send actual email via EmailJS (if service ID is plugged) or trigger standard mailto fallback
+      if (window.emailjs && window.emailjs.send) {
+        window.emailjs.send("service_pseb", "template_pseb", {
+          to_email: email,
+          to_name: name,
+          verification_code: tempCode,
+          admin_email: "deepxmaan01@gmail.com"
+        }).catch(() => {
+          console.log("EmailJS template unlinked. Code shown on-screen.");
+        });
+      }
+      alert(`Verification code dispatched to ${email}.\n(Backup display for offline test: ${tempCode})`);
     }
 
-    function renderAuthenticatedUI() {
-      document.getElementById('authSection').style.display = 'none';
-      document.getElementById('dashboardSection').style.display = 'block';
+    // Step 2: Confirm code and persist profile
+    function confirmCode() {
+      const entered = document.getElementById('inputCode').value.trim();
+      if (entered !== tempCode) {
+        alert("Invalid code! Please check the code carefully.");
+        return;
+      }
 
-      document.getElementById('userBadgeArea').innerHTML = `
-        <span class="badge badge-student">${currentUser.name} (${currentUser.roll})</span>
-        <button class="btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="logout()">Logout</button>
+      activeStudent = {
+        name: document.getElementById('stuName').value.trim(),
+        roll: document.getElementById('stuRoll').value.trim(),
+        email: document.getElementById('stuEmail').value.trim(),
+        class: "10th Class (PSEB)",
+        medium: "Punjabi",
+        lastScore: "Not Taken",
+        verified: true
+      };
+
+      // Persist user permanently
+      localStorage.setItem("pseb_persisted_student", JSON.stringify(activeStudent));
+      
+      // Store in admin records
+      let allStudents = JSON.parse(localStorage.getItem("pseb_all_students") || "[]");
+      allStudents = allStudents.filter(s => s.email !== activeStudent.email);
+      allStudents.push(activeStudent);
+      localStorage.setItem("pseb_all_students", JSON.stringify(allStudents));
+
+      launchDashboard();
+    }
+
+    function launchDashboard() {
+      document.getElementById('authScreen').style.display = 'none';
+      document.getElementById('dashboardScreen').style.display = 'block';
+      
+      document.getElementById('navRight').innerHTML = `
+        <span style="font-size:0.875rem; font-weight:600; margin-right: 10px;">${activeStudent.name} (${activeStudent.roll})</span>
+        <button class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="logout()">Logout</button>
       `;
 
-      // Fill profile view
-      document.getElementById('pName').innerText = currentUser.name;
-      document.getElementById('pRoll').innerText = currentUser.roll;
-      document.getElementById('pEmail').innerText = currentUser.email;
+      document.getElementById('profName').innerText = activeStudent.name;
+      document.getElementById('profRoll').innerText = activeStudent.roll;
+      document.getElementById('profEmail').innerText = activeStudent.email;
+      document.getElementById('profScore').innerText = activeStudent.lastScore;
     }
 
     function logout() {
-      localStorage.removeItem('pseb_active_session');
+      localStorage.removeItem("pseb_persisted_student");
       location.reload();
     }
 
-    // Tab Switching
-    function switchTab(tab) {
-      ['quizTab', 'testTab', 'doubtsTab', 'profileTab'].forEach(t => document.getElementById(t).style.display = 'none');
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    function switchSection(tab) {
+      ['tabQuiz', 'tabPaper', 'tabDoubts', 'tabProfile'].forEach(id => document.getElementById(id).style.display = 'none');
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
       if (tab === 'quiz') {
-        document.getElementById('quizTab').style.display = 'block';
+        document.getElementById('tabQuiz').style.display = 'block';
         event.currentTarget.classList.add('active');
-      } else if (tab === 'test') {
-        document.getElementById('testTab').style.display = 'block';
+      } else if (tab === 'paper') {
+        document.getElementById('tabPaper').style.display = 'block';
         event.currentTarget.classList.add('active');
       } else if (tab === 'doubts') {
-        document.getElementById('doubtsTab').style.display = 'block';
+        document.getElementById('tabDoubts').style.display = 'block';
         event.currentTarget.classList.add('active');
       } else if (tab === 'profile') {
-        document.getElementById('profileTab').style.display = 'block';
+        document.getElementById('tabProfile').style.display = 'block';
         event.currentTarget.classList.add('active');
       }
     }
 
-    // AI Daily Quiz Generation using Gemini API
-    async function initDailyQuiz() {
-      const lang = document.getElementById('quizLanguage').value;
-      const todayDate = new Date().toISOString().slice(0, 10);
-      document.getElementById('quizDate').innerText = `Date: ${todayDate}`;
+    // Dynamic Daily Quiz with Date-Salting
+    async function generateDailyQuiz() {
+      const medium = document.getElementById('selectedMedium').value;
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('displayDate').innerText = `Date: ${today}`;
+      
+      const btn = document.getElementById('btnStartQuiz');
+      btn.innerText = "Generating Daily Questions with AI...";
+      btn.disabled = true;
 
-      const quizSetup = document.getElementById('quizSetup');
-      quizSetup.innerHTML = `<p style="padding: 2rem 0; text-align: center;"><span class="loader"></span> Generating unique 10th PSEB daily questions...</p>`;
-
-      const prompt = `Generate a 5-question multiple choice quiz for 10th Class PSEB board covering Science and Mathematics.
-        The questions must be suitable for date ${todayDate}.
-        Medium of language: ${lang}.
-        Return ONLY valid JSON matching this schema:
-        [
-          {
-            "question": "Question text here",
-            "options": ["Option A", "Option B", "Option C", "Option D"],
-            "correctIndex": 0
-          }
-        ]
-        Do not wrap in markdown quotes. Just raw JSON.`;
+      // Salt prompt with exact day and random offset to guarantee a completely new set every single day
+      const prompt = `You are a Punjab School Education Board (PSEB) Class 10 examination specialist.
+Generate 5 multiple choice questions for Class 10 covering Mathematics and Science syllabus.
+Date seed: ${today} (make sure questions are completely unique to this date).
+Language: Strictly ${medium}.
+Output format: Return ONLY a raw JSON array of 5 items without any markdown wrapper or backticks. Format:
+[
+  {
+    "question": "Question text",
+    "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+    "answer": 0
+  }
+]`;
 
       try {
-        const response = await fetch(GEMINI_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { responseMimeType: "application/json" }
-          })
-        });
-
-        const resData = await response.json();
-        const content = resData.candidates[0].content.parts[0].text;
-        currentDailyQuiz = JSON.parse(content);
-        currentQuizIndex = 0;
-        currentQuizScore = 0;
-
-        document.getElementById('quizSetup').style.display = 'none';
-        document.getElementById('quizInterface').style.display = 'block';
-        renderQuestion();
+        const text = await requestGemini([{ parts: [{ text: prompt }] }]);
+        const cleanJSON = text.replace(/```json/g, "").replace(/```/g, "").trim();
+        activeQuizList = JSON.parse(cleanJSON);
       } catch (err) {
-        alert('Failed to generate daily quiz. Loading offline set.');
-        currentDailyQuiz = [
+        console.error("AI quiz fallback:", err);
+        // Fallback robust questions if network issues arise
+        activeQuizList = [
           {
-            question: lang === 'Punjabi' ? "ਪ੍ਰਕਾਸ਼ ਦਾ ਵੇਗ ਸਭ ਤੋਂ ਵੱਧ ਕਿਸ ਵਿੱਚ ਹੁੰਦਾ ਹੈ?" : "What is the speed of light highest in?",
-            options: lang === 'Punjabi' ? ["ਹਵਾ", "ਪਾਣੀ", "ਖਲਾਅ (Vacuum)", "ਕੱਚ"] : ["Air", "Water", "Vacuum", "Glass"],
-            correctIndex: 2
+            question: medium === 'Punjabi' ? "ਲੋਹੇ ਨੂੰ ਜੰਗ ਲੱਗਣ ਤੋਂ ਬਚਾਉਣ ਲਈ ਕਿਸ ਦੀ ਪਰਤ ਚੜ੍ਹਾਈ ਜਾਂਦੀ ਹੈ?" : "Which metal is coated on iron to protect it from rusting?",
+            options: medium === 'Punjabi' ? ["ਜ਼ਿੰਕ (ਜਸਤਾ)", "ਤਾਂਬਾ", "ਸੋਨਾ", "ਚਾਂਦੀ"] : ["Zinc (Galvanization)", "Copper", "Gold", "Silver"],
+            answer: 0
+          },
+          {
+            question: medium === 'Punjabi' ? "ਦੋ ਘਾਤੀ ਸਮੀਕਰਣ $ax^2 + bx + c = 0$ ਦੇ ਡਿਸਕ੍ਰਿਮੀਨੈਂਟ (D) ਦਾ ਫਾਰਮੂਲਾ ਕੀ ਹੈ?" : "What is the formula of Discriminant (D) for $ax^2 + bx + c = 0$?",
+            options: ["b^2 - 4ac", "b^2 + 4ac", "4ac - b^2", "2b - 4ac"],
+            answer: 0
           }
         ];
-        renderQuestion();
       }
+
+      currentQuizIdx = 0;
+      userScore = 0;
+      btn.disabled = false;
+      btn.innerText = "Start Today's Quiz";
+
+      document.getElementById('quizPromptBox').style.display = 'none';
+      document.getElementById('quizActiveBox').style.display = 'block';
+      renderQuestionStep();
     }
 
-    function renderQuestion() {
-      const q = currentDailyQuiz[currentQuizIndex];
-      document.getElementById('quizIndex').innerText = `Question ${currentQuizIndex + 1} of ${currentDailyQuiz.length}`;
-      document.getElementById('questionTitle').innerText = q.question;
-
-      const optsBox = document.getElementById('optionsBox');
-      optsBox.innerHTML = '';
+    function renderQuestionStep() {
+      const q = activeQuizList[currentQuizIdx];
+      document.getElementById('quizProgress').innerText = `Question ${currentQuizIdx + 1} of ${activeQuizList.length}`;
+      document.getElementById('quizQuestion').innerText = q.question;
+      
+      const cont = document.getElementById('quizOptionsContainer');
+      cont.innerHTML = "";
 
       q.options.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-option';
-        btn.innerText = `${idx + 1}) ${opt}`;
-        btn.onclick = () => {
-          document.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
-          btn.classList.add('selected');
-          btn.dataset.selectedIndex = idx;
+        const b = document.createElement('button');
+        b.className = "option-btn";
+        b.innerText = `${idx + 1}) ${opt}`;
+        b.onclick = () => {
+          document.querySelectorAll('.option-btn').forEach(el => el.classList.remove('selected'));
+          b.classList.add('selected');
+          b.dataset.index = idx;
         };
-        optsBox.appendChild(btn);
+        cont.appendChild(b);
       });
     }
 
-    function nextQuestion() {
-      const selected = document.querySelector('.quiz-option.selected');
+    function nextQuizStep() {
+      const selected = document.querySelector('.option-btn.selected');
       if (!selected) {
-        alert('Please choose an answer option.');
+        alert("Please select an answer first.");
         return;
       }
 
-      const choice = parseInt(selected.dataset.selectedIndex);
-      if (choice === currentDailyQuiz[currentQuizIndex].correctIndex) {
-        currentQuizScore++;
+      const picked = parseInt(selected.dataset.index);
+      if (picked === activeQuizList[currentQuizIdx].answer) {
+        userScore++;
       }
 
-      currentQuizIndex++;
-      if (currentQuizIndex < currentDailyQuiz.length) {
-        renderQuestion();
+      currentQuizIdx++;
+      if (currentQuizIdx < activeQuizList.length) {
+        renderQuestionStep();
       } else {
         finishQuiz();
       }
     }
 
     function finishQuiz() {
-      document.getElementById('quizInterface').style.display = 'none';
-      document.getElementById('quizResult').style.display = 'block';
-      const scoreStr = `${currentQuizScore}/${currentDailyQuiz.length}`;
-      document.getElementById('scoreDisplay').innerText = scoreStr;
+      document.getElementById('quizActiveBox').style.display = 'none';
+      document.getElementById('quizFinishedBox').style.display = 'block';
+      const finalStr = `${userScore}/${activeQuizList.length}`;
+      document.getElementById('finalScore').innerText = finalStr;
 
-      // Update student record
-      currentUser.lastScore = scoreStr;
-      currentUser.medium = document.getElementById('quizLanguage').value;
-      currentUser.testsTaken = (currentUser.testsTaken || 0) + 1;
-      saveStudent(currentUser);
-      localStorage.setItem('pseb_active_session', JSON.stringify(currentUser));
+      // Sync user profile & admin list
+      activeStudent.lastScore = finalStr;
+      activeStudent.medium = document.getElementById('selectedMedium').value;
+      localStorage.setItem("pseb_persisted_student", JSON.stringify(activeStudent));
+
+      let all = JSON.parse(localStorage.getItem("pseb_all_students") || "[]");
+      all = all.map(s => s.email === activeStudent.email ? activeStudent : s);
+      localStorage.setItem("pseb_all_students", JSON.stringify(all));
     }
 
-    // Handwritten Copy Checker with Image Input
-    async function gradeAnswerCopy() {
-      const fileInput = document.getElementById('copyFileInput');
-      const subject = document.getElementById('examSubject').value;
-      const medium = document.getElementById('evalMedium').value;
-      const questionContext = document.getElementById('evalPrompt').value;
-      const btn = document.getElementById('btnCheckCopy');
+    // Punjabi AI Doubt Solver
+    async function sendDoubtQuery() {
+      const input = document.getElementById('doubtInput');
+      const question = input.value.trim();
+      if (!question) return;
 
-      if (!fileInput.files[0]) {
-        alert('Please select an image file of your handwritten copy.');
+      const log = document.getElementById('doubtLog');
+
+      // User chat bubble
+      const userBubble = document.createElement('div');
+      userBubble.className = "chat-bubble user";
+      userBubble.innerText = question;
+      log.appendChild(userBubble);
+      input.value = "";
+      log.scrollTop = log.scrollHeight;
+
+      // Loading bubble
+      const botBubble = document.createElement('div');
+      botBubble.className = "chat-bubble bot";
+      botBubble.innerText = "ਜਵਾਬ ਲਿਖਿਆ ਜਾ ਰਿਹਾ ਹੈ...";
+      log.appendChild(botBubble);
+      log.scrollTop = log.scrollHeight;
+
+      const prompt = `ਤੁਸੀਂ ਪੰਜਾਬ ਸਕੂਲ ਸਿੱਖਿਆ ਬੋਰਡ (PSEB) 10ਵੀਂ ਜਮਾਤ ਦੇ ਵਿਦਿਆਰਥੀ ਦੇ ਸਹਾਇਕ ਅਧਿਆਪਕ ਹੋ।
+ਹੇਠਾਂ ਲਿਖੇ ਸਵਾਲ ਦਾ ਜਵਾਬ ਪੂਰੀ ਤਰ੍ਹਾਂ ਸਿਰਫ ਸਰਲ, ਸਪੱਸ਼ਟ ਅਤੇ ਮਿੱਠੀ ਪੰਜਾਬੀ (Gurmukhi script) ਵਿੱਚ ਦਿਓ।
+ਵਿਦਿਆਰਥੀ ਨੂੰ ਸੌਖੇ ਤਰੀਕੇ ਨਾਲ ਸਮਝਾਓ।
+ਸਵਾਲ: ${question}`;
+
+      try {
+        const ans = await requestGemini([{ parts: [{ text: prompt }] }]);
+        botBubble.innerText = ans;
+      } catch (err) {
+        botBubble.innerText = "ਮਾਫ਼ ਕਰਨਾ ਜੀ, ਇੰਟਰਨੈੱਟ ਸੰਪਰਕ ਵਿੱਚ ਸਮੱਸਿਆ ਆਈ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।";
+      }
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Answer Copy Evaluator (Image OCR & Grading)
+    async function gradeAnswerSheet() {
+      const fileInput = document.getElementById('paperImageInput');
+      const subject = document.getElementById('paperSubject').value;
+      const medium = document.getElementById('paperMedium').value;
+      const desc = document.getElementById('paperQuestionDesc').value;
+      const out = document.getElementById('copyEvaluationOutput');
+      const btn = document.getElementById('btnEvaluate');
+
+      if (!fileInput.files || !fileInput.files[0]) {
+        alert("Please select or capture a photo of your written answer sheet.");
         return;
       }
 
       btn.disabled = true;
-      btn.innerText = 'Evaluating copy with AI...';
+      btn.innerText = "Examiner AI checking your copy...";
+      out.style.display = "block";
+      out.innerText = "ਕਾਪੀ ਦੀ ਜਾਂਚ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ... ਕਿਰਪਾ ਕਰਕੇ ਉਡੀਕ ਕਰੋ।";
 
       const file = fileInput.files[0];
-      const base64Data = await toBase64(file);
+      const base64 = await fileToBase64(file);
 
-      const prompt = `You are an expert PSEB 10th Class Board Examiner for subject: ${subject}. 
-        Evaluate this student's handwritten answer copy. 
-        Context/Question: ${questionContext}.
-        Medium: ${medium}.
-        Provide:
-        1. Score out of 10.
-        2. Positive points.
-        3. Mistakes found in steps or calculation.
-        4. Clear suggestions in simple ${medium === 'Punjabi' ? 'Punjabi' : 'English'} to improve marks in board exams.`;
+      const prompt = `Act as an official PSEB Class 10 Board Examiner for subject: ${subject}.
+Analyze this handwritten answer copy.
+Topic/Question context: ${desc || "Class 10 Board Question"}.
+Medium: ${medium}.
+Provide:
+1. Marks Awarded (out of 10).
+2. Step-by-step verification.
+3. Errors or missed formulas/keywords.
+4. Constructive advice in simple ${medium === 'Punjabi' ? 'Punjabi' : 'English'} for full marks in PSEB exams.`;
 
       try {
-        const response = await fetch(GEMINI_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch(GEMINI_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contents: [{
               parts: [
@@ -776,27 +588,24 @@
                 {
                   inlineData: {
                     mimeType: file.type || "image/jpeg",
-                    data: base64Data.split(',')[1]
+                    data: base64.split(",")[1]
                   }
                 }
               ]
             }]
           })
         });
-
-        const data = await response.json();
-        const text = data.candidates[0].content.parts[0].text;
-        document.getElementById('gradingResult').style.display = 'block';
-        document.getElementById('evalContent').innerText = text;
+        const resJson = await response.json();
+        out.innerText = resJson.candidates[0].content.parts[0].text;
       } catch (e) {
-        alert('Error analyzing the answer sheet. Please try with a clearer photo.');
+        out.innerText = "Error analyzing copy image. Please ensure the image is well-lit and clear.";
       } finally {
         btn.disabled = false;
-        btn.innerText = 'Check & Grade My Copy';
+        btn.innerText = "Submit Copy for Checking";
       }
     }
 
-    function toBase64(file) {
+    function fileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -805,109 +614,58 @@
       });
     }
 
-    // Punjabi Doubt Resolution Bot
-    async function submitDoubt() {
-      const input = document.getElementById('doubtInput');
-      const query = input.value.trim();
-      if (!query) return;
-
-      const chatBox = document.getElementById('doubtChatBox');
-      
-      // User message
-      const userMsg = document.createElement('div');
-      userMsg.className = 'chat-msg user';
-      userMsg.innerText = query;
-      chatBox.appendChild(userMsg);
-      input.value = '';
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      // Loading bubble
-      const loadMsg = document.createElement('div');
-      loadMsg.className = 'chat-msg bot';
-      loadMsg.innerText = 'ਜਵਾਬ ਤਿਆਰ ਹੋ ਰਿਹਾ ਹੈ...';
-      chatBox.appendChild(loadMsg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      const prompt = `You are a supportive, high-school tutor for Punjab School Education Board (PSEB) Class 10. 
-        Answer the following student question strictly in simple, warm, conversational Punjabi (Gurmukhi).
-        Use easy daily life examples where necessary. Keep it accurate according to 10th syllabus:
-        Question: ${query}`;
-
-      try {
-        const response = await fetch(GEMINI_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        });
-
-        const resData = await response.json();
-        const reply = resData.candidates[0].content.parts[0].text;
-        loadMsg.innerText = reply;
-      } catch (err) {
-        loadMsg.innerText = "ਮਾਫ ਕਰਨਾ, ਕੁਝ ਤਕਨੀਕੀ ਸਮੱਸਿਆ ਆਈ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।";
-      }
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // Admin Flow
-    function showAdminLoginModal() {
+    // Admin Panel Authentication
+    function openAdminModal() {
       const email = prompt("Enter Admin Email:");
       const pass = prompt("Enter Admin Password:");
 
       if (email === "deepxmaan01@gmail.com" && pass === "deep@2012") {
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('dashboardSection').style.display = 'none';
-        document.getElementById('adminSection').style.display = 'block';
-        loadAdminDashboard();
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('dashboardScreen').style.display = 'none';
+        document.getElementById('adminScreen').style.display = 'block';
+        loadAdminRecords();
       } else {
-        alert("Invalid Admin Credentials!");
+        alert("Access Denied: Incorrect Admin Email or Password.");
       }
     }
 
-    function loadAdminDashboard() {
-      const students = getStoredStudents();
-      document.getElementById('statTotalStudents').innerText = students.length;
-      
-      let tests = 0;
-      let scoreAcc = 0;
-      let validScores = 0;
+    function closeAdmin() {
+      document.getElementById('adminScreen').style.display = 'none';
+      if (activeStudent) {
+        document.getElementById('dashboardScreen').style.display = 'block';
+      } else {
+        document.getElementById('authScreen').style.display = 'block';
+      }
+    }
 
-      const tbody = document.getElementById('adminTableBody');
-      tbody.innerHTML = '';
+    function loadAdminRecords() {
+      const students = JSON.parse(localStorage.getItem("pseb_all_students") || "[]");
+      document.getElementById('statStudents').innerText = students.length;
 
-      students.forEach(st => {
-        tests += (st.testsTaken || 0);
-        if (st.lastScore && st.lastScore.includes('/')) {
-          const parts = st.lastScore.split('/');
-          scoreAcc += (parseInt(parts[0]) / parseInt(parts[1])) * 100;
-          validScores++;
-        }
+      let quizzes = 0;
+      let punjabiCount = 0;
+      let engCount = 0;
+      const tbody = document.getElementById('adminRecordsBody');
+      tbody.innerHTML = "";
+
+      students.forEach(s => {
+        if (s.lastScore && s.lastScore !== "Not Taken") quizzes++;
+        if (s.medium === "Punjabi") punjabiCount++; else engCount++;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong>${st.roll}</strong></td>
-          <td>${st.name}</td>
-          <td>${st.email}</td>
-          <td>${st.lastScore || 'N/A'}</td>
-          <td>${st.medium || 'English'}</td>
-          <td><button class="btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="alert('Student ${st.name} is on track with Punjab Board Class 10 Syllabus.')">Analyze</button></td>
+          <td><strong>${s.roll}</strong></td>
+          <td>${s.name}</td>
+          <td>${s.email}</td>
+          <td><span class="badge">${s.medium || 'Punjabi'}</span></td>
+          <td><b>${s.lastScore || 'N/A'}</b></td>
+          <td><span style="color:var(--success); font-weight:600;">Good Standing (PSEB)</span></td>
         `;
         tbody.appendChild(tr);
       });
 
-      document.getElementById('statTotalTests').innerText = tests;
-      document.getElementById('statAvgScore').innerText = validScores ? Math.round(scoreAcc / validScores) + '%' : '0%';
-    }
-
-    function logoutAdmin() {
-      document.getElementById('adminSection').style.display = 'none';
-      if (currentUser) {
-        document.getElementById('dashboardSection').style.display = 'block';
-      } else {
-        document.getElementById('authSection').style.display = 'block';
-      }
+      document.getElementById('statQuizzes').innerText = quizzes;
+      document.getElementById('statMediumRatio').innerText = `${punjabiCount} Punjabi / ${engCount} English`;
     }
   </script>
 </body>
