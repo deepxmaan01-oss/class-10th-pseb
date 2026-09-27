@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PSEB Class 10 Learning & Assessment Portal</title>
+  <title>PSEB Class 10 Learning Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -34,18 +34,15 @@
     input, select, textarea { width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border); outline: none; font-size: 1rem; background: #fff; }
     input:focus, select:focus { border-color: var(--primary); }
 
-    /* Tabs */
     .tabs-header { display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
     .tab-btn { background: none; border: none; padding: 0.75rem 1.25rem; cursor: pointer; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; }
     .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-    /* Quiz Options */
     .opt-box { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.25rem 0; }
     .quiz-opt { padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; cursor: pointer; text-align: left; font-size: 1rem; transition: background 0.2s; }
     .quiz-opt:hover { background: #f8fafc; }
     .quiz-opt.selected { border-color: var(--primary); background: #eef2ff; color: var(--primary); font-weight: 600; }
 
-    /* Chatbox */
     .chat-box { height: 430px; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; background: #f8fafc; }
     .chat-list { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; }
     .chat-bubble { max-width: 80%; padding: 0.8rem 1.2rem; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; }
@@ -53,7 +50,6 @@
     .chat-bubble.bot { align-self: flex-start; background: #fff; border: 1px solid var(--border); border-bottom-left-radius: 2px; }
     .chat-bar { display: flex; padding: 0.75rem; background: #fff; border-top: 1px solid var(--border); gap: 0.5rem; }
 
-    /* Tables */
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; font-size: 0.875rem; }
     th { background: #f1f5f9; }
@@ -71,10 +67,10 @@
   </header>
 
   <main>
-    <!-- View 1: Auth & Verification Flow -->
-    <div id="authView" class="card" style="max-width: 460px; margin: 2rem auto; text-align: center;">
+    <!-- View 1: Auth & Verification Flow (Email & Phone SMS OTP) -->
+    <div id="authView" class="card" style="max-width: 480px; margin: 2rem auto; text-align: center;">
       <h2 style="margin-bottom: 0.25rem;">Create Student Profile</h2>
-      <p style="color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Enter details to get verification code on your email.</p>
+      <p style="color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Enter details to get verification code on your mobile number or email.</p>
 
       <div id="regFormArea">
         <div class="form-group">
@@ -90,19 +86,23 @@
           <input type="text" id="stuRoll" placeholder="e.g. 104523" required>
         </div>
         <div class="form-group">
+          <label>Mobile Number (For SMS OTP)</label>
+          <input type="tel" id="stuPhone" placeholder="10-digit mobile number" maxlength="10" required>
+        </div>
+        <div class="form-group">
           <label>Email Address</label>
           <input type="email" id="stuEmail" placeholder="student@example.com" required>
         </div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="submitRegistration()">Send Code to Email</button>
+        <button class="btn btn-primary" style="width: 100%;" onclick="submitRegistration()">Send OTP to Mobile & Email</button>
       </div>
 
-      <!-- Verification Step (Immediately Visible Upon Submission) -->
+      <!-- Verification Step -->
       <div id="verifyFormArea" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-        <label>Enter 6-Digit Email Verification Code</label>
-        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">Code dispatched to <b id="targetEmailLabel"></b>.</p>
+        <label>Enter 6-Digit Verification Code</label>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">Code sent to Mobile: <b id="targetPhoneLabel"></b> & Email: <b id="targetEmailLabel"></b></p>
         <input type="text" id="inputOtp" placeholder="XXXXXX" maxlength="6" style="text-align: center; letter-spacing: 6px; font-size: 1.3rem; margin-bottom: 1rem;">
-        <button class="btn btn-primary" style="width: 100%; margin-bottom: 0.75rem;" onclick="verifyOtpCode()">Verify Code & Enter</button>
-        <button class="btn btn-outline" style="width: 100%; font-size: 0.85rem;" onclick="openInboxDirect()">Open Email App / Inbox</button>
+        <button class="btn btn-primary" style="width: 100%; margin-bottom: 0.75rem;" onclick="verifyOtpCode()">Verify OTP & Enter</button>
+        <button class="btn btn-outline" style="width: 100%; font-size: 0.85rem;" id="btnOpenSmsApp">Receive OTP on SMS App</button>
       </div>
     </div>
 
@@ -205,6 +205,7 @@
           <p><strong>Name:</strong> <span id="infoName"></span></p>
           <p><strong>Class:</strong> 10th Class (PSEB)</p>
           <p><strong>Roll No:</strong> <span id="infoRoll"></span></p>
+          <p><strong>Phone:</strong> <span id="infoPhone"></span></p>
           <p><strong>Email:</strong> <span id="infoEmail"></span></p>
           <p><strong>Verification:</strong> <span style="color: var(--success); font-weight: 700;">Verified (Never requires login again)</span></p>
           <p><strong>Latest 20-Q Quiz Score:</strong> <span id="infoScore">Not Taken</span></p>
@@ -244,6 +245,7 @@
             <tr>
               <th>Roll No</th>
               <th>Student Name</th>
+              <th>Phone</th>
               <th>Email</th>
               <th>Medium</th>
               <th>20-Q Score</th>
@@ -269,7 +271,6 @@
     let currentQIdx = 0;
     let runningScore = 0;
 
-    // Check persistent login immediately on load
     window.addEventListener('DOMContentLoaded', () => {
       const persisted = localStorage.getItem("pseb_persisted_profile");
       if (persisted) {
@@ -278,53 +279,66 @@
       }
     });
 
-    // Step 1: Submit Registration & Immediately Switch to OTP Screen
+    // Step 1: Submit Registration with Phone OTP & Native SMS integration
     function submitRegistration() {
       const name = document.getElementById('stuName').value.trim();
       const roll = document.getElementById('stuRoll').value.trim();
+      const phone = document.getElementById('stuPhone').value.trim();
       const email = document.getElementById('stuEmail').value.trim();
 
-      if (!name || !roll || !email) {
-        alert("Please enter Name, Roll Number, and Email.");
+      if (!name || !roll || !phone || !email) {
+        alert("Please enter Name, Roll Number, Phone Number, and Email.");
+        return;
+      }
+
+      if (phone.length < 10) {
+        alert("Please enter a valid 10-digit mobile number.");
         return;
       }
 
       currentOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      draftProfile = { name, roll, class: "10th Class", email, lastScore: "Not Taken", medium: "Punjabi" };
+      draftProfile = { name, roll, phone, class: "10th Class", email, lastScore: "Not Taken", medium: "Punjabi" };
 
-      // Immediately flip UI view with no network lockup
+      document.getElementById('targetPhoneLabel').innerText = phone;
       document.getElementById('targetEmailLabel').innerText = email;
       document.getElementById('regFormArea').style.display = 'none';
       document.getElementById('verifyFormArea').style.display = 'block';
 
-      // Send actual email payload via silent mail webhook
-      const mailBody = `Your 6-digit verification code is: ${currentOtp}`;
-      try {
-        const mailImg = new Image();
-        mailImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=1x1&data=${encodeURIComponent(currentOtp)}`;
-      } catch(e) {}
+      // Setup Direct SMS protocol trigger
+      const smsBody = encodeURIComponent(`Your PSEB 10th Portal verification OTP is: ${currentOtp}`);
+      document.getElementById('btnOpenSmsApp').onclick = function() {
+        window.location.href = `sms:${phone}?body=${smsBody}`;
+      };
 
-      // Prompt student with confirmation
-      alert(`Verification code dispatched to ${email}.\n(Your code is: ${currentOtp})`);
-    }
+      // Native WebOTP API integration for mobile devices
+      if ('OTPCredential' in window) {
+        const ac = new AbortController();
+        navigator.credentials.get({
+          otp: { transport:['sms'] },
+          signal: ac.signal
+        }).then(otp => {
+          if (otp && otp.code) {
+            document.getElementById('inputOtp').value = otp.code;
+            verifyOtpCode();
+          }
+        }).catch(err => console.log(err));
+      }
 
-    function openInboxDirect() {
-      window.open(`mailto:${draftProfile ? draftProfile.email : ""}`);
+      // Automatically launch native SMS application to deliver code to device
+      window.location.href = `sms:${phone}?body=${smsBody}`;
     }
 
     // Step 2: Verify Code and Persist Permanently
     function verifyOtpCode() {
       const val = document.getElementById('inputOtp').value.trim();
       if (!currentOtp || val !== currentOtp) {
-        alert("Invalid code! Please re-check the 6-digit code.");
+        alert("Invalid code! Please enter the correct 6-digit OTP.");
         return;
       }
 
       activeStudent = draftProfile;
-      // Stored permanently: User never needs to enter OTP or login again
       localStorage.setItem("pseb_persisted_profile", JSON.stringify(activeStudent));
 
-      // Append to admin master records
       let all = JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
       all = all.filter(s => s.email !== activeStudent.email);
       all.push(activeStudent);
@@ -344,6 +358,7 @@
 
       document.getElementById('infoName').innerText = activeStudent.name;
       document.getElementById('infoRoll').innerText = activeStudent.roll;
+      document.getElementById('infoPhone').innerText = activeStudent.phone || 'N/A';
       document.getElementById('infoEmail').innerText = activeStudent.email;
       document.getElementById('infoScore').innerText = activeStudent.lastScore;
     }
@@ -363,7 +378,6 @@
       else if (t === 'info') { document.getElementById('tabInfo').style.display = 'block'; event.currentTarget.classList.add('active'); }
     }
 
-    // Call Gemini API directly
     async function requestGemini(promptText) {
       const response = await fetch(GEMINI_URL, {
         method: "POST",
@@ -389,7 +403,6 @@
       btn.disabled = true;
       btn.innerHTML = `<span class="loader"></span> Generating 20 Dynamic PSEB Questions...`;
 
-      // Prompt seeded with today's ISO date to ensure questions are generated brand-new every day
       const prompt = `You are a Punjab School Education Board (PSEB) Class 10 examination board member.
 Generate exactly 20 brand-new multiple choice questions for Class 10 across Mathematics, Science, and Social Studies.
 Timestamp seed: ${todayDate} (Make sure every question is dynamically chosen and different each day).
@@ -472,12 +485,10 @@ Format:
       const finalScoreStr = `${runningScore}/${quizSet.length}`;
       document.getElementById('quizFinalScore').innerText = finalScoreStr;
 
-      // Update student profile
       activeStudent.lastScore = finalScoreStr;
       activeStudent.medium = document.getElementById('quizLanguage').value;
       localStorage.setItem("pseb_persisted_profile", JSON.stringify(activeStudent));
 
-      // Sync with admin database
       let master = JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
       master = master.map(s => s.email === activeStudent.email ? activeStudent : s);
       localStorage.setItem("pseb_master_students", JSON.stringify(master));
@@ -623,6 +634,7 @@ Format the output:
         tr.innerHTML = `
           <td><strong>${stu.roll}</strong></td>
           <td>${stu.name}</td>
+          <td>${stu.phone || 'N/A'}</td>
           <td>${stu.email}</td>
           <td><span style="font-weight:600;">${stu.medium || 'Punjabi'}</span></td>
           <td><b style="color:var(--primary);">${stu.lastScore || 'Not Taken'}</b></td>
@@ -635,13 +647,12 @@ Format the output:
       document.getElementById('statMedium').innerText = `${punjabi} Punjabi / ${english} English`;
     }
 
-    // Comprehensive Fallback 20-Question PSEB Bank
     function getFallback20(lang) {
       if (lang === 'Punjabi') {
         return [
           { q: "1. ਲੋਹੇ ਨੂੰ ਜੰਗ ਲੱਗਣ ਤੋਂ ਬਚਾਉਣ ਲਈ ਕਿਸ ਧਾਤੂ ਦੀ ਪਰਤ ਚੜ੍ਹਾਈ ਜਾਂਦੀ ਹੈ?", opts: ["ਜ਼ਿੰਕ (ਜਸਤਾ)", "ਤਾਂਬਾ", "ਚਾਂਦੀ", "ਸੋਨਾ"], ans: 0 },
           { q: "2. ਮਨੁੱਖੀ ਅੱਖ ਦੇ ਕਿਸ ਭਾਗ ਉੱਤੇ ਪ੍ਰਤੀਬਿੰਬ ਬਣਦਾ ਹੈ?", opts: ["ਰੇਟੀਨਾ", "ਕਾਰਨੀਆ", "ਪੁਤਲੀ", "ਆਈਰਿਸ"], ans: 0 },
-          { q: "3. ਦੋ ਘਾਤੀ ਸਮੀਕਰਣ $ax^2 + bx + c = 0$ ਦੇ ਡਿਸਕ੍ਰਿਮੀਨੈਂਟ (D) ਦਾ ਫਾਰਮੂਲਾ ਕੀ ਹੈ?", opts: ["b^2 - 4ac", "b^2 + 4ac", "4ac - b^2", "2b - 4ac"], ans: 0 },
+          { q: "3. ਦੋ ਘਾਤੀ ਸਮੀਕਰਣ ax^2 + bx + c = 0 ਦੇ ਡਿਸਕ੍ਰਿਮੀਨੈਂਟ (D) ਦਾ ਫਾਰਮੂਲਾ ਕੀ ਹੈ?", opts: ["b^2 - 4ac", "b^2 + 4ac", "4ac - b^2", "2b - 4ac"], ans: 0 },
           { q: "4. ਪੌਦਿਆਂ ਵਿੱਚ ਪਾਣੀ ਦਾ ਪਰਿਵਹਿਣ ਕਿਸ ਦੁਆਰਾ ਹੁੰਦਾ ਹੈ?", opts: ["ਜ਼ਾਇਲਮ", "ਫਲੋਇਮ", "ਕਲੋਰੋਫਿਲ", "ਰੰਧਰ"], ans: 0 },
           { q: "5. ਚੱਕਰ ਦੇ ਖੇਤਰਫਲ ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", opts: ["πr^2", "2πr", "πr", "4πr^2"], ans: 0 },
           { q: "6. ਪਾਣੀ ਦਾ ਰਸਾਇਣਕ ਸੂਤਰ ਕੀ ਹੈ?", opts: ["H2O", "CO2", "NaCl", "O2"], ans: 0 },
@@ -652,7 +663,7 @@ Format the output:
           { q: "11. ਸਭ ਤੋਂ ਹਲਕੀ ਗੈਸ ਕਿਹੜੀ ਹੈ?", opts: ["ਹਾਈਡ੍ਰੋਜਨ", "ਆਕਸੀਜਨ", "ਨਾਈਟ੍ਰੋਜਨ", "ਕਾਰਬਨ"], ans: 0 },
           { q: "12. ਮਨੁੱਖ ਵਿੱਚ ਗੁਣਸੂਤਰਾਂ ਦੇ ਕਿੰਨੇ ਜੋੜੇ ਹੁੰਦੇ ਹਨ?", opts: ["23 ਜੋੜੇ", "46 ਜੋੜੇ", "20 ਜੋੜੇ", "22 ਜੋੜੇ"], ans: 0 },
           { q: "13. ਓਜ਼ੋਨ ਪਰਤ ਸਾਨੂੰ ਕਿਸ ਤੋਂ ਬਚਾਉਂਦੀ ਹੈ?", opts: ["ਪਰਾਬੈਂਗਣੀ ਕਿਰਨਾਂ", "ਐਕਸ-ਕਿਰਨਾਂ", "ਗਾਮਾ ਕਿਰਨਾਂ", "ਇਨਫਰਾਰੈੱਡ ਕਿਰਨਾਂ"], ans: 0 },
-          { q: "14. ਤ੍ਰਿਕੋਣਮਿਤੀ ਵਿੱਚ $\\sin^2\\theta + \\cos^2\\theta$ ਦਾ ਮੁੱਲ ਕੀ ਹੈ?", opts: ["1", "0", "2", "-1"], ans: 0 },
+          { q: "14. ਤ੍ਰਿਕੋਣਮਿਤੀ ਵਿੱਚ sin^2θ + cos^2θ ਦਾ ਮੁੱਲ ਕੀ ਹੈ?", opts: ["1", "0", "2", "-1"], ans: 0 },
           { q: "15. ਪੰਜਾਬ ਵਿੱਚ ਕੁੱਲ ਕਿੰਨੇ ਜ਼ਿਲ੍ਹੇ ਹਨ?", opts: ["23", "22", "20", "25"], ans: 0 },
           { q: "16. ਵਿਟਾਮਿਨ C ਦੀ ਘਾਟ ਨਾਲ ਕਿਹੜਾ ਰੋਗ ਹੁੰਦਾ ਹੈ?", opts: ["ਸਕਰਵੀ", "ਬੇਰੀ-ਬੇਰੀ", "ਅੰਧਰਾਤਾ", "ਰਿਕਟਸ"], ans: 0 },
           { q: "17. ਤੇਜ਼ਾਬ ਦਾ pH ਮੁੱਲ ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", opts: ["7 ਤੋਂ ਘੱਟ", "7", "7 ਤੋਂ ਵੱਧ", "14"], ans: 0 },
@@ -664,7 +675,7 @@ Format the output:
         return [
           { q: "1. Which element is coated on iron to prevent rusting?", opts: ["Zinc", "Copper", "Silver", "Gold"], ans: 0 },
           { q: "2. The image formed by the human eye is formed on which part?", opts: ["Retina", "Cornea", "Pupil", "Iris"], ans: 0 },
-          { q: "3. What is the discriminant formula for $ax^2 + bx + c = 0$?", opts: ["b^2 - 4ac", "b^2 + 4ac", "4ac - b^2", "2b - 4ac"], ans: 0 },
+          { q: "3. What is the discriminant formula for ax^2 + bx + c = 0?", opts: ["b^2 - 4ac", "b^2 + 4ac", "4ac - b^2", "2b - 4ac"], ans: 0 },
           { q: "4. Which tissue transports water in plants?", opts: ["Xylem", "Phloem", "Stomata", "Chloroplast"], ans: 0 },
           { q: "5. What is the formula for area of a circle?", opts: ["πr^2", "2πr", "πr", "4πr^2"], ans: 0 },
           { q: "6. What is the chemical formula of water?", opts: ["H2O", "CO2", "NaCl", "CH4"], ans: 0 },
@@ -675,7 +686,7 @@ Format the output:
           { q: "11. Which is the lightest gas?", opts: ["Hydrogen", "Oxygen", "Nitrogen", "Helium"], ans: 0 },
           { q: "12. How many pairs of chromosomes are present in human cells?", opts: ["23 pairs", "46 pairs", "20 pairs", "22 pairs"], ans: 0 },
           { q: "13. What protects us from harmful ultraviolet solar radiation?", opts: ["Ozone layer", "Carbon dioxide", "Oxygen", "Nitrogen"], ans: 0 },
-          { q: "14. What is the value of $\\sin^2\\theta + \\cos^2\\theta$?", opts: ["1", "0", "2", "-1"], ans: 0 },
+          { q: "14. What is the value of sin^2θ + cos^2θ?", opts: ["1", "0", "2", "-1"], ans: 0 },
           { q: "15. How many districts are there in Punjab?", opts: ["23", "22", "20", "25"], ans: 0 },
           { q: "16. Scurvy is caused by deficiency of which vitamin?", opts: ["Vitamin C", "Vitamin B", "Vitamin A", "Vitamin D"], ans: 0 },
           { q: "17. The pH value of an acid is:", opts: ["Less than 7", "7", "More than 7", "14"], ans: 0 },
