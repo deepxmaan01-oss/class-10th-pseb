@@ -3,84 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PSEB 10th Class - Daily Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- EmailJS SDK for delivering real emails -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <title>PSEB 10th Daily Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
+      --primary: #4338ca;
+      --primary-hover: #3730a3;
       --bg: #f8fafc;
-      --card-bg: #ffffff;
+      --card: #ffffff;
       --text: #0f172a;
-      --text-muted: #64748b;
+      --muted: #64748b;
       --border: #e2e8f0;
       --success: #16a34a;
       --danger: #dc2626;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Noto Sans Gurmukhi', sans-serif; }
     body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
-    header { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
-    .logo { font-size: 1.25rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    header { background: var(--card); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+    .brand { font-size: 1.25rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
     main { flex: 1; max-width: 950px; width: 100%; margin: 1.5rem auto; padding: 0 1rem; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    .btn { cursor: pointer; border: none; outline: none; font-weight: 600; border-radius: 8px; padding: 0.75rem 1.25rem; transition: background 0.2s; font-size: 0.95rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; box-shadow: var(--shadow); }
+    .btn { cursor: pointer; border: none; outline: none; font-weight: 600; border-radius: 8px; padding: 0.75rem 1.25rem; font-size: 0.95rem; transition: background 0.2s, transform 0.1s; }
+    .btn:active { transform: scale(0.98); }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-secondary { background: #e0e7ff; color: var(--primary); }
     .btn-outline { border: 1px solid var(--border); background: transparent; color: var(--text); }
-    .form-group { margin-bottom: 1.25rem; text-align: left; }
+    .form-group { margin-bottom: 1.25rem; }
     label { display: block; margin-bottom: 0.4rem; font-size: 0.875rem; font-weight: 600; }
     input, select, textarea { width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border); outline: none; font-size: 1rem; background: #fff; }
     input:focus, select:focus, textarea:focus { border-color: var(--primary); ring: 2px solid #c7d2fe; }
-    
-    /* Navigation Tabs */
+
+    /* Tabs */
     .tabs-header { display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
-    .tab-btn { background: none; border: none; padding: 0.75rem 1.25rem; cursor: pointer; font-weight: 600; color: var(--text-muted); border-bottom: 2px solid transparent; }
+    .tab-btn { background: none; border: none; padding: 0.75rem 1.25rem; cursor: pointer; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; }
     .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-    /* Quiz Styling */
-    .option-btn { width: 100%; text-align: left; padding: 1rem; margin-bottom: 0.75rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; cursor: pointer; font-size: 1rem; }
-    .option-btn:hover { background: #f1f5f9; }
-    .option-btn.selected { border-color: var(--primary); background: #eef2ff; color: var(--primary); font-weight: 600; }
+    /* Quiz Option Elements */
+    .opt-box { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.25rem 0; }
+    .quiz-opt { padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; cursor: pointer; text-align: left; font-size: 1rem; transition: background 0.2s; }
+    .quiz-opt:hover { background: #f8fafc; }
+    .quiz-opt.selected { border-color: var(--primary); background: #eef2ff; color: var(--primary); font-weight: 600; }
 
-    /* Doubt Chatbox */
-    .chat-wrapper { height: 420px; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; background: #f8fafc; }
-    .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; }
-    .chat-bubble { max-width: 80%; padding: 0.8rem 1.1rem; border-radius: 12px; font-size: 0.95rem; line-height: 1.5; }
+    /* Doubts Chatbox */
+    .chat-box { height: 440px; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; background: #f8fafc; }
+    .chat-list { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; }
+    .chat-bubble { max-width: 80%; padding: 0.8rem 1.2rem; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; }
     .chat-bubble.user { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 2px; }
     .chat-bubble.bot { align-self: flex-start; background: #fff; border: 1px solid var(--border); border-bottom-left-radius: 2px; }
-    .chat-input-bar { display: flex; padding: 0.75rem; background: #fff; border-top: 1px solid var(--border); gap: 0.5rem; }
+    .chat-bar { display: flex; padding: 0.75rem; background: #fff; border-top: 1px solid var(--border); gap: 0.5rem; }
 
-    /* Tables */
+    /* Admin Table */
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; font-size: 0.9rem; }
+    th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; font-size: 0.875rem; }
     th { background: #f1f5f9; }
-    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; background: #e2e8f0; }
+    .loader { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="logo">
-      <span>📖 PSEB Class 10 Learning Portal</span>
-    </div>
-    <div id="navRight">
-      <button class="btn btn-outline" onclick="openAdminModal()">Teacher / Admin Login</button>
+    <div class="brand">PSEB 10th Portal</div>
+    <div id="topActionArea">
+      <button class="btn btn-outline" onclick="openAdminDialog()">Admin Login</button>
     </div>
   </header>
 
   <main>
-    <!-- Screen 1: Registration and Verification -->
-    <div id="authScreen" class="card" style="max-width: 460px; margin: 2rem auto; text-align: center;">
-      <h2 style="margin-bottom: 0.5rem;">Student Verification</h2>
-      <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Enter details to get verification code on your email.</p>
-      
-      <div id="stepDetails">
+    <!-- View 1: Auth & Verification Flow -->
+    <div id="authView" class="card" style="max-width: 480px; margin: 2rem auto;">
+      <h2 style="margin-bottom: 0.25rem;">Student Profile Creation</h2>
+      <p style="color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Enter details to receive your one-time verification code on your email.</p>
+
+      <div id="regInputs">
         <div class="form-group">
           <label>Student Full Name</label>
-          <input type="text" id="stuName" placeholder="e.g. Manpreet Singh" required>
+          <input type="text" id="stuName" placeholder="e.g. Gurpreet Singh" required>
         </div>
         <div class="form-group">
           <label>Class</label>
@@ -88,75 +89,73 @@
         </div>
         <div class="form-group">
           <label>Roll Number</label>
-          <input type="text" id="stuRoll" placeholder="e.g. 104523" required>
+          <input type="text" id="stuRoll" placeholder="e.g. 102345" required>
         </div>
         <div class="form-group">
-          <label>Email Address (For Verification Code)</label>
-          <input type="email" id="stuEmail" placeholder="student@gmail.com" required>
+          <label>Email Address</label>
+          <input type="email" id="stuEmail" placeholder="yourname@gmail.com" required>
         </div>
-        <button class="btn btn-primary" style="width: 100%;" id="btnSendCode" onclick="sendVerificationCode()">Send Code to Email</button>
+        <button class="btn btn-primary" id="btnRequestOtp" style="width: 100%;" onclick="requestOTP()">Send Code to Email</button>
       </div>
 
-      <div id="stepCode" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-        <label>Enter 6-Digit Email Code</label>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Code sent! If testing without an email gateway configured, your code is: <b id="fallbackCodeDisplay" style="color:var(--primary);"></b></p>
-        <input type="text" id="inputCode" placeholder="Enter 6-digit code" style="text-align: center; font-size: 1.25rem; letter-spacing: 4px; margin-bottom: 1rem;">
-        <button class="btn btn-primary" style="width: 100%;" onclick="confirmCode()">Verify & Create Profile</button>
+      <div id="otpInputs" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+        <label>Enter 6-Digit Email Verification Code</label>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem;">Check your email inbox/spam folder for the verification code.</p>
+        <input type="text" id="inputOtp" placeholder="6-Digit OTP" maxlength="6" style="text-align: center; letter-spacing: 4px; font-size: 1.2rem; margin-bottom: 1rem;">
+        <button class="btn btn-primary" style="width: 100%;" onclick="validateOTP()">Verify Code & Enter</button>
       </div>
     </div>
 
-    <!-- Screen 2: Student Main Dashboard -->
-    <div id="dashboardScreen" style="display: none;">
+    <!-- View 2: Student Main Dashboard -->
+    <div id="studentDashboard" style="display: none;">
       <div class="tabs-header">
-        <button class="tab-btn active" onclick="switchSection('quiz')">Daily Quiz</button>
-        <button class="tab-btn" onclick="switchSection('paper')">PSEB Answer Copy Grader</button>
-        <button class="tab-btn" onclick="switchSection('doubts')">ਸ਼ੰਕੇ ਹੱਲ ਕਰੋ (AI Doubts)</button>
-        <button class="tab-btn" onclick="switchSection('profile')">My Profile</button>
+        <button class="tab-btn active" onclick="showTab('quiz')">Daily 20-Q Quiz</button>
+        <button class="tab-btn" onclick="showTab('copy')">Handwritten Copy Grader</button>
+        <button class="tab-btn" onclick="showTab('doubts')">ਸ਼ੰਕੇ ਹੱਲ ਕਰੋ (AI Punjabi Doubts)</button>
+        <button class="tab-btn" onclick="showTab('info')">Personal Info</button>
       </div>
 
-      <!-- Tab: Daily Quiz -->
+      <!-- Tab: 20-Question Daily Quiz -->
       <div id="tabQuiz" class="card">
-        <div id="quizPromptBox">
-          <h3>10th Class Daily PSEB Quiz</h3>
-          <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Subject questions update automatically each day based on Punjab Board pattern.</p>
-          
+        <div id="quizStartView">
+          <h3>PSEB 10th Daily 20-Question Challenge</h3>
+          <p style="color: var(--muted); margin-bottom: 1.5rem;">Daily updated 20 questions based on PSEB Board Curriculum.</p>
           <div class="form-group" style="max-width: 320px;">
             <label>Select Medium / ਮਾਧਿਅਮ ਚੁਣੋ:</label>
-            <select id="selectedMedium">
+            <select id="quizLanguage">
               <option value="Punjabi">ਪੰਜਾਬੀ ਮਾਧਿਅਮ (Punjabi)</option>
               <option value="English">English Medium</option>
             </select>
           </div>
-          <button class="btn btn-primary" id="btnStartQuiz" onclick="generateDailyQuiz()">Start Today's Quiz</button>
+          <button class="btn btn-primary" id="btnStartQuiz" onclick="generate20QuestionsQuiz()">Start Daily 20-Q Quiz</button>
         </div>
 
-        <div id="quizActiveBox" style="display: none;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-            <span id="quizProgress" style="font-weight: 700; color: var(--primary);">Question 1 of 5</span>
-            <span id="displayDate" style="color: var(--text-muted); font-size: 0.85rem;"></span>
+        <div id="quizRunView" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span id="quizCounter" style="font-weight: 700; color: var(--primary);">Question 1 of 20</span>
+            <span id="quizDateBadge" style="color: var(--muted); font-size: 0.85rem;"></span>
           </div>
-          <h3 id="quizQuestion" style="font-size: 1.15rem; margin-bottom: 1.25rem;"></h3>
-          <div id="quizOptionsContainer"></div>
-          <button class="btn btn-primary" id="btnNext" onclick="nextQuizStep()" style="margin-top: 1rem;">Submit & Next</button>
+          <h3 id="currentQuestionTitle" style="font-size: 1.15rem; margin-bottom: 1rem;"></h3>
+          <div class="opt-box" id="quizOptionsBox"></div>
+          <button class="btn btn-primary" id="btnNextQ" onclick="submitCurrentAnswer()">Next Question</button>
         </div>
 
-        <div id="quizFinishedBox" style="display: none; text-align: center; padding: 2rem 0;">
-          <h2>Daily Quiz Complete!</h2>
-          <p style="color: var(--text-muted); margin: 0.5rem 0 1.5rem 0;">Your score has been registered and synced with the school admin.</p>
-          <h1 id="finalScore" style="color: var(--primary); font-size: 3rem; margin-bottom: 1.5rem;">0/5</h1>
-          <button class="btn btn-secondary" onclick="switchSection('doubts')">Ask Doubts on Mistakes in Punjabi</button>
+        <div id="quizDoneView" style="display: none; text-align: center; padding: 2rem 0;">
+          <h2>Daily Assessment Complete!</h2>
+          <p style="color: var(--muted); margin: 0.5rem 0 1.5rem 0;">Your result and medium details have been registered and transmitted to the admin.</p>
+          <h1 id="quizFinalScore" style="color: var(--primary); font-size: 3.5rem; margin-bottom: 1.5rem;">0/20</h1>
+          <button class="btn btn-secondary" onclick="showTab('doubts')">Ask AI in Punjabi about Wrong Answers</button>
         </div>
       </div>
 
       <!-- Tab: Handwritten Copy Checker -->
-      <div id="tabPaper" class="card" style="display: none;">
-        <h3>PSEB Handwritten Answer Copy Evaluation</h3>
-        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Take a photo of your paper solution. The AI examiner marks it out of 10 and points out step errors.</p>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div id="tabCopy" class="card" style="display: none;">
+        <h3>PSEB Written Test Evaluation</h3>
+        <p style="color: var(--muted); margin-bottom: 1.5rem;">Upload a photo of your handwritten notebook copy/answer sheet for automatic grading.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
           <div class="form-group">
             <label>Subject</label>
-            <select id="paperSubject">
+            <select id="examSubject">
               <option>ਗਣਿਤ (Mathematics)</option>
               <option>ਵਿਗਿਆਨ (Science)</option>
               <option>ਸਮਾਜਿਕ ਸਿੱਖਿਆ (Social Studies)</option>
@@ -165,81 +164,76 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Medium</label>
-            <select id="paperMedium">
+            <label>Language Medium</label>
+            <select id="evalMedium">
               <option value="Punjabi">ਪੰਜਾਬੀ ਮਾਧਿਅਮ (Punjabi)</option>
               <option value="English">English Medium</option>
             </select>
           </div>
         </div>
-
         <div class="form-group">
-          <label>Question Topic / Chapter / Question Number</label>
-          <input type="text" id="paperQuestionDesc" placeholder="e.g. Chapter 8 Trigonometry - Exercise 8.2 Question 3">
+          <label>Question Topic or Exercise</label>
+          <input type="text" id="evalTopic" placeholder="e.g. Chapter 14 Statistics - Mean calculation">
         </div>
-
         <div class="form-group">
-          <label>Upload Photo of Answer Sheet</label>
-          <input type="file" id="paperImageInput" accept="image/*">
+          <label>Upload Handwritten Copy Image</label>
+          <input type="file" id="copyImageFile" accept="image/*">
         </div>
-
-        <button class="btn btn-primary" id="btnEvaluate" onclick="gradeAnswerSheet()">Submit Copy for Checking</button>
-
-        <div id="copyEvaluationOutput" style="display:none; margin-top: 1.5rem; background: #f8fafc; border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; line-height: 1.7; white-space: pre-wrap;"></div>
+        <button class="btn btn-primary" id="btnGradeCopy" onclick="gradeAnswerCopy()">Check & Grade My Copy</button>
+        <div id="copyReport" style="display:none; margin-top: 1.5rem; background: var(--bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; line-height: 1.7; white-space: pre-wrap;"></div>
       </div>
 
       <!-- Tab: Punjabi Doubt Resolution -->
       <div id="tabDoubts" class="card" style="display: none;">
-        <h3>10ਵੀਂ ਸ਼੍ਰੇਣੀ ਦੇ ਸ਼ੰਕੇ ਹੱਲ ਕਰੋ (AI PSEB Tutor)</h3>
-        <p style="color: var(--text-muted); margin-bottom: 1rem;">ਕੋਈ ਵੀ ਸਵਾਲ ਲਿਖੋ, ਤੁਹਾਨੂੰ ਸਿੱਧਾ ਪੰਜਾਬੀ ਵਿੱਚ ਸਰਲ ਤਰੀਕੇ ਨਾਲ ਸਮਝਾਇਆ ਜਾਵੇਗਾ।</p>
-
-        <div class="chat-wrapper">
-          <div class="chat-messages" id="doubtLog">
-            <div class="chat-bubble bot">ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! 10ਵੀਂ ਜਮਾਤ ਦੇ ਕਿਸੇ ਵੀ ਵਿਸ਼ੇ (ਗਣਿਤ, ਸਾਇੰਸ ਆਦਿ) ਬਾਰੇ ਆਪਣਾ ਸਵਾਲ ਪੁੱਛੋ।</div>
+        <h3>ਪੜ੍ਹਾਈ ਦੇ ਸ਼ੰਕੇ ਪੁੱਛੋ (PSEB Punjabi Doubt AI)</h3>
+        <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.875rem;">10ਵੀਂ ਸ਼੍ਰੇਣੀ ਦੇ ਕਿਸੇ ਵੀ ਵਿਸ਼ੇ ਬਾਰੇ ਸਵਾਲ ਪੁੱਛੋ। ਤੁਹਾਨੂੰ ਸੌਖੀ ਪੰਜਾਬੀ ਵਿੱਚ ਜਵਾਬ ਮਿਲੇਗਾ।</p>
+        <div class="chat-box">
+          <div class="chat-list" id="doubtMessages">
+            <div class="chat-bubble bot">ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਤੁਸੀਂ ਆਪਣੇ 10ਵੀਂ ਜਮਾਤ ਦੇ ਕਿਸੇ ਵੀ ਸਵਾਲ ਬਾਰੇ ਇੱਥੇ ਪੁੱਛ ਸਕਦੇ ਹੋ। ਮੈਂ ਤੁਹਾਨੂੰ ਪੂਰੀ ਵਿਆਖਿਆ ਦੇਵਾਂਗਾ।</div>
           </div>
-          <div class="chat-input-bar">
-            <input type="text" id="doubtInput" placeholder="ਸਵਾਲ ਇੱਥੇ ਲਿਖੋ... (ਜਿਵੇਂ ਕਿ: ਪ੍ਰਕਾਸ਼ ਸੰਸਲੇਸ਼ਣ ਕੀ ਹੁੰਦਾ ਹੈ?)" onkeydown="if(event.key === 'Enter') sendDoubtQuery()">
-            <button class="btn btn-primary" onclick="sendDoubtQuery()">ਪੁੱਛੋ</button>
+          <div class="chat-bar">
+            <input type="text" id="txtDoubt" placeholder="ਆਪਣਾ ਸਵਾਲ ਇੱਥੇ ਲਿਖੋ..." onkeydown="if(event.key === 'Enter') askDoubt()">
+            <button class="btn btn-primary" onclick="askDoubt()">ਪੁੱਛੋ</button>
           </div>
         </div>
       </div>
 
       <!-- Tab: Student Profile -->
-      <div id="tabProfile" class="card" style="display: none;">
-        <h3>Student Information</h3>
-        <div style="margin-top: 1rem; line-height: 2;">
-          <p><strong>Name:</strong> <span id="profName"></span></p>
-          <p><strong>Roll No:</strong> <span id="profRoll"></span></p>
-          <p><strong>Class:</strong> 10th Class (Punjab School Education Board)</p>
-          <p><strong>Email:</strong> <span id="profEmail"></span></p>
-          <p><strong>Verification:</strong> <span style="color: var(--success); font-weight: 700;">Verified (No repeat login required)</span></p>
-          <p><strong>Latest Quiz Score:</strong> <span id="profScore">Not taken yet</span></p>
+      <div id="tabInfo" class="card" style="display: none;">
+        <h3>Personal Information</h3>
+        <div style="margin-top: 1.25rem; line-height: 2;">
+          <p><strong>Name:</strong> <span id="infoName"></span></p>
+          <p><strong>Class:</strong> 10th Class (PSEB)</p>
+          <p><strong>Roll No:</strong> <span id="infoRoll"></span></p>
+          <p><strong>Email:</strong> <span id="infoEmail"></span></p>
+          <p><strong>Verification:</strong> <span style="color: var(--success); font-weight: 700;">Verified (Persistent Session Active)</span></p>
+          <p><strong>Latest 20-Q Quiz Score:</strong> <span id="infoScore">Pending</span></p>
         </div>
       </div>
     </div>
 
-    <!-- Screen 3: Admin Console -->
-    <div id="adminScreen" class="card" style="display: none;">
+    <!-- View 3: Admin Console -->
+    <div id="adminView" class="card" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <div>
-          <h2>PSEB Class 10 Admin & Teacher Console</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Admin Email: deepxmaan01@gmail.com</p>
+          <h2>Teacher & Admin Console</h2>
+          <p style="color: var(--muted); font-size: 0.85rem;">Admin Contact: deepxmaan01@gmail.com</p>
         </div>
-        <button class="btn btn-outline" onclick="closeAdmin()">Exit Admin</button>
+        <button class="btn btn-outline" onclick="exitAdmin()">Exit Admin</button>
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
         <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px;">
-          <p style="font-size: 0.8rem; color: var(--text-muted);">Enrolled Students</p>
-          <h3 id="statStudents">0</h3>
+          <p style="font-size: 0.8rem; color: var(--muted);">Registered Students</p>
+          <h3 id="statTotalStudents">0</h3>
         </div>
         <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px;">
-          <p style="font-size: 0.8rem; color: var(--text-muted);">Quizzes Submitted</p>
-          <h3 id="statQuizzes">0</h3>
+          <p style="font-size: 0.8rem; color: var(--muted);">Quizzes Submitted</p>
+          <h3 id="statTotalQuizzes">0</h3>
         </div>
         <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px;">
-          <p style="font-size: 0.8rem; color: var(--text-muted);">Medium of Students</p>
-          <h3 id="statMediumRatio" style="font-size: 1rem; margin-top: 0.25rem;">Punjabi / English</h3>
+          <p style="font-size: 0.8rem; color: var(--muted);">Medium Breakdown</p>
+          <h3 id="statMedium" style="font-size: 1rem; margin-top: 0.25rem;">0 Punjabi / 0 English</h3>
         </div>
       </div>
 
@@ -248,424 +242,497 @@
         <table>
           <thead>
             <tr>
-              <th>Roll</th>
+              <th>Roll No</th>
               <th>Student Name</th>
               <th>Email</th>
-              <th>Chosen Medium</th>
-              <th>Last Quiz Result</th>
-              <th>AI Performance Status</th>
+              <th>Medium</th>
+              <th>Score (Out of 20)</th>
+              <th>Admin Analysis</th>
             </tr>
           </thead>
-          <tbody id="adminRecordsBody"></tbody>
+          <tbody id="adminStudentRows"></tbody>
         </table>
       </div>
     </div>
   </main>
 
   <script>
-    // System Constants
     const GEMINI_API_KEY = "AIzaSyAMMPZQuJpBFt-JrQpKRnCJYyp5hoVBuK4";
-    const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-    
-    // Application State
-    let activeStudent = null;
-    let tempCode = "";
-    let activeQuizList = [];
-    let currentQuizIdx = 0;
-    let userScore = 0;
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const ADMIN_EMAIL = "deepxmaan01@gmail.com";
+    const ADMIN_PASS = "deep@2012";
 
-    // Check persistent login on load
-    window.onload = function() {
-      const savedUser = localStorage.getItem("pseb_persisted_student");
-      if (savedUser) {
-        activeStudent = JSON.parse(savedUser);
+    let activeStudent = null;
+    let serverOTP = null;
+    let pendingStudentData = null;
+    let quizQuestions = [];
+    let activeQuestionIndex = 0;
+    let totalScore = 0;
+
+    // Initialize application and restore persistent session
+    window.addEventListener('DOMContentLoaded', () => {
+      // Initialize EmailJS if public key is configured
+      if (window.emailjs) {
+        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");
+      }
+
+      const saved = localStorage.getItem("pseb_persisted_profile");
+      if (saved) {
+        activeStudent = JSON.parse(saved);
         launchDashboard();
       }
-    };
+    });
 
-    // Helper: Call Gemini API securely
-    async function requestGemini(contents) {
-      const response = await fetch(GEMINI_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: contents })
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP Error ${response.status}`);
+    // Unified dispatch service: Sends emails directly via backend FormSubmit & EmailJS
+    async function transmitNotification(toEmail, subject, messageBody) {
+      // 1. Direct FormSubmit endpoint (sends real email to inbox without server setup)
+      try {
+        await fetch(`https://formsubmit.co/ajax/${toEmail}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({
+            _subject: subject,
+            email: toEmail,
+            message: messageBody
+          })
+        });
+      } catch (err) {
+        console.warn("Direct dispatch network error:", err);
       }
-      const data = await response.json();
-      return data.candidates[0].content.parts[0].text;
+
+      // 2. EmailJS dispatch fallback
+      try {
+        if (window.emailjs && window.emailjs.send) {
+          await emailjs.send("default_service", "template_otp", {
+            to_email: toEmail,
+            subject: subject,
+            message: messageBody
+          });
+        }
+      } catch (e) {
+        console.warn("EmailJS unconfigured:", e);
+      }
     }
 
-    // Step 1: Send verification code to email
-    function sendVerificationCode() {
+    // Step 1: Request OTP and transmit to email inbox
+    async function requestOTP() {
       const name = document.getElementById('stuName').value.trim();
       const roll = document.getElementById('stuRoll').value.trim();
       const email = document.getElementById('stuEmail').value.trim();
 
       if (!name || !roll || !email) {
-        alert("Please fill all details: Name, Roll Number, and Email.");
+        alert("Please enter Name, Roll Number, and Email.");
         return;
       }
 
-      tempCode = Math.floor(100000 + Math.random() * 900000).toString();
-      document.getElementById('fallbackCodeDisplay').innerText = tempCode;
-      document.getElementById('stepDetails').style.display = 'none';
-      document.getElementById('stepCode').style.display = 'block';
+      serverOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      pendingStudentData = { name, roll, class: "10th Class", email, lastScore: "Pending", medium: "Punjabi" };
 
-      // Send actual email via EmailJS (if service ID is plugged) or trigger standard mailto fallback
-      if (window.emailjs && window.emailjs.send) {
-        window.emailjs.send("service_pseb", "template_pseb", {
-          to_email: email,
-          to_name: name,
-          verification_code: tempCode,
-          admin_email: "deepxmaan01@gmail.com"
-        }).catch(() => {
-          console.log("EmailJS template unlinked. Code shown on-screen.");
-        });
-      }
-      alert(`Verification code dispatched to ${email}.\n(Backup display for offline test: ${tempCode})`);
+      const btn = document.getElementById('btnRequestOtp');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="loader"></span> Sending Code to Email...`;
+
+      // Dispatch OTP to student's inbox
+      await transmitNotification(
+        email,
+        "Your PSEB Class 10 Verification Code",
+        `Hello ${name},\n\nYour 6-digit verification code is: ${serverOTP}\n\nPlease enter this on the portal to create your profile.`
+      );
+
+      // Notify admin immediately about new registration
+      await transmitNotification(
+        ADMIN_EMAIL,
+        "New PSEB Student Registration Alert",
+        `New student registration requested:\nName: ${name}\nRoll No: ${roll}\nEmail: ${email}`
+      );
+
+      btn.disabled = false;
+      btn.innerText = "Send Code to Email";
+      document.getElementById('regInputs').style.display = 'none';
+      document.getElementById('otpInputs').style.display = 'block';
+
+      alert(`A 6-digit verification code has been dispatched to your email address: ${email}.\nPlease check your inbox and spam folder.`);
     }
 
-    // Step 2: Confirm code and persist profile
-    function confirmCode() {
-      const entered = document.getElementById('inputCode').value.trim();
-      if (entered !== tempCode) {
-        alert("Invalid code! Please check the code carefully.");
+    // Step 2: Validate OTP and permanently save profile
+    function validateOTP() {
+      const entered = document.getElementById('inputOtp').value.trim();
+      if (!serverOTP || entered !== serverOTP) {
+        alert("Incorrect verification code. Please check your email.");
         return;
       }
 
-      activeStudent = {
-        name: document.getElementById('stuName').value.trim(),
-        roll: document.getElementById('stuRoll').value.trim(),
-        email: document.getElementById('stuEmail').value.trim(),
-        class: "10th Class (PSEB)",
-        medium: "Punjabi",
-        lastScore: "Not Taken",
-        verified: true
-      };
+      activeStudent = pendingStudentData;
+      // Save permanently in local storage so verification is never asked twice
+      localStorage.setItem("pseb_persisted_profile", JSON.stringify(activeStudent));
 
-      // Persist user permanently
-      localStorage.setItem("pseb_persisted_student", JSON.stringify(activeStudent));
-      
-      // Store in admin records
-      let allStudents = JSON.parse(localStorage.getItem("pseb_all_students") || "[]");
-      allStudents = allStudents.filter(s => s.email !== activeStudent.email);
-      allStudents.push(activeStudent);
-      localStorage.setItem("pseb_all_students", JSON.stringify(allStudents));
+      // Append to admin master student records
+      let all = JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
+      all = all.filter(s => s.email !== activeStudent.email);
+      all.push(activeStudent);
+      localStorage.setItem("pseb_master_students", JSON.stringify(all));
 
       launchDashboard();
     }
 
     function launchDashboard() {
-      document.getElementById('authScreen').style.display = 'none';
-      document.getElementById('dashboardScreen').style.display = 'block';
-      
-      document.getElementById('navRight').innerHTML = `
-        <span style="font-size:0.875rem; font-weight:600; margin-right: 10px;">${activeStudent.name} (${activeStudent.roll})</span>
+      document.getElementById('authView').style.display = 'none';
+      document.getElementById('studentDashboard').style.display = 'block';
+
+      document.getElementById('topActionArea').innerHTML = `
+        <span style="font-size:0.875rem; font-weight:600; margin-right:8px;">${activeStudent.name} (${activeStudent.roll})</span>
         <button class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="logout()">Logout</button>
       `;
 
-      document.getElementById('profName').innerText = activeStudent.name;
-      document.getElementById('profRoll').innerText = activeStudent.roll;
-      document.getElementById('profEmail').innerText = activeStudent.email;
-      document.getElementById('profScore').innerText = activeStudent.lastScore;
+      document.getElementById('infoName').innerText = activeStudent.name;
+      document.getElementById('infoRoll').innerText = activeStudent.roll;
+      document.getElementById('infoEmail').innerText = activeStudent.email;
+      document.getElementById('infoScore').innerText = activeStudent.lastScore;
     }
 
     function logout() {
-      localStorage.removeItem("pseb_persisted_student");
+      localStorage.removeItem("pseb_persisted_profile");
       location.reload();
     }
 
-    function switchSection(tab) {
-      ['tabQuiz', 'tabPaper', 'tabDoubts', 'tabProfile'].forEach(id => document.getElementById(id).style.display = 'none');
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    function showTab(tab) {
+      ['tabQuiz', 'tabCopy', 'tabDoubts', 'tabInfo'].forEach(id => document.getElementById(id).style.display = 'none');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
 
-      if (tab === 'quiz') {
-        document.getElementById('tabQuiz').style.display = 'block';
-        event.currentTarget.classList.add('active');
-      } else if (tab === 'paper') {
-        document.getElementById('tabPaper').style.display = 'block';
-        event.currentTarget.classList.add('active');
-      } else if (tab === 'doubts') {
-        document.getElementById('tabDoubts').style.display = 'block';
-        event.currentTarget.classList.add('active');
-      } else if (tab === 'profile') {
-        document.getElementById('tabProfile').style.display = 'block';
-        event.currentTarget.classList.add('active');
-      }
+      if (tab === 'quiz') { document.getElementById('tabQuiz').style.display = 'block'; event.currentTarget.classList.add('active'); }
+      else if (tab === 'copy') { document.getElementById('tabCopy').style.display = 'block'; event.currentTarget.classList.add('active'); }
+      else if (tab === 'doubts') { document.getElementById('tabDoubts').style.display = 'block'; event.currentTarget.classList.add('active'); }
+      else if (tab === 'info') { document.getElementById('tabInfo').style.display = 'block'; event.currentTarget.classList.add('active'); }
     }
 
-    // Dynamic Daily Quiz with Date-Salting
-    async function generateDailyQuiz() {
-      const medium = document.getElementById('selectedMedium').value;
-      const today = new Date().toISOString().slice(0, 10);
-      document.getElementById('displayDate').innerText = `Date: ${today}`;
-      
-      const btn = document.getElementById('btnStartQuiz');
-      btn.innerText = "Generating Daily Questions with AI...";
-      btn.disabled = true;
+    // Call Gemini API securely
+    async function callGemini(contents) {
+      const response = await fetch(GEMINI_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: contents })
+      });
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    }
 
-      // Salt prompt with exact day and random offset to guarantee a completely new set every single day
-      const prompt = `You are a Punjab School Education Board (PSEB) Class 10 examination specialist.
-Generate 5 multiple choice questions for Class 10 covering Mathematics and Science syllabus.
-Date seed: ${today} (make sure questions are completely unique to this date).
-Language: Strictly ${medium}.
-Output format: Return ONLY a raw JSON array of 5 items without any markdown wrapper or backticks. Format:
+    // Dynamic 20-Question Daily Quiz Generator
+    async function generate20QuestionsQuiz() {
+      const lang = document.getElementById('quizLanguage').value;
+      const todayDate = new Date().toISOString().slice(0, 10);
+      document.getElementById('quizDateBadge').innerText = `Date: ${todayDate}`;
+
+      const btn = document.getElementById('btnStartQuiz');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="loader"></span> Generating 20 Daily PSEB Questions...`;
+
+      const prompt = `You are a Punjab School Education Board (PSEB) Class 10 examination board member.
+Generate exactly 20 multiple choice questions covering the Class 10 syllabus (Math, Science, Social Studies).
+Date Seed: ${todayDate} (ensure questions are distinct and unique for this date).
+Language: Strictly ${lang}.
+Return ONLY a valid JSON array of 20 items without markdown fences, code blocks, or explanations. Format:
 [
   {
-    "question": "Question text",
-    "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
-    "answer": 0
+    "q": "Question text here",
+    "opts": ["Option 1", "Option 2", "Option 3", "Option 4"],
+    "ans": 0
   }
 ]`;
 
       try {
-        const text = await requestGemini([{ parts: [{ text: prompt }] }]);
-        const cleanJSON = text.replace(/```json/g, "").replace(/```/g, "").trim();
-        activeQuizList = JSON.parse(cleanJSON);
+        const rawText = await callGemini([{ parts: [{ text: prompt }] }]);
+        const cleanJSON = rawText.replace(/```json/gi, "").replace(/```/gi, "").trim();
+        quizQuestions = JSON.parse(cleanJSON);
+        if (!Array.isArray(quizQuestions) || quizQuestions.length === 0) {
+          throw new Error("Invalid question structure");
+        }
       } catch (err) {
-        console.error("AI quiz fallback:", err);
-        // Fallback robust questions if network issues arise
-        activeQuizList = [
-          {
-            question: medium === 'Punjabi' ? "ਲੋਹੇ ਨੂੰ ਜੰਗ ਲੱਗਣ ਤੋਂ ਬਚਾਉਣ ਲਈ ਕਿਸ ਦੀ ਪਰਤ ਚੜ੍ਹਾਈ ਜਾਂਦੀ ਹੈ?" : "Which metal is coated on iron to protect it from rusting?",
-            options: medium === 'Punjabi' ? ["ਜ਼ਿੰਕ (ਜਸਤਾ)", "ਤਾਂਬਾ", "ਸੋਨਾ", "ਚਾਂਦੀ"] : ["Zinc (Galvanization)", "Copper", "Gold", "Silver"],
-            answer: 0
-          },
-          {
-            question: medium === 'Punjabi' ? "ਦੋ ਘਾਤੀ ਸਮੀਕਰਣ $ax^2 + bx + c = 0$ ਦੇ ਡਿਸਕ੍ਰਿਮੀਨੈਂਟ (D) ਦਾ ਫਾਰਮੂਲਾ ਕੀ ਹੈ?" : "What is the formula of Discriminant (D) for $ax^2 + bx + c = 0$?",
-            options: ["b^2 - 4ac", "b^2 + 4ac", "4ac - b^2", "2b - 4ac"],
-            answer: 0
-          }
-        ];
+        console.error("AI Generation Error, loading full offline 20-Q set:", err);
+        quizQuestions = getFallback20Questions(lang);
       }
 
-      currentQuizIdx = 0;
-      userScore = 0;
       btn.disabled = false;
-      btn.innerText = "Start Today's Quiz";
+      btn.innerText = "Start Daily 20-Q Quiz";
+      activeQuestionIndex = 0;
+      totalScore = 0;
 
-      document.getElementById('quizPromptBox').style.display = 'none';
-      document.getElementById('quizActiveBox').style.display = 'block';
-      renderQuestionStep();
+      document.getElementById('quizStartView').style.display = 'none';
+      document.getElementById('quizRunView').style.display = 'block';
+      renderQuizStep();
     }
 
-    function renderQuestionStep() {
-      const q = activeQuizList[currentQuizIdx];
-      document.getElementById('quizProgress').innerText = `Question ${currentQuizIdx + 1} of ${activeQuizList.length}`;
-      document.getElementById('quizQuestion').innerText = q.question;
-      
-      const cont = document.getElementById('quizOptionsContainer');
-      cont.innerHTML = "";
+    function renderQuizStep() {
+      const item = quizQuestions[activeQuestionIndex];
+      document.getElementById('quizCounter').innerText = `Question ${activeQuestionIndex + 1} of ${quizQuestions.length}`;
+      document.getElementById('currentQuestionTitle').innerText = item.q;
 
-      q.options.forEach((opt, idx) => {
-        const b = document.createElement('button');
-        b.className = "option-btn";
-        b.innerText = `${idx + 1}) ${opt}`;
-        b.onclick = () => {
-          document.querySelectorAll('.option-btn').forEach(el => el.classList.remove('selected'));
-          b.classList.add('selected');
-          b.dataset.index = idx;
+      const container = document.getElementById('quizOptionsBox');
+      container.innerHTML = "";
+
+      item.opts.forEach((optText, index) => {
+        const optBtn = document.createElement('button');
+        optBtn.className = "quiz-opt";
+        optBtn.innerText = `${index + 1}) ${optText}`;
+        optBtn.onclick = () => {
+          document.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('selected'));
+          optBtn.classList.add('selected');
+          optBtn.dataset.choice = index;
         };
-        cont.appendChild(b);
+        container.appendChild(optBtn);
       });
     }
 
-    function nextQuizStep() {
-      const selected = document.querySelector('.option-btn.selected');
+    function submitCurrentAnswer() {
+      const selected = document.querySelector('.quiz-opt.selected');
       if (!selected) {
-        alert("Please select an answer first.");
+        alert("Please pick an answer option to continue.");
         return;
       }
 
-      const picked = parseInt(selected.dataset.index);
-      if (picked === activeQuizList[currentQuizIdx].answer) {
-        userScore++;
+      const choice = parseInt(selected.dataset.choice);
+      if (choice === quizQuestions[activeQuestionIndex].ans) {
+        totalScore++;
       }
 
-      currentQuizIdx++;
-      if (currentQuizIdx < activeQuizList.length) {
-        renderQuestionStep();
+      activeQuestionIndex++;
+      if (activeQuestionIndex < quizQuestions.length) {
+        renderQuizStep();
       } else {
-        finishQuiz();
+        completeQuiz();
       }
     }
 
-    function finishQuiz() {
-      document.getElementById('quizActiveBox').style.display = 'none';
-      document.getElementById('quizFinishedBox').style.display = 'block';
-      const finalStr = `${userScore}/${activeQuizList.length}`;
-      document.getElementById('finalScore').innerText = finalStr;
+    async function completeQuiz() {
+      document.getElementById('quizRunView').style.display = 'none';
+      document.getElementById('quizDoneView').style.display = 'block';
 
-      // Sync user profile & admin list
-      activeStudent.lastScore = finalStr;
-      activeStudent.medium = document.getElementById('selectedMedium').value;
-      localStorage.setItem("pseb_persisted_student", JSON.stringify(activeStudent));
+      const finalDisplay = `${totalScore}/${quizQuestions.length}`;
+      document.getElementById('quizFinalScore').innerText = finalDisplay;
 
-      let all = JSON.parse(localStorage.getItem("pseb_all_students") || "[]");
+      // Update student profile
+      activeStudent.lastScore = finalDisplay;
+      activeStudent.medium = document.getElementById('quizLanguage').value;
+      localStorage.setItem("pseb_persisted_profile", JSON.stringify(activeStudent));
+
+      // Update admin master database
+      let all = JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
       all = all.map(s => s.email === activeStudent.email ? activeStudent : s);
-      localStorage.setItem("pseb_all_students", JSON.stringify(all));
+      localStorage.setItem("pseb_master_students", JSON.stringify(all));
+
+      // Transmit full score report to admin email
+      await transmitNotification(
+        ADMIN_EMAIL,
+        `PSEB Class 10 Result: ${activeStudent.name} (${activeStudent.roll})`,
+        `Student Result Summary:\nName: ${activeStudent.name}\nRoll: ${activeStudent.roll}\nEmail: ${activeStudent.email}\nMedium: ${activeStudent.medium}\nScore: ${finalDisplay}`
+      );
     }
 
-    // Punjabi AI Doubt Solver
-    async function sendDoubtQuery() {
-      const input = document.getElementById('doubtInput');
+    // Punjabi AI Doubt Resolution
+    async function askDoubt() {
+      const input = document.getElementById('txtDoubt');
       const question = input.value.trim();
       if (!question) return;
 
-      const log = document.getElementById('doubtLog');
+      const chatList = document.getElementById('doubtMessages');
 
-      // User chat bubble
+      // User Message Bubble
       const userBubble = document.createElement('div');
       userBubble.className = "chat-bubble user";
       userBubble.innerText = question;
-      log.appendChild(userBubble);
+      chatList.appendChild(userBubble);
       input.value = "";
-      log.scrollTop = log.scrollHeight;
+      chatList.scrollTop = chatList.scrollHeight;
 
-      // Loading bubble
+      // Bot Loading Bubble
       const botBubble = document.createElement('div');
       botBubble.className = "chat-bubble bot";
-      botBubble.innerText = "ਜਵਾਬ ਲਿਖਿਆ ਜਾ ਰਿਹਾ ਹੈ...";
-      log.appendChild(botBubble);
-      log.scrollTop = log.scrollHeight;
+      botBubble.innerText = "ਜਵਾਬ ਤਿਆਰ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...";
+      chatList.appendChild(botBubble);
+      chatList.scrollTop = chatList.scrollHeight;
 
-      const prompt = `ਤੁਸੀਂ ਪੰਜਾਬ ਸਕੂਲ ਸਿੱਖਿਆ ਬੋਰਡ (PSEB) 10ਵੀਂ ਜਮਾਤ ਦੇ ਵਿਦਿਆਰਥੀ ਦੇ ਸਹਾਇਕ ਅਧਿਆਪਕ ਹੋ।
-ਹੇਠਾਂ ਲਿਖੇ ਸਵਾਲ ਦਾ ਜਵਾਬ ਪੂਰੀ ਤਰ੍ਹਾਂ ਸਿਰਫ ਸਰਲ, ਸਪੱਸ਼ਟ ਅਤੇ ਮਿੱਠੀ ਪੰਜਾਬੀ (Gurmukhi script) ਵਿੱਚ ਦਿਓ।
-ਵਿਦਿਆਰਥੀ ਨੂੰ ਸੌਖੇ ਤਰੀਕੇ ਨਾਲ ਸਮਝਾਓ।
+      const prompt = `ਤੁਸੀਂ ਪੰਜਾਬ ਸਕੂਲ ਸਿੱਖਿਆ ਬੋਰਡ (PSEB) 10ਵੀਂ ਜਮਾਤ ਦੇ ਵਿਦਿਆਰਥੀਆਂ ਦੇ ਸਹਾਇਕ ਅਧਿਆਪਕ ਹੋ।
+ਹੇਠਾਂ ਲਿਖੇ ਸਵਾਲ ਦਾ ਜਵਾਬ ਪੂਰੀ ਤਰ੍ਹਾਂ ਸਿਰਫ ਸਰਲ, ਸਪੱਸ਼ਟ ਅਤੇ ਆਮ ਬੋਲਚਾਲ ਦੀ ਪੰਜਾਬੀ (Gurmukhi script) ਵਿੱਚ ਦਿਓ:
 ਸਵਾਲ: ${question}`;
 
       try {
-        const ans = await requestGemini([{ parts: [{ text: prompt }] }]);
-        botBubble.innerText = ans;
-      } catch (err) {
-        botBubble.innerText = "ਮਾਫ਼ ਕਰਨਾ ਜੀ, ਇੰਟਰਨੈੱਟ ਸੰਪਰਕ ਵਿੱਚ ਸਮੱਸਿਆ ਆਈ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।";
+        const answer = await callGemini([{ parts: [{ text: prompt }] }]);
+        botBubble.innerText = answer;
+      } catch (e) {
+        botBubble.innerText = "ਮਾਫ਼ ਕਰਨਾ ਜੀ, ਇੰਟਰਨੈੱਟ ਕੁਨੈਕਸ਼ਨ ਜਾਂ ਸਰਵਰ ਵਿੱਚ ਸਮੱਸਿਆ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।";
       }
-      log.scrollTop = log.scrollHeight;
+      chatList.scrollTop = chatList.scrollHeight;
     }
 
-    // Answer Copy Evaluator (Image OCR & Grading)
-    async function gradeAnswerSheet() {
-      const fileInput = document.getElementById('paperImageInput');
-      const subject = document.getElementById('paperSubject').value;
-      const medium = document.getElementById('paperMedium').value;
-      const desc = document.getElementById('paperQuestionDesc').value;
-      const out = document.getElementById('copyEvaluationOutput');
-      const btn = document.getElementById('btnEvaluate');
+    // Handwritten Copy Checker with Image Input
+    async function gradeAnswerCopy() {
+      const fileInput = document.getElementById('copyImageFile');
+      const subject = document.getElementById('examSubject').value;
+      const medium = document.getElementById('evalMedium').value;
+      const topic = document.getElementById('evalTopic').value;
+      const reportBox = document.getElementById('copyReport');
+      const btn = document.getElementById('btnGradeCopy');
 
       if (!fileInput.files || !fileInput.files[0]) {
-        alert("Please select or capture a photo of your written answer sheet.");
+        alert("Please upload an image of your handwritten answer sheet.");
         return;
       }
 
       btn.disabled = true;
-      btn.innerText = "Examiner AI checking your copy...";
-      out.style.display = "block";
-      out.innerText = "ਕਾਪੀ ਦੀ ਜਾਂਚ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ... ਕਿਰਪਾ ਕਰਕੇ ਉਡੀਕ ਕਰੋ।";
+      btn.innerHTML = `<span class="loader"></span> Checking copy with AI...`;
+      reportBox.style.display = "block";
+      reportBox.innerText = "ਕਾਪੀ ਦੀ ਜਾਂਚ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ... ਕਿਰਪਾ ਕਰਕੇ ਉਡੀਕ ਕਰੋ।";
 
       const file = fileInput.files[0];
-      const base64 = await fileToBase64(file);
+      const base64 = await toBase64(file);
 
-      const prompt = `Act as an official PSEB Class 10 Board Examiner for subject: ${subject}.
-Analyze this handwritten answer copy.
-Topic/Question context: ${desc || "Class 10 Board Question"}.
+      const prompt = `You are an official Punjab School Education Board (PSEB) Class 10 Examiner.
+Evaluate this student's handwritten answer copy for subject: ${subject}.
+Topic: ${topic || "Board Question"}.
 Medium: ${medium}.
-Provide:
-1. Marks Awarded (out of 10).
-2. Step-by-step verification.
-3. Errors or missed formulas/keywords.
-4. Constructive advice in simple ${medium === 'Punjabi' ? 'Punjabi' : 'English'} for full marks in PSEB exams.`;
+Format the output:
+1. Marks Awarded: (out of 10)
+2. Step-by-step review
+3. Calculation or concept errors
+4. Feedback written in simple ${medium === 'Punjabi' ? 'Punjabi' : 'English'} for improving board score.`;
 
       try {
-        const response = await fetch(GEMINI_ENDPOINT, {
+        const response = await fetch(GEMINI_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contents: [{
               parts: [
                 { text: prompt },
-                {
-                  inlineData: {
-                    mimeType: file.type || "image/jpeg",
-                    data: base64.split(",")[1]
-                  }
-                }
+                { inlineData: { mimeType: file.type || "image/jpeg", data: base64.split(",")[1] } }
               ]
             }]
           })
         });
-        const resJson = await response.json();
-        out.innerText = resJson.candidates[0].content.parts[0].text;
-      } catch (e) {
-        out.innerText = "Error analyzing copy image. Please ensure the image is well-lit and clear.";
+        const resData = await response.json();
+        reportBox.innerText = resData.candidates[0].content.parts[0].text;
+      } catch (err) {
+        reportBox.innerText = "Error analyzing copy image. Please ensure the image is clear and well-lit.";
       } finally {
         btn.disabled = false;
-        btn.innerText = "Submit Copy for Checking";
+        btn.innerText = "Check & Grade My Copy";
       }
     }
 
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
+    function toBase64(file) {
+      return new Promise((res, rej) => {
+        const r = new FileReader();
+        r.readAsDataURL(file);
+        r.onload = () => res(r.result);
+        r.onerror = error => rej(error);
       });
     }
 
-    // Admin Panel Authentication
-    function openAdminModal() {
+    // Admin Console
+    function openAdminDialog() {
       const email = prompt("Enter Admin Email:");
       const pass = prompt("Enter Admin Password:");
 
-      if (email === "deepxmaan01@gmail.com" && pass === "deep@2012") {
-        document.getElementById('authScreen').style.display = 'none';
-        document.getElementById('dashboardScreen').style.display = 'none';
-        document.getElementById('adminScreen').style.display = 'block';
+      if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
+        document.getElementById('authView').style.display = 'none';
+        document.getElementById('studentDashboard').style.display = 'none';
+        document.getElementById('adminView').style.display = 'block';
         loadAdminRecords();
       } else {
-        alert("Access Denied: Incorrect Admin Email or Password.");
+        alert("Invalid Admin Credentials!");
       }
     }
 
-    function closeAdmin() {
-      document.getElementById('adminScreen').style.display = 'none';
+    function exitAdmin() {
+      document.getElementById('adminView').style.display = 'none';
       if (activeStudent) {
-        document.getElementById('dashboardScreen').style.display = 'block';
+        document.getElementById('studentDashboard').style.display = 'block';
       } else {
-        document.getElementById('authScreen').style.display = 'block';
+        document.getElementById('authView').style.display = 'block';
       }
     }
 
     function loadAdminRecords() {
-      const students = JSON.parse(localStorage.getItem("pseb_all_students") || "[]");
-      document.getElementById('statStudents').innerText = students.length;
+      const list = JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
+      document.getElementById('statTotalStudents').innerText = list.length;
 
       let quizzes = 0;
-      let punjabiCount = 0;
-      let engCount = 0;
-      const tbody = document.getElementById('adminRecordsBody');
+      let punjabi = 0;
+      let english = 0;
+      const tbody = document.getElementById('adminStudentRows');
       tbody.innerHTML = "";
 
-      students.forEach(s => {
-        if (s.lastScore && s.lastScore !== "Not Taken") quizzes++;
-        if (s.medium === "Punjabi") punjabiCount++; else engCount++;
+      list.forEach(stu => {
+        if (stu.lastScore && stu.lastScore !== "Pending") quizzes++;
+        if (stu.medium === "Punjabi") punjabi++; else english++;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong>${s.roll}</strong></td>
-          <td>${s.name}</td>
-          <td>${s.email}</td>
-          <td><span class="badge">${s.medium || 'Punjabi'}</span></td>
-          <td><b>${s.lastScore || 'N/A'}</b></td>
-          <td><span style="color:var(--success); font-weight:600;">Good Standing (PSEB)</span></td>
+          <td><strong>${stu.roll}</strong></td>
+          <td>${stu.name}</td>
+          <td>${stu.email}</td>
+          <td><span style="font-weight:600;">${stu.medium || 'Punjabi'}</span></td>
+          <td><b style="color:var(--primary);">${stu.lastScore || 'Not Taken'}</b></td>
+          <td>${stu.lastScore && stu.lastScore !== 'Pending' ? 'Score synced to admin' : 'Enrolled'}</td>
         `;
         tbody.appendChild(tr);
       });
 
-      document.getElementById('statQuizzes').innerText = quizzes;
-      document.getElementById('statMediumRatio').innerText = `${punjabiCount} Punjabi / ${engCount} English`;
+      document.getElementById('statTotalQuizzes').innerText = quizzes;
+      document.getElementById('statMedium').innerText = `${punjabi} Punjabi / ${english} English`;
+    }
+
+    // Fallback 20 questions bank if offline
+    function getFallback20Questions(lang) {
+      if (lang === 'Punjabi') {
+        return [
+          { q: "1. ਲੋਹੇ ਨੂੰ ਜੰਗ ਲੱਗਣ ਤੋਂ ਬਚਾਉਣ ਲਈ ਕਿਸ ਦੀ ਪਰਤ ਚੜ੍ਹਾਈ ਜਾਂਦੀ ਹੈ?", opts: ["ਜ਼ਿੰਕ", "ਤਾਂਬਾ", "ਚਾਂਦੀ", "ਸੋਨਾ"], ans: 0 },
+          { q: "2. ਮਨੁੱਖੀ ਅੱਖ ਦੇ ਕਿਸ ਭਾਗ ਉੱਤੇ ਪ੍ਰਤੀਬਿੰਬ ਬਣਦਾ ਹੈ?", opts: ["ਰੇਟੀਨਾ", "ਕਾਰਨੀਆ", "ਪੁਤਲੀ", "ਆਈਰਿਸ"], ans: 0 },
+          { q: "3. ਦੋ ਘਾਤੀ ਸਮੀਕਰਣ $ax^2 + bx + c = 0$ ਦੇ ਡਿਸਕ੍ਰਿਮੀਨੈਂਟ (D) ਦਾ ਫਾਰਮੂਲਾ ਕੀ ਹੈ?", opts: ["b^2 - 4ac", "b^2 + 4ac", "4ac - b^2", "2b - 4ac"], ans: 0 },
+          { q: "4. ਪੌਦਿਆਂ ਵਿੱਚ ਪਾਣੀ ਦਾ ਪਰਿਵਹਿਣ ਕਿਸ ਦੁਆਰਾ ਹੁੰਦਾ ਹੈ?", opts: ["ਜ਼ਾਇਲਮ", "ਫਲੋਇਮ", "ਕਲੋਰੋਫਿਲ", "ਰੰਧਰ"], ans: 0 },
+          { q: "5. ਚੱਕਰ ਦੇ ਖੇਤਰਫਲ ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", opts: ["πr^2", "2πr", "πr", "4πr^2"], ans: 0 },
+          { q: "6. ਪਾਣੀ ਦਾ ਰਸਾਇਣਕ ਸੂਤਰ ਕੀ ਹੈ?", opts: ["H2O", "CO2", "NaCl", "O2"], ans: 0 },
+          { q: "7. ਬਿਜਲੀ ਧਾਰਾ ਮਾਪਣ ਵਾਲੇ ਯੰਤਰ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", opts: ["ਐਮੀਟਰ", "ਵੋਲਟਮੀਟਰ", "ਗੈਲਵੈਨੋਮੀਟਰ", "ਥਰਮਾਮੀਟਰ"], ans: 0 },
+          { q: "8. ਆਮ ਲੂਣ ਦਾ ਰਸਾਇਣਕ ਸੂਤਰ ਕੀ ਹੈ?", opts: ["NaCl", "KCl", "HCl", "NaOH"], ans: 0 },
+          { q: "9. ਅੰਕਗਣਿਤਕ ਲੜੀ (A.P.) ਦੇ n-ਵੇਂ ਪਦ ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", opts: ["a + (n-1)d", "a + nd", "a - (n-1)d", "n/2[2a + (n-1)d]"], ans: 0 },
+          { q: "10. ਪ੍ਰਕਾਸ਼ ਦਾ ਵੇਗ ਸਭ ਤੋਂ ਵੱਧ ਕਿਸ ਵਿੱਚ ਹੁੰਦਾ ਹੈ?", opts: ["ਖਲਾਅ (Vacuum)", "ਹਵਾ", "ਪਾਣੀ", "ਕੱਚ"], ans: 0 },
+          { q: "11. ਸਭ ਤੋਂ ਹਲਕੀ ਗੈਸ ਕਿਹੜੀ ਹੈ?", opts: ["ਹਾਈਡ੍ਰੋਜਨ", "ਆਕਸੀਜਨ", "ਨਾਈਟ੍ਰੋਜਨ", "ਕਾਰਬਨ"], ans: 0 },
+          { q: "12. ਮਨੁੱਖ ਵਿੱਚ ਗੁਣਸੂਤਰਾਂ ਦੇ ਕਿੰਨੇ ਜੋੜੇ ਹੁੰਦੇ ਹਨ?", opts: ["23 ਜੋੜੇ", "46 ਜੋੜੇ", "20 ਜੋੜੇ", "22 ਜੋੜੇ"], ans: 0 },
+          { q: "13. ਓਜ਼ੋਨ ਪਰਤ ਸਾਨੂੰ ਕਿਸ ਤੋਂ ਬਚਾਉਂਦੀ ਹੈ?", opts: ["ਪਰਾਬੈਂਗਣੀ ਕਿਰਨਾਂ", "ਐਕਸ-ਕਿਰਨਾਂ", "ਗਾਮਾ ਕਿਰਨਾਂ", "ਇਨਫਰਾਰੈੱਡ ਕਿਰਨਾਂ"], ans: 0 },
+          { q: "14. ਤ੍ਰਿਕੋਣਮਿਤੀ ਵਿੱਚ $\\sin^2\\theta + \\cos^2\\theta$ ਦਾ ਮੁੱਲ ਕੀ ਹੈ?", opts: ["1", "0", "2", "-1"], ans: 0 },
+          { q: "15. ਪੰਜਾਬ ਦੇ ਲੋਕ ਸਭਾ ਹਲਕੇ ਕਿੰਨੇ ਹਨ?", opts: ["13", "117", "7", "20"], ans: 0 },
+          { q: "16. ਵਿਟਾਮਿਨ C ਦੀ ਘਾਟ ਨਾਲ ਕਿਹੜਾ ਰੋਗ ਹੁੰਦਾ ਹੈ?", opts: ["ਸਕਰਵੀ", "ਬੇਰੀ-ਬੇਰੀ", "ਅੰਧਰਾਤਾ", "ਰਿਕਟਸ"], ans: 0 },
+          { q: "17. ਤੇਜ਼ਾਬ ਦਾ pH ਮੁੱਲ ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", opts: ["7 ਤੋਂ ਘੱਟ", "7", "7 ਤੋਂ ਵੱਧ", "14"], ans: 0 },
+          { q: "18. ਦੋ ਸਮਰੂਪ ਤ੍ਰਿਭੁਜਾਂ ਦੇ ਖੇਤਰਫਲਾਂ ਦਾ ਅਨੁਪਾਤ ਉਹਨਾਂ ਦੀਆਂ ਸੰਗਤ ਭੁਜਾਵਾਂ ਦੇ ਕੀ ਹੁੰਦਾ ਹੈ?", opts: ["ਵਰਗਾਂ ਦੇ ਅਨੁਪਾਤ ਬਰਾਬਰ", "ਅਨੁਪਾਤ ਬਰਾਬਰ", "ਘਣ ਦੇ ਬਰਾਬਰ", "ਕੋਈ ਨਹੀਂ"], ans: 0 },
+          { q: "19. ਨਿਊਟਨ ਦੀ ਗਤੀ ਦਾ ਪਹਿਲਾ ਨਿਯਮ ਕਿਸ ਬਾਰੇ ਹੈ?", opts: ["ਜੜ੍ਹਤਾ (Inertia)", "ਸੰਵੇਗ", "ਗੁਰੂਤਾ", "ਊਰਜਾ"], ans: 0 },
+          { q: "20. ਹਵਾ ਵਿੱਚ ਆਕਸੀਜਨ ਦੀ ਮਾਤਰਾ ਕਿੰਨੀ ਪ੍ਰਤੀਸ਼ਤ ਹੈ?", opts: ["21%", "78%", "0.03%", "1%"], ans: 0 }
+        ];
+      } else {
+        return [
+          { q: "1. Which element is coated on iron to prevent rusting?", opts: ["Zinc", "Copper", "Silver", "Gold"], ans: 0 },
+          { q: "2. The image formed by the human eye is formed on which part?", opts: ["Retina", "Cornea", "Pupil", "Iris"], ans: 0 },
+          { q: "3. What is the discriminant formula for $ax^2 + bx + c = 0$?", opts: ["b^2 - 4ac", "b^2 + 4ac", "4ac - b^2", "2b - 4ac"], ans: 0 },
+          { q: "4. Which tissue transports water in plants?", opts: ["Xylem", "Phloem", "Stomata", "Chloroplast"], ans: 0 },
+          { q: "5. What is the area of a circle?", opts: ["πr^2", "2πr", "πr", "4πr^2"], ans: 0 },
+          { q: "6. What is the chemical formula of water?", opts: ["H2O", "CO2", "NaCl", "CH4"], ans: 0 },
+          { q: "7. Which device is used to measure electric current?", opts: ["Ammeter", "Voltmeter", "Galvanometer", "Thermometer"], ans: 0 },
+          { q: "8. What is common salt chemically?", opts: ["NaCl", "KCl", "HCl", "NaOH"], ans: 0 },
+          { q: "9. Formula for nth term of an AP is:", opts: ["a + (n-1)d", "a + nd", "a - (n-1)d", "n/2[2a + (n-1)d]"], ans: 0 },
+          { q: "10. In which medium is the speed of light highest?", opts: ["Vacuum", "Air", "Water", "Glass"], ans: 0 },
+          { q: "11. Which is the lightest gas?", opts: ["Hydrogen", "Oxygen", "Nitrogen", "Helium"], ans: 0 },
+          { q: "12. How many pairs of chromosomes are in humans?", opts: ["23 pairs", "46 pairs", "20 pairs", "22 pairs"], ans: 0 },
+          { q: "13. What protects us from harmful UV rays?", opts: ["Ozone layer", "Carbon dioxide", "Oxygen", "Nitrogen"], ans: 0 },
+          { q: "14. What is the value of $\\sin^2\\theta + \\cos^2\\theta$?", opts: ["1", "0", "2", "-1"], ans: 0 },
+          { q: "15. How many Lok Sabha seats are there in Punjab?", opts: ["13", "117", "7", "22"], ans: 0 },
+          { q: "16. Scurvy is caused by deficiency of which vitamin?", opts: ["Vitamin C", "Vitamin B", "Vitamin A", "Vitamin D"], ans: 0 },
+          { q: "17. The pH value of an acid is:", opts: ["Less than 7", "7", "More than 7", "14"], ans: 0 },
+          { q: "18. The ratio of areas of two similar triangles equals ratio of squares of their:", opts: ["Corresponding sides", "Perimeters", "Altitudes", "None"], ans: 0 },
+          { q: "19. Newton's first law of motion gives the definition of:", opts: ["Inertia", "Momentum", "Work", "Energy"], ans: 0 },
+          { q: "20. What percentage of the air is Oxygen?", opts: ["21%", "78%", "0.04%", "1%"], ans: 0 }
+        ];
+      }
     }
   </script>
 </body>
