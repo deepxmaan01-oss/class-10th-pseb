@@ -261,17 +261,28 @@
     </div>
   </main>
 
-  <script>
-    // System Configurations
+  <script type="module">
+    // 1. Import official Firebase Web SDK modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // 2. Configure active Firebase project credentials
+    const firebaseConfig = {
+      projectId: "quizmap-f0b2d",
+      databaseURL: "https://quizmap-f0b2d-default-rtdb.firebaseio.com"
+    };
+
+    // Initialize Firebase SDK
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // System credentials & API keys
     const GEMINI_API_KEY = "AIzaSyAMMPZQuJpBFt-JrQpKRnCJYyp5hoVBuK4";
     const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-    
-    // Live Cloud Database (Universal REST Gateway for Firebase Sync)
-    const CLOUD_DB_BASE = "https://pseb-10th-portal-default-rtdb.firebaseio.com/students";
-    
     const ADMIN_EMAIL = "deepxmaan01@gmail.com";
     const ADMIN_PASS = "deep@2012";
 
+    // App runtime state
     let activeStudent = null;
     let currentOtp = "";
     let draftProfile = null;
@@ -279,7 +290,7 @@
     let currentQIdx = 0;
     let runningScore = 0;
 
-    // Check persistent user session on load
+    // Restore persistent login on load
     window.addEventListener('DOMContentLoaded', () => {
       const persisted = localStorage.getItem("pseb_persisted_profile");
       if (persisted) {
@@ -288,35 +299,27 @@
       }
     });
 
-    // Helper: Push & Fetch Live Firebase Cloud Data
+    // 3. Firebase Cloud Sync Operations
     async function syncStudentToCloud(studentData) {
       try {
-        // Sanitize email as key
-        const key = studentData.roll || studentData.email.replace(/[.@$#\[\]]/g, "_");
-        await fetch(`${CLOUD_DB_BASE}/${key}.json`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(studentData)
-        });
+        const key = String(studentData.roll || studentData.email.replace(/[.@$#\[\]]/g, "_"));
+        await set(ref(db, `students/${key}`), studentData);
       } catch (err) {
-        console.warn("Cloud sync fallback:", err);
+        console.error("Firebase write error:", err);
       }
     }
 
     async function fetchAllStudentsFromCloud() {
       try {
-        const response = await fetch(`${CLOUD_DB_BASE}.json`);
-        if (!response.ok) return [];
-        const data = await response.json();
-        if (!data) return [];
-        return Object.values(data);
+        const snapshot = await get(ref(db, "students"));
+        return snapshot.exists() ? Object.values(snapshot.val()) : [];
       } catch (e) {
-        console.warn("Cloud fetch error:", e);
+        console.error("Firebase read error:", e);
         return JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
       }
     }
 
-    // Step 1: Submit Registration with Phone OTP & Native SMS integration
+    // 4. Student Registration & OTP Verification
     function submitRegistration() {
       const name = document.getElementById('stuName').value.trim();
       const roll = document.getElementById('stuRoll').value.trim();
@@ -334,24 +337,31 @@
       }
 
       currentOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      draftProfile = { name, roll, phone, class: "10th Class", email, lastScore: "Not Taken", medium: "Punjabi", registeredAt: new Date().toISOString() };
+      draftProfile = {
+        name,
+        roll,
+        phone,
+        class: "10th Class",
+        email,
+        lastScore: "Not Taken",
+        medium: "Punjabi",
+        registeredAt: new Date().toISOString()
+      };
 
       document.getElementById('targetPhoneLabel').innerText = phone;
       document.getElementById('targetEmailLabel').innerText = email;
       document.getElementById('regFormArea').style.display = 'none';
       document.getElementById('verifyFormArea').style.display = 'block';
 
-      // Setup Direct SMS protocol trigger
       const smsBody = encodeURIComponent(`Your PSEB 10th Portal verification OTP is: ${currentOtp}`);
       document.getElementById('btnOpenSmsApp').onclick = function() {
         window.location.href = `sms:${phone}?body=${smsBody}`;
       };
 
-      // Native WebOTP API integration for mobile devices
       if ('OTPCredential' in window) {
         const ac = new AbortController();
         navigator.credentials.get({
-          otp: { transport:['sms'] },
+          otp: { transport: ['sms'] },
           signal: ac.signal
         }).then(otp => {
           if (otp && otp.code) {
@@ -361,11 +371,9 @@
         }).catch(err => console.log(err));
       }
 
-      // Automatically launch native SMS application to deliver code to device
       window.location.href = `sms:${phone}?body=${smsBody}`;
     }
 
-    // Step 2: Verify Code and Persist Permanently in Cloud + Local Device
     async function verifyOtpCode() {
       const val = document.getElementById('inputOtp').value.trim();
       if (!currentOtp || val !== currentOtp) {
@@ -375,17 +383,16 @@
 
       const btn = document.getElementById('btnVerify');
       btn.disabled = true;
-      btn.innerHTML = `<span class="loader"></span> Saving to Cloud...`;
+      btn.innerHTML = `<span class="loader"></span> Saving to Firebase...`;
 
       activeStudent = draftProfile;
-      
-      // 1. Save to cloud database (Firebase)
+
+      // Push to Firebase Realtime Database
       await syncStudentToCloud(activeStudent);
 
-      // 2. Persist in local storage so OTP is never required again
+      // Save locally so the student does not have to log in or verify OTP again
       localStorage.setItem("pseb_persisted_profile", JSON.stringify(activeStudent));
 
-      // Local mirror
       let all = JSON.parse(localStorage.getItem("pseb_master_students") || "[]");
       all = all.filter(s => s.email !== activeStudent.email);
       all.push(activeStudent);
@@ -427,6 +434,7 @@
       else if (t === 'info') { document.getElementById('tabInfo').style.display = 'block'; event.currentTarget.classList.add('active'); }
     }
 
+    // 5. Gemini API Handler
     async function requestGemini(promptText) {
       const response = await fetch(GEMINI_URL, {
         method: "POST",
@@ -442,7 +450,7 @@
       return data.candidates[0].content.parts[0].text;
     }
 
-    // Dynamic Daily 20-Question Quiz Generator
+    // 6. Dynamic Daily 20-Question Quiz
     async function startDaily20Quiz() {
       const lang = document.getElementById('quizLanguage').value;
       const todayDate = new Date().toISOString();
@@ -534,16 +542,15 @@ Format:
       const finalScoreStr = `${runningScore}/${quizSet.length}`;
       document.getElementById('quizFinalScore').innerText = finalScoreStr;
 
-      // Update student profile with latest test result
       activeStudent.lastScore = finalScoreStr;
       activeStudent.medium = document.getElementById('quizLanguage').value;
       localStorage.setItem("pseb_persisted_profile", JSON.stringify(activeStudent));
 
-      // Push updated score to live Cloud Database (Firebase)
+      // Update real-time score in Firebase
       await syncStudentToCloud(activeStudent);
     }
 
-    // Punjabi AI Doubt Resolution
+    // 7. Punjabi AI Doubt Resolution
     async function askDoubt() {
       const input = document.getElementById('txtDoubt');
       const question = input.value.trim();
@@ -577,7 +584,7 @@ Format:
       chatList.scrollTop = chatList.scrollHeight;
     }
 
-    // Handwritten Copy Checker with Image Input
+    // 8. Handwritten Copy Evaluator
     async function gradeAnswerCopy() {
       const fileInput = document.getElementById('copyImageFile');
       const subject = document.getElementById('examSubject').value;
@@ -641,7 +648,7 @@ Format the output:
       });
     }
 
-    // Admin Panel (Live Firebase Sync)
+    // 9. Admin Panel Authentication & Live Cloud Query
     async function openAdminModal() {
       const email = prompt("Enter Admin Email:");
       const pass = prompt("Enter Admin Password:");
@@ -667,9 +674,8 @@ Format the output:
 
     async function loadAdminRecords() {
       const tbody = document.getElementById('adminStudentRows');
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:1.5rem;"><span class="loader"></span> Loading student records live from Firebase cloud...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:1.5rem;"><span class="loader"></span> Fetching student records from Firebase project (quizmap-f0b2d)...</td></tr>`;
 
-      // Fetch live cross-device student database
       const list = await fetchAllStudentsFromCloud();
       document.getElementById('statTotalStudents').innerText = list.length;
 
@@ -679,7 +685,7 @@ Format the output:
       tbody.innerHTML = "";
 
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:1rem;">No registered students yet in cloud database.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:1rem;">No registered students found in Firebase Realtime Database.</td></tr>`;
         return;
       }
 
@@ -695,7 +701,7 @@ Format the output:
           <td>${stu.email || 'N/A'}</td>
           <td><span style="font-weight:600;">${stu.medium || 'Punjabi'}</span></td>
           <td><b style="color:var(--primary);">${stu.lastScore || 'Not Taken'}</b></td>
-          <td><span style="color:var(--success); font-weight:700;">Synced to Cloud</span></td>
+          <td><span style="color:var(--success); font-weight:700;">Live in Firebase</span></td>
         `;
         tbody.appendChild(tr);
       });
@@ -704,6 +710,7 @@ Format the output:
       document.getElementById('statMedium').innerText = `${punjabi} Punjabi / ${english} English`;
     }
 
+    // 10. Fallback Bank
     function getFallback20(lang) {
       if (lang === 'Punjabi') {
         return [
@@ -753,6 +760,19 @@ Format the output:
         ];
       }
     }
+
+    // 11. Bind all module-scoped functions to global window object
+    window.submitRegistration = submitRegistration;
+    window.verifyOtpCode = verifyOtpCode;
+    window.logout = logout;
+    window.switchTab = switchTab;
+    window.startDaily20Quiz = startDaily20Quiz;
+    window.submitAnswer = submitAnswer;
+    window.askDoubt = askDoubt;
+    window.gradeAnswerCopy = gradeAnswerCopy;
+    window.openAdminModal = openAdminModal;
+    window.exitAdmin = exitAdmin;
+    window.loadAdminRecords = loadAdminRecords;
   </script>
 </body>
 </html>
